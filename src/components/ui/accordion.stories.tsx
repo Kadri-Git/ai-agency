@@ -19,9 +19,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: {},
-  render: () => (
-    <Accordion type="single" collapsible className="w-[400px]">
+  args: {
+    type: 'single',
+    collapsible: true,
+  },
+  render: (args) => (
+    <Accordion {...args} className="w-[400px]">
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>
@@ -45,9 +48,11 @@ export const Default: Story = {
 }
 
 export const Multiple: Story = {
-  args: {},
-  render: () => (
-    <Accordion type="multiple" className="w-[400px]">
+  args: {
+    type: 'multiple',
+  },
+  render: (args) => (
+    <Accordion {...args} className="w-[400px]">
       <AccordionItem value="item-1">
         <AccordionTrigger>Can I open multiple items?</AccordionTrigger>
         <AccordionContent>
@@ -71,11 +76,14 @@ export const Multiple: Story = {
 }
 
 export const FAQ: Story = {
-  args: {},
-  render: () => (
+  args: {
+    type: 'single',
+    collapsible: true,
+  },
+  render: (args) => (
     <div className="w-[500px]">
       <h2 className="text-xl font-semibold mb-4">Frequently Asked Questions</h2>
-      <Accordion type="single" collapsible>
+      <Accordion {...args}>
         <AccordionItem value="item-1">
           <AccordionTrigger>What payment methods do you accept?</AccordionTrigger>
           <AccordionContent>
