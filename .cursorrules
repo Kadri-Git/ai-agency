@@ -1,0 +1,562 @@
+# Next Vibe Starter - Cursor Rules
+
+You are an expert in Next.js, React, TypeScript, and Tailwind CSS. This project is a "Design First" starter kit optimized for AI-assisted (vibe) coding.
+
+## Who Is This For
+
+This starter kit is built for **vibe coders** - people who build websites by describing what they want to an AI and letting it write the code.
+
+The typical user:
+- Has ideas but limited coding experience
+- Uses AI tools like Cursor, ChatGPT, or Claude to write code
+- Wants to build real websites and apps without learning programming from scratch
+- Prefers visual tools (like Storybook) over reading documentation
+- Values speed and simplicity over understanding every technical detail
+
+When helping these users:
+- Explain things in plain English, not developer jargon
+- Show working examples they can copy and modify
+- Avoid overwhelming them with options or edge cases
+- Celebrate small wins - every working feature is progress
+- If something breaks, help them fix it without making them feel bad
+
+Remember: Their job is to have ideas and give feedback. Your job is to turn those ideas into working code.
+
+## Project Context
+
+This is a production-ready Next.js starter with:
+- Next.js 16 with App Router
+- TypeScript for type safety
+- Tailwind CSS 4 for styling
+- Shadcn/ui components in `src/components/ui/`
+- Storybook for component development
+- Zustand for state management
+- React Hook Form + Zod for forms
+- next-themes for dark mode
+- Sonner for toast notifications
+- Lucide React for icons
+- ESLint + Prettier for code formatting
+- Husky + lint-staged for pre-commit checks
+- Vitest + Playwright for testing
+- Motion (Framer Motion) for animations
+
+## Design Principles
+
+### 1. Design First
+Always check Storybook (`npm run storybook`) before building. Components exist there for a reason. Reference existing stories when creating new features.
+
+### 2. Use Existing Components
+ALWAYS use components from `@/components/ui/` before creating new ones. These are pre-built, accessible, and tested:
+- Button, Input, Label, Checkbox
+- Card, Badge, Avatar
+- Dialog, Dropdown Menu
+- Separator, Sonner (toasts)
+
+Only create one-off components if absolutely necessary. If you need a new component, check if Shadcn has it first: `npx shadcn@latest add [component]`
+
+### 3. Tailwind Only
+Use Tailwind classes for all styling. Never write raw CSS unless absolutely required for animations.
+- Use Tailwind color classes, not hex codes
+- Follow the spacing scale (p-4, m-6, gap-8)
+- Use responsive prefixes (sm:, md:, lg:)
+- Dark mode with `dark:` prefix is automatic
+- Avoid purple, pink, and violet gradients unless the user explicitly requests them
+
+### 4. Typography Excellence
+Typography makes or breaks a design:
+- Use `tracking-tight` for headings
+- Use `leading-relaxed` for body text
+- Muted text: `text-muted-foreground`
+- Size hierarchy: text-sm, text-base, text-lg, text-xl, text-2xl, text-3xl
+
+### 5. Optimistic UI
+This app should feel instant. Do what the user expects immediately, then sync in the background:
+- Show success states before server confirms
+- Use `useTransition` for non-blocking updates
+- Avoid loading spinners when possible
+- Use skeleton states only for initial loads
+- Mutations should feel instant with rollback on error
+
+### 6. Accessibility
+- Always include proper ARIA labels
+- Ensure keyboard navigation works
+- Use semantic HTML elements
+- Test with screen readers in mind
+
+## Code Patterns
+
+### File Structure
+```
+src/
+  app/           # Pages and API routes
+  components/
+    ui/          # Shadcn components (do not modify unless necessary)
+    layout/      # Layout components (Header, Footer, etc.)
+    forms/       # Form components
+  lib/           # Utilities
+  store/         # Zustand stores
+```
+
+### Component Template
+```tsx
+'use client' // Only if using hooks/state
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+
+interface Props {
+  // Define props with TypeScript
+}
+
+export function ComponentName({ prop }: Props) {
+  return (
+    // JSX here
+  )
+}
+```
+
+### Form Pattern
+```tsx
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+
+const schema = z.object({
+  email: z.string().email(),
+})
+
+type FormData = z.infer<typeof schema>
+```
+
+### State Pattern (Zustand)
+```tsx
+import { create } from 'zustand'
+
+interface Store {
+  value: string
+  setValue: (v: string) => void
+}
+
+export const useStore = create<Store>((set) => ({
+  value: '',
+  setValue: (v) => set({ value: v }),
+}))
+```
+
+## Zustand Best Practices
+
+Zustand is our state management tool. It is simple and powerful.
+
+### When to Use Zustand
+- Sharing data between components that are not parent/child
+- Global UI state (sidebar open, theme, modals)
+- User session data
+- Shopping cart, favorites, etc.
+
+### When NOT to Use Zustand
+- Local component state (use `useState` instead)
+- Server data (use React Query or server components)
+- Form state (use React Hook Form)
+
+### Store Structure
+Keep stores focused. One store per domain:
+```tsx
+// Good: Separate stores
+src/store/useCartStore.ts
+src/store/useUserStore.ts
+src/store/useUIStore.ts
+
+// Bad: One giant store
+src/store/useEverythingStore.ts
+```
+
+### Accessing State
+Only select what you need to prevent unnecessary re-renders:
+```tsx
+// Good: Select specific values
+const count = useCartStore((state) => state.count)
+const addItem = useCartStore((state) => state.addItem)
+
+// Bad: Select entire store
+const store = useCartStore()
+```
+
+### Actions Inside Store
+Keep logic in the store, not in components:
+```tsx
+// Good: Logic in store
+const useCartStore = create((set, get) => ({
+  items: [],
+  addItem: (item) => {
+    const exists = get().items.find(i => i.id === item.id)
+    if (exists) {
+      // Update quantity
+    } else {
+      set({ items: [...get().items, item] })
+    }
+  }
+}))
+
+// Bad: Logic in component
+const Component = () => {
+  const items = useCartStore(s => s.items)
+  const setItems = useCartStore(s => s.setItems)
+  
+  const addItem = (item) => {
+    // Logic here is harder to reuse
+  }
+}
+```
+
+### Client Components Only
+Zustand only works in client components:
+```tsx
+'use client' // Required!
+
+import { useCartStore } from '@/store/useCartStore'
+```
+
+## Best Practices for This Codebase
+
+### Starting a New Feature
+1. Check Storybook for existing components
+2. Create the UI first with hardcoded data
+3. Add interactivity with state
+4. Connect to backend last
+
+### Adding a New Page
+```tsx
+// src/app/your-page/page.tsx
+export default function YourPage() {
+  return <div>Your content</div>
+}
+// Automatically available at /your-page
+```
+
+### Adding a New Component
+1. Check if Shadcn has it: `npx shadcn@latest add [name]`
+2. If not, create in `src/components/` (not in `ui/`)
+3. Create a Storybook story for it
+
+### Writing Tests
+Write tests for important logic. Use Vitest for unit tests and Playwright for E2E:
+```tsx
+// Unit test example (*.test.ts)
+import { describe, it, expect } from 'vitest'
+import { calculateTotal } from './cart'
+
+describe('calculateTotal', () => {
+  it('sums item prices correctly', () => {
+    const items = [{ price: 10 }, { price: 20 }]
+    expect(calculateTotal(items)).toBe(30)
+  })
+
+  it('returns 0 for empty cart', () => {
+    expect(calculateTotal([])).toBe(0)
+  })
+})
+```
+
+Run tests with `npm test`. Always run tests after making changes to ensure nothing broke.
+
+### Styling Order
+1. Layout first (flex, grid, padding, margin)
+2. Colors and backgrounds
+3. Typography
+4. Borders and shadows
+5. Hover/focus states
+6. Dark mode adjustments
+
+### Responsive Design
+Mobile-first approach:
+```tsx
+// Base styles for mobile, then add larger breakpoints
+<div className="p-4 md:p-6 lg:p-8">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+```
+
+## Scalable Code Practices
+
+### Naming Conventions
+Names should explain what things do:
+```tsx
+// Good: Clear and descriptive
+const isUserLoggedIn = true
+const handleSubmitForm = () => {}
+const userProfileData = {}
+function calculateTotalPrice(items) {}
+
+// Bad: Vague or abbreviated
+const flag = true
+const handle = () => {}
+const data = {}
+function calc(i) {}
+```
+
+### Keep Functions Small
+Each function should do one thing:
+```tsx
+// Good: Single responsibility
+function validateEmail(email: string): boolean { }
+function sendWelcomeEmail(user: User): Promise<void> { }
+function createUser(data: UserData): User { }
+
+// Bad: Function doing too much
+function createUserAndSendEmailAndLogAnalytics(data) { }
+```
+
+### Early Returns
+Exit early to avoid deep nesting:
+```tsx
+// Good: Early returns
+function processUser(user: User | null) {
+  if (!user) return null
+  if (!user.isActive) return null
+  
+  return doSomething(user)
+}
+
+// Bad: Deep nesting
+function processUser(user: User | null) {
+  if (user) {
+    if (user.isActive) {
+      return doSomething(user)
+    }
+  }
+  return null
+}
+```
+
+### Error Handling
+Handle errors gracefully:
+```tsx
+// Good: Try-catch with user feedback
+async function fetchData() {
+  try {
+    const data = await api.get('/users')
+    return data
+  } catch (error) {
+    toast.error('Could not load users. Please try again.')
+    return null
+  }
+}
+
+// Always provide fallbacks
+const userName = user?.name ?? 'Anonymous'
+```
+
+### Avoid Magic Numbers
+Use named constants:
+```tsx
+// Good: Named constants
+const MAX_RETRY_ATTEMPTS = 3
+const ITEMS_PER_PAGE = 10
+const ANIMATION_DURATION_MS = 300
+
+// Bad: Magic numbers
+if (attempts > 3) { }
+const items = data.slice(0, 10)
+```
+
+### DRY (Don't Repeat Yourself)
+Extract repeated code:
+```tsx
+// Good: Reusable function
+function formatPrice(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`
+}
+
+// Use it everywhere
+<span>{formatPrice(item.price)}</span>
+<span>{formatPrice(cart.total)}</span>
+```
+
+### Colocation
+Keep related code together:
+```
+// Good: Feature-based structure
+src/features/checkout/
+  CheckoutForm.tsx
+  CheckoutSummary.tsx
+  useCheckout.ts
+  checkout.types.ts
+
+// Bad: Type-based structure (harder to navigate)
+src/components/CheckoutForm.tsx
+src/hooks/useCheckout.ts
+src/types/checkout.types.ts
+```
+
+### Type Safety
+Let TypeScript help you:
+```tsx
+// Good: Explicit types
+interface Product {
+  id: string
+  name: string
+  price: number
+  inStock: boolean
+}
+
+function addToCart(product: Product): void { }
+
+// Use type inference when obvious
+const count = 0 // TypeScript knows it's a number
+const items = [] as Product[] // Be explicit for empty arrays
+```
+
+### Async Patterns
+Handle async operations properly:
+```tsx
+// Good: Loading and error states
+const [data, setData] = useState<User | null>(null)
+const [isLoading, setIsLoading] = useState(true)
+const [error, setError] = useState<string | null>(null)
+
+// Good: Promise.all for parallel requests
+const [users, products] = await Promise.all([
+  fetchUsers(),
+  fetchProducts()
+])
+
+// Good: Cleanup in useEffect
+useEffect(() => {
+  let cancelled = false
+  
+  fetchData().then(data => {
+    if (!cancelled) setData(data)
+  })
+  
+  return () => { cancelled = true }
+}, [])
+```
+
+### Component Composition
+Build complex UIs from simple pieces:
+```tsx
+// Good: Composable components
+<Card>
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+  </CardHeader>
+  <CardContent>Content</CardContent>
+  <CardFooter>
+    <Button>Action</Button>
+  </CardFooter>
+</Card>
+
+// Bad: Monolithic component with many props
+<Card
+  title="Title"
+  content="Content"
+  footerButtonText="Action"
+  footerButtonOnClick={() => {}}
+  showHeader={true}
+  showFooter={true}
+/>
+```
+
+### Props Interface
+Define clear component contracts:
+```tsx
+interface ButtonProps {
+  children: React.ReactNode
+  variant?: 'primary' | 'secondary' | 'danger'
+  size?: 'sm' | 'md' | 'lg'
+  disabled?: boolean
+  onClick?: () => void
+}
+
+// Destructure with defaults
+function Button({ 
+  children, 
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  onClick 
+}: ButtonProps) { }
+```
+
+### Performance Basics
+Optimize when needed:
+```tsx
+// Memoize expensive calculations
+const sortedItems = useMemo(() => 
+  items.sort((a, b) => a.name.localeCompare(b.name)),
+  [items]
+)
+
+// Memoize callbacks passed to children
+const handleClick = useCallback(() => {
+  doSomething(id)
+}, [id])
+
+// Lazy load heavy components
+const HeavyChart = lazy(() => import('./HeavyChart'))
+```
+
+### Environment Variables
+Keep secrets safe:
+```tsx
+// .env.local (never commit this)
+DATABASE_URL=xxx
+API_SECRET=xxx
+
+// For client-side, prefix with NEXT_PUBLIC_
+NEXT_PUBLIC_API_URL=https://api.example.com
+
+// Access in code
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+```
+
+### Comments
+Write comments that explain WHY, not WHAT:
+```tsx
+// Bad: Explains what (obvious from code)
+// Loop through users
+users.forEach(user => { })
+
+// Good: Explains why
+// We filter inactive users first because the API 
+// returns them but they shouldn't see premium features
+const activeUsers = users.filter(u => u.isActive)
+```
+
+### Git Commits
+Write clear commit messages:
+```
+// Good
+feat: add shopping cart functionality
+fix: resolve checkout button not responding on mobile
+refactor: extract price formatting to utility function
+
+// Bad
+fixed stuff
+updates
+wip
+```
+
+## Communication Style
+
+When explaining code to users:
+- Use simple, beginner-friendly language
+- Avoid jargon - explain what things do, not what they are called
+- Be encouraging and supportive
+- Give concrete examples
+
+## Don'ts
+
+- Don't create new UI components if Shadcn has them
+- Don't use inline styles
+- Don't use CSS modules
+- Don't skip TypeScript types
+- Don't forget dark mode support
+- Don't add loading spinners for fast operations
+- Don't over-engineer simple features
+- Don't ignore TypeScript errors
+- Don't use `any` type unless absolutely necessary
+- Don't forget to handle loading and error states
+- Don't leave console.logs in production code
+- Don't store secrets in code (use environment variables)
+- Don't use setTimeout/delays to fix race conditions or timing bugs - find the real cause instead (wait for actual data, use proper async/await, or fix the dependency chain)
+

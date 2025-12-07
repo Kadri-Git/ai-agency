@@ -1,0 +1,60 @@
+import type { Meta, StoryObj } from '@storybook/react'
+import { Switch } from './switch'
+import { Label } from './label'
+
+const meta = {
+  title: 'UI/Switch',
+  component: Switch,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+} satisfies Meta<typeof Switch>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {
+  args: {},
+}
+
+export const Checked: Story = {
+  args: {
+    defaultChecked: true,
+  },
+}
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
+}
+
+export const WithLabel: Story = {
+  render: () => (
+    <div className="flex items-center space-x-2">
+      <Switch id="airplane-mode" />
+      <Label htmlFor="airplane-mode">Airplane Mode</Label>
+    </div>
+  ),
+}
+
+export const SettingsExample: Story = {
+  render: () => (
+    <div className="space-y-4 w-[300px]">
+      <div className="flex items-center justify-between">
+        <Label htmlFor="notifications">Push Notifications</Label>
+        <Switch id="notifications" defaultChecked />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label htmlFor="emails">Email Updates</Label>
+        <Switch id="emails" />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label htmlFor="marketing">Marketing Emails</Label>
+        <Switch id="marketing" />
+      </div>
+    </div>
+  ),
+}
+
