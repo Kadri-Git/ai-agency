@@ -17,12 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Citrus - AI Visibility Agency | Get Cited by ChatGPT, Gemini, Claude & Grok',
   description:
-    'Citrus helps businesses improve their AI visibility and get cited by large language models including ChatGPT by OpenAI, Google Gemini, Anthropic Claude, and X Grok. We specialize in AI citation optimization, strategic content architecture, and helping companies become discoverable when users ask AI assistants about products and services. Learn how AI agents discover and cite businesses, and how to optimize your online presence for better AI visibility across major LLM platforms.',
+    'Citrus helps e-commerce businesses improve their AI visibility and get cited by large language models including ChatGPT by OpenAI, Google Gemini, Anthropic Claude, and X Grok. We specialize in AI citation optimization for online stores, strategic content architecture, and helping e-commerce businesses become discoverable when shoppers ask AI assistants about products.',
   keywords: [
     'AI visibility',
-    'AI citation',
     'ChatGPT visibility',
-    'ChatGPT citation',
     'Gemini visibility',
     'Claude visibility',
     'Grok visibility',
@@ -40,17 +38,10 @@ export const metadata: Metadata = {
     'AI agent recommendations',
     'business discovery through AI',
     'AI-powered search optimization',
-    'AI visibility optimization',
-    'get cited by ChatGPT',
-    'AI citation strategy',
-    'how to get cited by AI',
-    'AI agent citation',
-    'ChatGPT business citation',
-    'improve AI visibility',
   ],
   openGraph: {
     title: 'Citrus - AI Visibility Agency | Get Cited by ChatGPT, Gemini, Claude & Grok',
-    description: 'Citrus helps businesses improve their AI visibility and get cited by large language models. Learn how AI agents discover businesses and optimize your presence for ChatGPT, Gemini, Claude, and Grok.',
+    description: 'Citrus helps e-commerce businesses improve their AI visibility and get cited by large language models. Learn how AI agents discover e-commerce stores and optimize your presence for ChatGPT, Gemini, Claude, and Grok.',
     type: 'website',
   },
 }

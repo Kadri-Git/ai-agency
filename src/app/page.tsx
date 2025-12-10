@@ -76,11 +76,9 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              As artificial intelligence becomes the primary way people discover information, businesses face a critical challenge: 
-              when customers ask AI assistants about products, services, or solutions, will your company be the one mentioned? 
-              Large language models like ChatGPT, Google Gemini, Anthropic Claude, and X Grok are reshaping how people find and 
-              evaluate businesses. These AI systems learn from vast amounts of online content—your website, industry publications, 
-              reviews, and more—to provide answers to user queries.
+              As AI becomes the primary way people discover products, e-commerce businesses face a critical challenge: when shoppers ask AI 
+              assistants about products, will your store be mentioned? Large language models like ChatGPT, Gemini, Claude, and Grok learn from 
+              online content to provide product recommendations.
             </motion.p>
             
             <motion.p 
@@ -89,11 +87,9 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              At Citrus, we specialize in AI visibility optimization. We help companies understand how AI agents discover and cite 
-              businesses, then optimize their online presence to increase the likelihood of being recommended. Our approach combines 
-              content strategy, technical optimization, and strategic positioning to help your brand become more discoverable across 
-              major AI platforms. Whether you're an e-commerce store, SaaS company, or service provider, being visible to AI agents 
-              is becoming essential for growth.
+              At Citrus, we specialize in AI visibility optimization for e-commerce businesses. We help online stores understand how AI agents 
+              discover and cite e-commerce brands, then optimize their online presence to increase product recommendations. Our approach combines 
+              content strategy, technical optimization, and positioning to make your e-commerce store discoverable across major AI platforms.
             </motion.p>
             
             <motion.div 
@@ -166,25 +162,23 @@ export default function HomePage() {
               </h2>
               <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
                 <p>
-                  AI visibility refers to how discoverable and citable your business is when users interact with large language models 
-                  (LLMs) like ChatGPT, Gemini, Claude, and Grok. Unlike traditional search engine optimization, which focuses on ranking 
-                  in search results, AI visibility is about being recommended, cited, and mentioned by AI agents in their responses to user queries.
+                  AI visibility refers to how discoverable and citable your e-commerce store is when users interact with large language models 
+                  like ChatGPT, Gemini, Claude, and Grok. Unlike SEO, which focuses on ranking in search results, AI visibility is about 
+                  being recommended and cited by AI agents when shoppers ask about products.
                 </p>
                 <p>
-                  When someone asks an AI assistant a question—whether it's "What's the best payroll software for small businesses?" 
-                  or "Where can I find sustainable fashion brands?"—the AI searches through its training data and knowledge base to provide 
-                  an answer. The companies that get mentioned are those that have established authority, clear positioning, and comprehensive 
-                  online presence that AI systems can understand and reference.
+                  When someone asks an AI assistant about products, the AI searches through its training data to provide recommendations. The e-commerce 
+                  stores that get mentioned are those with established authority, clear product positioning, and comprehensive online presence that AI 
+                  systems can understand and reference.
                 </p>
                 <p>
-                  This shift represents a fundamental change in how people discover businesses. Traditional search results show multiple options 
-                  for users to click through, but AI responses often provide direct answers with specific company recommendations. This means 
-                  that if your business isn't being cited by AI agents, you're missing out on a growing channel of customer discovery.
+                  This shift represents a fundamental change in how people discover products. Traditional search shows multiple options, but AI 
+                  responses provide direct answers with specific store and product recommendations. If your e-commerce store isn't being cited by AI 
+                  agents, you're missing out on a growing channel of customer discovery.
                 </p>
                 <p>
-                  The challenge for businesses is that AI systems don't work like search engines. They don't simply index and rank content. 
-                  Instead, they understand context, relationships, and authority signals. They learn from patterns in how information is 
-                  presented, how companies are described, and what sources are considered authoritative in different industries.
+                  AI systems don't work like search engines. They understand context, relationships, and authority signals. They learn from patterns 
+                  in how product information is presented and what e-commerce sources are considered authoritative.
                 </p>
               </div>
             </motion.div>
@@ -206,7 +200,7 @@ export default function HomePage() {
               The New Reality
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2 mt-4">
-              The landscape of customer discovery is changing rapidly. Here's what many businesses are experiencing versus what's possible 
+              The landscape of product discovery is changing rapidly. Here's what many e-commerce businesses are experiencing versus what's possible 
               with strategic AI visibility optimization.
             </p>
           </motion.div>
@@ -429,7 +423,7 @@ export default function HomePage() {
               className="p-6 sm:p-8 rounded-lg border-2 border-primary/30 bg-primary/5"
             >
               <h3 className="text-2xl sm:text-3xl font-bold mb-2">Growth Plan</h3>
-              <p className="text-3xl sm:text-4xl font-bold text-primary mb-6">$7,500/mo</p>
+              <p className="text-3xl sm:text-4xl font-bold text-primary mb-6">$500/mo</p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
@@ -503,13 +497,13 @@ export default function HomePage() {
               The People Behind Your Success
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
-              We're not just a service—we're your partners in growth, committed to understanding your unique journey
+              We're not just a service—we're your partners in growth, committed to understanding your unique e-commerce journey
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
             {[
-              { name: 'Kadri Kaasik', role: 'Business Development & Partnerships', initials: 'KK', photo: '/Kadrikaasik.jpg', desc: 'Kadri believes every financial institution has a story worth telling. She listens deeply, builds genuine relationships, and ensures you feel supported every step of the way. Her passion is helping you connect with the clients who need exactly what you offer.', badges: ['Business Development', 'Partnerships', 'Customer Service'] },
-              { name: 'Andrias Seeberg', role: 'Marketing & Technical Solutions', initials: 'AS', photo: '/andrias.jpg', desc: 'Andrias combines technical expertise with genuine care for your success. He sees the big picture while paying attention to every detail, crafting strategies that feel authentic to who you are. His goal? Making sure AI agents understand your financial institution as well as you do.', badges: ['Marketing', 'Technical Solutions', 'AI Integration'] },
+              { name: 'Kadri Kaasik', role: 'Business Development & Partnerships', initials: 'KK', photo: '/Kadrikaasik.jpg', desc: 'Kadri believes every e-commerce store has a story worth telling. She listens deeply, builds genuine relationships, and ensures you feel supported every step of the way. Her passion is helping you connect with the shoppers who need exactly what you offer.', badges: ['Business Development', 'Partnerships', 'Customer Service'] },
+              { name: 'Andrias Seeberg', role: 'Marketing & Technical Solutions', initials: 'AS', photo: '/andrias.jpg', desc: 'Andrias combines technical expertise with genuine care for your success. He sees the big picture while paying attention to every detail, crafting strategies that feel authentic to who you are. His goal? Making sure AI agents understand your e-commerce store as well as you do.', badges: ['Marketing', 'Technical Solutions', 'AI Integration'] },
             ].map((founder, index) => (
               <motion.div
                 key={founder.name}
@@ -568,33 +562,28 @@ export default function HomePage() {
               </h2>
               <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
                 <p>
-                  Large language models like ChatGPT, Gemini, Claude, and Grok are trained on vast amounts of text data from the internet, 
-                  including websites, articles, documentation, reviews, and more. When a user asks a question, these AI systems don't perform 
-                  a real-time web search in the traditional sense. Instead, they draw from their training data and knowledge base to construct 
-                  responses based on patterns they've learned.
+                  Large language models like ChatGPT, Gemini, Claude, and Grok are trained on vast amounts of text data from the internet. When a 
+                  shopper asks about products, these AI systems draw from their training data to construct responses based on patterns they've learned 
+                  about e-commerce stores and products.
                 </p>
                 <p>
-                  For a business to be cited by an AI agent, several factors come into play. The company needs to have a strong online presence 
-                  with clear, authoritative content. Industry recognition, media coverage, and comprehensive information about products or services 
-                  all contribute to how AI systems understand and reference a business. The way information is structured, the language used to 
-                  describe the company, and the context in which it appears all influence whether an AI will cite it in responses.
+                  For an e-commerce store to be cited by an AI agent, it needs a strong online presence with clear, authoritative product content. Industry 
+                  recognition, media coverage, and comprehensive product information all contribute to how AI systems understand and reference an e-commerce 
+                  business. The way product information is structured and the language used influence whether an AI will cite it.
                 </p>
                 <p>
-                  AI systems are particularly good at recognizing patterns of authority. If a company is frequently mentioned in industry publications, 
-                  has detailed product documentation, receives positive reviews, and maintains a comprehensive online presence, it's more likely to 
-                  be cited. However, simply having a website isn't enough. The content needs to be structured in ways that AI systems can understand, 
-                  extract, and reference meaningfully.
+                  AI systems recognize patterns of authority. E-commerce stores frequently mentioned in industry publications, with detailed product documentation 
+                  and positive reviews, are more likely to be cited. However, simply having an online store isn't enough—product content must be structured in 
+                  ways AI systems can understand and reference meaningfully.
                 </p>
                 <p>
-                  This is where strategic AI visibility optimization comes in. By understanding how AI systems process and reference information, 
-                  businesses can structure their online presence to increase the likelihood of being cited. This involves content strategy, technical 
-                  optimization, and positioning that makes it easier for AI systems to understand what a company does, why it's relevant, and when 
-                  it should be recommended.
+                  Strategic AI visibility optimization helps e-commerce businesses structure their online presence to increase citations. This involves product 
+                  content strategy, technical optimization, and positioning that makes it easier for AI systems to understand what products you offer and when 
+                  your store should be recommended.
                 </p>
                 <p>
-                  It's important to note that AI visibility is different from traditional SEO. While SEO focuses on ranking in search results, 
-                  AI visibility is about being included in AI-generated responses. The metrics are different, the strategies are different, and 
-                  the outcomes are different. A company might rank well in Google search but not be cited by ChatGPT, or vice versa.
+                  AI visibility is different from traditional SEO. While SEO focuses on ranking in search results, AI visibility is about being included 
+                  in AI-generated product recommendations. The metrics, strategies, and outcomes are different for e-commerce businesses.
                 </p>
               </div>
             </motion.div>
@@ -613,20 +602,20 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
-              We Work With Firms Like Yours
+              We Work With E-commerce Stores Like Yours
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
-              Every financial institution has unique needs. Here's how we've helped others, and how we can help you too.
+              Every e-commerce business has unique needs. Here's how we've helped others, and how we can help you too.
             </p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[
-              { icon: DollarSign, title: 'Banks & Credit Unions', desc: 'When someone asks AI about banking services or financial planning, we make sure your institution comes to mind. We understand the trust your clients place in you, and we help AI agents understand that too—all while keeping every detail compliant and secure.' },
-              { icon: TrendingUp, title: 'Investment Institutions & Wealth Management', desc: 'Your clients are using AI to explore investment strategies and find advisors. We help them find you. When someone asks about wealth management or retirement planning, we ensure your financial institution is part of that conversation, presented in a way that reflects your values and expertise.' },
-              { icon: Building2, title: 'Fintech Companies', desc: 'The fintech space moves fast, and we help you keep up. When users ask AI about payment solutions or digital banking, we make sure your innovation gets noticed. We understand the unique challenges of fintech, and we\'re here to help you shine.' },
-              { icon: Shield, title: 'Insurance Companies', desc: 'Insurance is about protection and peace of mind. We help AI agents understand how your company provides that. When prospects research coverage options, we ensure you\'re part of their consideration—presented accurately and in compliance with all regulations.' },
-              { icon: BarChart3, title: 'Financial Advisors & Consultants', desc: 'As an independent advisor or consultant, your personal touch matters. We help AI agents understand what makes your approach unique. When decision-makers use AI to find financial guidance, we make sure they discover someone who truly understands their needs—you.' },
-              { icon: Network, title: 'Payment Processors & Lending Platforms', desc: 'Businesses turn to AI when they need payment solutions or financing. We help them find you. We understand the technical side of what you do, and we help AI agents explain it in ways that resonate with the businesses you serve.' },
+              { icon: ShoppingCart, title: 'Fashion & Apparel Stores', desc: 'When shoppers ask AI about clothing, accessories, or style recommendations, we make sure your store comes to mind. We understand what makes your brand unique, and we help AI agents understand that too—so shoppers discover your products when they need them most.' },
+              { icon: Home, title: 'Home & Lifestyle Brands', desc: 'Shoppers are using AI to find home decor, furniture, and lifestyle products. We help them find you. When someone asks about home improvement or interior design, we ensure your e-commerce store is part of that conversation, presented in a way that reflects your brand and quality.' },
+              { icon: Heart, title: 'Beauty & Wellness Products', desc: 'The beauty and wellness space moves fast, and we help you keep up. When shoppers ask AI about skincare, makeup, or wellness products, we make sure your products get noticed. We understand the unique challenges of e-commerce in this industry, and we\'re here to help you shine.' },
+              { icon: Zap, title: 'Electronics & Tech Stores', desc: 'Tech products are about innovation and reliability. We help AI agents understand how your e-commerce store provides that. When shoppers research the latest gadgets or tech solutions, we ensure you\'re part of their consideration—presented accurately and highlighting your expertise.' },
+              { icon: Briefcase, title: 'B2B E-commerce Platforms', desc: 'As a B2B e-commerce platform, your professional approach matters. We help AI agents understand what makes your service unique. When businesses use AI to find suppliers or wholesale products, we make sure they discover a platform that truly understands their needs—yours.' },
+              { icon: Users, title: 'Niche & Specialty Stores', desc: 'Shoppers turn to AI when they need specific, hard-to-find products. We help them find you. We understand the unique products you offer, and we help AI agents explain them in ways that resonate with the shoppers who need exactly what you sell.' },
             ].map((benefit, index) => (
               <motion.div
                 key={benefit.title}
@@ -668,17 +657,17 @@ export default function HomePage() {
               Why This Matters for Your Growth
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
-              These aren't just features—they're real benefits that help your financial institution connect with the clients who need you most
+              These aren't just features—they're real benefits that help your e-commerce store connect with the shoppers who need you most
             </p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {[
-              { icon: Clock, title: 'Always There When They Need You', desc: 'AI agents never sleep, and neither does your opportunity to be discovered. Whether it\'s 2 AM or 2 PM, someone might be asking AI about financial solutions. We make sure you\'re there, ready to help, whenever that moment comes.' },
-              { icon: Target, title: 'Connecting With People Who Are Ready', desc: 'When someone asks AI a specific financial question, they\'re not just curious—they\'re actively looking for solutions. We help you reach these people at exactly the right moment, when they\'re most ready to engage and most likely to value what you offer.' },
-              { icon: Globe, title: 'One Strategy, Many Platforms', desc: 'You don\'t have to choose which AI platform to focus on. We help you be present across all of them—ChatGPT, Gemini, Claude, Grok—so no matter where your ideal clients turn, they find you. It\'s efficient, effective, and designed to work for you.' },
-              { icon: TrendingUp, title: 'Staying Ahead of the Curve', desc: 'The way people discover financial services is changing, and we want you to be part of that change, not left behind by it. By getting started now, you\'re positioning yourself ahead of competitors and preparing for opportunities that are just around the corner.' },
-              { icon: Shield, title: 'Recommendations That Feel Trusted', desc: 'When AI agents recommend your financial institution, it feels different than traditional advertising. It\'s more like a trusted referral—someone genuinely suggesting you because they understand what you offer and who you serve. That trust translates to better connections and stronger relationships.' },
-              { icon: DollarSign, title: 'Smart Investment, Real Results', desc: 'We believe in showing you the value of what we do. AI visibility often costs less than traditional advertising while reaching people who are genuinely interested. Plus, when paid AI advertising arrives, you\'ll already be positioned to take advantage of it.' },
+              { icon: Clock, title: 'Always There When They Need You', desc: 'AI agents never sleep, and neither does your opportunity to be discovered. Whether it\'s 2 AM or 2 PM, someone might be asking AI about products. We make sure your e-commerce store is there, ready to help, whenever that shopping moment comes.' },
+              { icon: Target, title: 'Connecting With Shoppers Who Are Ready', desc: 'When someone asks AI a specific product question, they\'re not just curious—they\'re actively looking to buy. We help you reach these shoppers at exactly the right moment, when they\'re most ready to purchase and most likely to convert.' },
+              { icon: Globe, title: 'One Strategy, Many Platforms', desc: 'You don\'t have to choose which AI platform to focus on. We help you be present across all of them—ChatGPT, Gemini, Claude, Grok—so no matter where your ideal shoppers turn, they find you. It\'s efficient, effective, and designed to work for your e-commerce business.' },
+              { icon: TrendingUp, title: 'Staying Ahead of the Curve', desc: 'The way people discover products is changing, and we want you to be part of that change, not left behind by it. By getting started now, you\'re positioning your e-commerce store ahead of competitors and preparing for opportunities that are just around the corner.' },
+              { icon: Shield, title: 'Recommendations That Feel Trusted', desc: 'When AI agents recommend your e-commerce store, it feels different than traditional advertising. It\'s more like a trusted referral—someone genuinely suggesting your products because they understand what you offer. That trust translates to better conversions and stronger customer relationships.' },
+              { icon: DollarSign, title: 'Smart Investment, Real Results', desc: 'We believe in showing you the value of what we do. AI visibility often costs less than traditional advertising while reaching shoppers who are genuinely interested in buying. Plus, when paid AI advertising arrives, you\'ll already be positioned to take advantage of it.' },
             ].map((benefit, index) => (
               <motion.div
                 key={benefit.title}
@@ -726,14 +715,14 @@ export default function HomePage() {
             </motion.div>
             <Accordion type="single" collapsible className="w-full">
               {[
-                { q: 'What exactly is AI visibility?', a: 'Think of AI visibility as helping AI agents truly understand your financial institution. When someone asks ChatGPT, Gemini, Claude, or Grok about financial solutions, we make sure your financial institution is part of that conversation. It\'s about being discoverable in a way that feels authentic to who you are, not just being listed somewhere.' },
-                { q: 'How do AI agents actually find firms like mine?', a: 'AI agents learn from everything available online—your website, regulatory filings, industry publications. They recognize patterns and understand context. When someone asks a question, they search through what they know. We help them know you—your strengths, your approach, your values. It\'s like introducing yourself to someone who can recommend you to thousands of ideal clients.' },
-                { q: 'Which AI platforms should we focus on?', a: 'We work with all the major platforms—ChatGPT, Gemini, Claude, Grok, and emerging ones too. Each has its own personality and user base. Rather than choosing just one, we help you be present across all of them. That way, no matter where your ideal clients turn, they find you. We\'ll help you prioritize based on where your clients actually are.' },
-                { q: 'What about AI advertising—is that coming?', a: 'Yes, and we want you to be ready. The major AI platforms are building advertising networks designed with financial services in mind. Soon, you\'ll be able to reach clients exactly when they\'re asking AI about financial solutions. We\'re already helping firms prepare—optimizing profiles, creating compliant content, developing strategies. When these opportunities arrive, you\'ll be ready, not scrambling.' },
-                { q: 'How is this different from SEO?', a: 'Traditional SEO is about ranking in search results. AI visibility is about being recommended. AI agents don\'t just list options—they understand context, compare thoughtfully, and make personalized recommendations. When someone asks about wealth management, the AI doesn\'t just show a list—it recommends firms it truly understands. We help it understand you.' },
-                { q: 'How quickly will we see results?', a: 'You\'ll start seeing improvements within 2-4 weeks as AI agents update their knowledge. But here\'s what we believe: this is a journey, not a one-time fix. We\'re in this with you for the long term, continuously monitoring, adjusting, and ensuring everything stays compliant. Your success is our success, and we\'re committed to both.' },
-                { q: 'Do we really need to be on every platform?', a: 'We understand that every financial institution has different priorities. While being on multiple platforms maximizes your reach, we\'ll help you focus on what matters most for your specific situation. We\'ll look at where your ideal clients actually are, what makes sense for your services, and help you make smart decisions. It\'s about what works for you, not a one-size-fits-all approach.' },
-                { q: 'Can you help us prepare for AI advertising?', a: 'Absolutely. We\'re already working with firms to get ready for what\'s coming. We\'ll help you create profiles that feel authentic, develop content that\'s both compelling and compliant, and build strategies that work. When ChatGPT, Gemini, Claude, and Grok launch their ad networks, you won\'t just be ready—you\'ll be positioned to thrive. Let\'s start preparing together.' },
+                { q: 'What exactly is AI visibility?', a: 'Think of AI visibility as helping AI agents truly understand your e-commerce store. When someone asks ChatGPT, Gemini, Claude, or Grok about products, we make sure your store is part of that conversation. It\'s about being discoverable in a way that feels authentic to your brand, not just being listed somewhere.' },
+                { q: 'How do AI agents actually find stores like mine?', a: 'AI agents learn from everything available online—your website, product descriptions, reviews, and industry content. They recognize patterns and understand context. When someone asks about products, they search through what they know. We help them know you—your products, your brand, your values. It\'s like introducing yourself to someone who can recommend you to thousands of ideal shoppers.' },
+                { q: 'Which AI platforms should we focus on?', a: 'We work with all the major platforms—ChatGPT, Gemini, Claude, Grok, and emerging ones too. Each has its own personality and user base. Rather than choosing just one, we help you be present across all of them. That way, no matter where your ideal shoppers turn, they find you. We\'ll help you prioritize based on where your shoppers actually are.' },
+                { q: 'What about AI advertising—is that coming?', a: 'Yes, and we want you to be ready. The major AI platforms are building advertising networks designed with e-commerce in mind. Soon, you\'ll be able to reach shoppers exactly when they\'re asking AI about products. We\'re already helping e-commerce stores prepare—optimizing product descriptions, creating compelling content, developing strategies. When these opportunities arrive, you\'ll be ready, not scrambling.' },
+                { q: 'How is this different from SEO?', a: 'Traditional SEO is about ranking in search results. AI visibility is about being recommended. AI agents don\'t just list options—they understand context, compare thoughtfully, and make personalized product recommendations. When someone asks about running shoes, the AI doesn\'t just show a list—it recommends stores it truly understands. We help it understand you.' },
+                { q: 'How quickly will we see results?', a: 'You\'ll start seeing improvements within 2-4 weeks as AI agents update their knowledge. But here\'s what we believe: this is a journey, not a one-time fix. We\'re in this with you for the long term, continuously monitoring, adjusting, and optimizing your presence. Your success is our success, and we\'re committed to both.' },
+                { q: 'Do we really need to be on every platform?', a: 'We understand that every e-commerce store has different priorities. While being on multiple platforms maximizes your reach, we\'ll help you focus on what matters most for your specific situation. We\'ll look at where your ideal shoppers actually are, what makes sense for your products, and help you make smart decisions. It\'s about what works for you, not a one-size-fits-all approach.' },
+                { q: 'Can you help us prepare for AI advertising?', a: 'Absolutely. We\'re already working with e-commerce stores to get ready for what\'s coming. We\'ll help you create product profiles that feel authentic, develop descriptions that are both compelling and optimized, and build strategies that work. When ChatGPT, Gemini, Claude, and Grok launch their ad networks, you won\'t just be ready—you\'ll be positioned to thrive. Let\'s start preparing together.' },
               ].map((faq, index) => (
                 <motion.div
                   key={faq.q}
@@ -771,7 +760,7 @@ export default function HomePage() {
                 Get Started with AI Visibility Optimization
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10">
-                Understand your current AI visibility and explore how to improve your presence across major AI platforms. 
+                Understand your current AI visibility and explore how to improve your e-commerce store's presence across major AI platforms. 
                 Our free visibility score provides insights into where you stand today and what opportunities exist.
               </p>
               <Button asChild size="lg" className="h-12 sm:h-14 px-8 sm:px-12 text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all bg-primary hover:bg-primary/90 hover:scale-105 active:scale-95">
@@ -800,7 +789,7 @@ export default function HomePage() {
                 Let's Start a Conversation
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground px-2">
-                We'd love to hear about your business and explore how we can help you improve your AI visibility
+                We'd love to hear about your e-commerce store and explore how we can help you improve your AI visibility
               </p>
             </motion.div>
             <motion.div 
@@ -831,7 +820,7 @@ export default function HomePage() {
                     onClick={(e) => {
                       e.preventDefault()
                       const phoneNumber = '37253498180'
-                      const message = encodeURIComponent('Hello! I\'m interested in learning more about AI visibility for my business.')
+                      const message = encodeURIComponent('Hello! I\'m interested in learning more about AI visibility for my e-commerce store.')
                       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank')
                     }}
                     className="flex items-center gap-2"
@@ -862,10 +851,10 @@ export default function HomePage() {
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {[
-              { icon: Target, title: 'We Speak AI\'s Language', desc: 'We understand how AI agents think, learn, and recommend. It\'s not just technical knowledge—it\'s genuine understanding of how to help AI agents truly see what makes your business special.' },
-              { icon: Globe, title: 'Everywhere Your Customers Are', desc: 'We help you be present across all major AI platforms, so no matter where your ideal customers turn for recommendations, they find you.' },
-              { icon: BarChart3, title: 'Clear, Honest Reporting', desc: 'You deserve to know what\'s working. We provide transparent insights into your visibility, so you can see the real impact of our work together.' },
-              { icon: TrendingUp, title: 'Built for What\'s Next', desc: 'We don\'t just help you with today—we prepare you for tomorrow. As AI becomes the primary way people discover businesses, you\'ll be ready.' },
+              { icon: Target, title: 'We Speak AI\'s Language', desc: 'We understand how AI agents think, learn, and recommend. It\'s not just technical knowledge—it\'s genuine understanding of how to help AI agents truly see what makes your e-commerce store special.' },
+              { icon: Globe, title: 'Everywhere Your Shoppers Are', desc: 'We help you be present across all major AI platforms, so no matter where your ideal shoppers turn for product recommendations, they find you.' },
+              { icon: BarChart3, title: 'Clear, Honest Reporting', desc: 'You deserve to know what\'s working. We provide transparent insights into your visibility, so you can see the real impact on your sales and traffic.' },
+              { icon: TrendingUp, title: 'Built for What\'s Next', desc: 'We don\'t just help you with today—we prepare you for tomorrow. As AI becomes the primary way people discover products, you\'ll be ready.' },
             ].map((item, index) => (
               <motion.div
                 key={item.title}
