@@ -15,12 +15,14 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'AI Visibility Agency - Get Discovered by AI Agents | ChatGPT, Gemini, Claude, Grok',
+  title: 'Citrus - AI Visibility Agency | Get Cited by ChatGPT, Gemini, Claude & Grok',
   description:
-    'AI Visibility Agency specializes in making businesses discoverable through large language models including ChatGPT by OpenAI, Google Gemini, Anthropic Claude, and X Grok. We help companies optimize their content for AI agent discovery and prepare for upcoming AI advertising opportunities on major LLM platforms.',
+    'Citrus helps businesses improve their AI visibility and get cited by large language models including ChatGPT by OpenAI, Google Gemini, Anthropic Claude, and X Grok. We specialize in AI citation optimization, strategic content architecture, and helping companies become discoverable when users ask AI assistants about products and services. Learn how AI agents discover and cite businesses, and how to optimize your online presence for better AI visibility across major LLM platforms.',
   keywords: [
     'AI visibility',
+    'AI citation',
     'ChatGPT visibility',
+    'ChatGPT citation',
     'Gemini visibility',
     'Claude visibility',
     'Grok visibility',
@@ -38,10 +40,17 @@ export const metadata: Metadata = {
     'AI agent recommendations',
     'business discovery through AI',
     'AI-powered search optimization',
+    'AI visibility optimization',
+    'get cited by ChatGPT',
+    'AI citation strategy',
+    'how to get cited by AI',
+    'AI agent citation',
+    'ChatGPT business citation',
+    'improve AI visibility',
   ],
   openGraph: {
-    title: 'AI Visibility Agency - Get Discovered by AI Agents',
-    description: 'Make your business discoverable through ChatGPT, Gemini, Claude, Grok, and other leading AI platforms. Prepare for upcoming AI advertising opportunities.',
+    title: 'Citrus - AI Visibility Agency | Get Cited by ChatGPT, Gemini, Claude & Grok',
+    description: 'Citrus helps businesses improve their AI visibility and get cited by large language models. Learn how AI agents discover businesses and optimize your presence for ChatGPT, Gemini, Claude, and Grok.',
     type: 'website',
   },
 }

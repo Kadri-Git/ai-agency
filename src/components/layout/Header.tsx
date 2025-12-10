@@ -1,6 +1,6 @@
 'use client'
 
-import { Moon, Sun, Menu, Sparkles } from 'lucide-react'
+import { Moon, Sun, Menu } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import {
@@ -37,9 +37,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         {/* Logo */}
-        <Link href="/" className="text-lg font-semibold tracking-tight hover:opacity-80 transition-opacity flex items-center gap-2">
-          <Sparkles className="h-5 w-5" />
-          AI Visibility
+        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <span className="text-2xl font-bold tracking-tight">Citrus</span>
+          <span className="text-sm font-bold text-muted-foreground hidden sm:inline">AI visibility agency</span>
         </Link>
 
         {/* Desktop Navigation */}

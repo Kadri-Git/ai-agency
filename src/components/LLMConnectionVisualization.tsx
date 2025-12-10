@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { Building2, Sparkles, Brain, Zap, MessageSquare } from 'lucide-react'
+import { ShoppingBag, Sparkles, Brain, Zap, MessageSquare } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const LLMs = [
@@ -27,7 +27,7 @@ export function LLMConnectionVisualization() {
       {/* Background glow effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5" />
       
-      {/* Central Financial Institution Node */}
+      {/* Central E-commerce Store Node */}
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
         initial={{ scale: 0, opacity: 0 }}
@@ -46,7 +46,7 @@ export function LLMConnectionVisualization() {
           }}
         >
           <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl border-4 border-primary/30">
-            <Building2 className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-primary-foreground" />
+            <ShoppingBag className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-primary-foreground" />
           </div>
           {/* Pulsing ring effect */}
           <motion.div
@@ -68,7 +68,7 @@ export function LLMConnectionVisualization() {
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          Your Financial Institution
+          Your E-commerce Store
         </motion.p>
       </motion.div>
 

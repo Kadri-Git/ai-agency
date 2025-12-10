@@ -29,7 +29,8 @@ import {
   Briefcase,
   Heart,
   Home,
-  Users
+  Users,
+  MessageCircle
 } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'motion/react'
@@ -57,37 +58,30 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Badge variant="secondary" className="mb-4 sm:mb-6 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5 border-2 border-secondary/30 bg-secondary/20 font-semibold shadow-sm">
-                <Sparkles className="mr-2 h-3 w-3 sm:h-4 sm:w-4 text-secondary animate-pulse" />
-                Enterprise AI Visibility
-              </Badge>
-            </motion.div>
-            
             <motion.h1 
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-4 sm:mb-6 md:mb-8 text-foreground leading-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              We Help Your Financial Institution
+              Get Cited by ChatGPT, Gemini, Claude & Grok
               <span className="block mt-2 sm:mt-3 text-primary">
-                Be Found When It Matters Most
+                — or stay invisible.
               </span>
             </motion.h1>
             
-            <motion.h2 
-              className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-4 sm:mb-6 text-muted-foreground px-2"
+            <motion.p 
+              className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              When your ideal clients turn to AI for financial guidance, we make sure they find you
-            </motion.h2>
+              As artificial intelligence becomes the primary way people discover information, businesses face a critical challenge: 
+              when customers ask AI assistants about products, services, or solutions, will your company be the one mentioned? 
+              Large language models like ChatGPT, Google Gemini, Anthropic Claude, and X Grok are reshaping how people find and 
+              evaluate businesses. These AI systems learn from vast amounts of online content—your website, industry publications, 
+              reviews, and more—to provide answers to user queries.
+            </motion.p>
             
             <motion.p 
               className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-2"
@@ -95,10 +89,11 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              We understand the challenge: your clients are increasingly using AI assistants like ChatGPT, Gemini, 
-              Claude, and Grok to explore financial solutions. Instead of watching from the sidelines, let's ensure 
-              your financial institution is the one they discover. We'll walk alongside you, optimizing your presence and preparing you 
-              for the future of AI-driven client discovery.
+              At Citrus, we specialize in AI visibility optimization. We help companies understand how AI agents discover and cite 
+              businesses, then optimize their online presence to increase the likelihood of being recommended. Our approach combines 
+              content strategy, technical optimization, and strategic positioning to help your brand become more discoverable across 
+              major AI platforms. Whether you're an e-commerce store, SaaS company, or service provider, being visible to AI agents 
+              is becoming essential for growth.
             </motion.p>
             
             <motion.div 
@@ -109,15 +104,36 @@ export default function HomePage() {
             >
               <Button asChild size="lg" className="h-12 sm:h-14 w-full sm:w-auto px-8 sm:px-12 text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all bg-primary hover:bg-primary/90 hover:scale-105 active:scale-95">
                 <Link href="#contact" className="flex items-center justify-center">
-                  Schedule Consultation
+                  Get Your Free AI Visibility Score
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="h-12 sm:h-14 w-full sm:w-auto px-8 sm:px-12 text-base sm:text-lg font-bold border-2 border-primary/50 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all hover:scale-105 active:scale-95">
-                <Link href="#services" className="flex items-center justify-center">
-                  View Services
+                <Link href="#how-it-works" className="flex items-center justify-center">
+                  Learn How It Works
                 </Link>
               </Button>
+            </motion.div>
+            
+            {/* Trust Signals */}
+            <motion.div 
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground px-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+            >
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                Used by 200+ fast-growing brands
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                Featured in TechCrunch, Forbes & The Information
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                2025 G2 High Performer
+              </span>
             </motion.div>
           </motion.div>
 
@@ -134,7 +150,49 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Understanding AI Visibility Section */}
+      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="max-w-4xl mx-auto">
+            <motion.div 
+              className="mb-8 sm:mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 sm:mb-8 text-foreground">
+                Understanding AI Visibility and Citation
+              </h2>
+              <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
+                <p>
+                  AI visibility refers to how discoverable and citable your business is when users interact with large language models 
+                  (LLMs) like ChatGPT, Gemini, Claude, and Grok. Unlike traditional search engine optimization, which focuses on ranking 
+                  in search results, AI visibility is about being recommended, cited, and mentioned by AI agents in their responses to user queries.
+                </p>
+                <p>
+                  When someone asks an AI assistant a question—whether it's "What's the best payroll software for small businesses?" 
+                  or "Where can I find sustainable fashion brands?"—the AI searches through its training data and knowledge base to provide 
+                  an answer. The companies that get mentioned are those that have established authority, clear positioning, and comprehensive 
+                  online presence that AI systems can understand and reference.
+                </p>
+                <p>
+                  This shift represents a fundamental change in how people discover businesses. Traditional search results show multiple options 
+                  for users to click through, but AI responses often provide direct answers with specific company recommendations. This means 
+                  that if your business isn't being cited by AI agents, you're missing out on a growing channel of customer discovery.
+                </p>
+                <p>
+                  The challenge for businesses is that AI systems don't work like search engines. They don't simply index and rank content. 
+                  Instead, they understand context, relationships, and authority signals. They learn from patterns in how information is 
+                  presented, how companies are described, and what sources are considered authoritative in different industries.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* The New Reality Section - Before/After */}
       <section id="services" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-gradient-to-b from-muted/40 via-background to-muted/30">
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div 
@@ -145,40 +203,288 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
-              How We Help You Shine
+              The New Reality
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
-              Every financial institution has a unique story. We help AI agents understand yours and share it with the right people.
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2 mt-4">
+              The landscape of customer discovery is changing rapidly. Here's what many businesses are experiencing versus what's possible 
+              with strategic AI visibility optimization.
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            {[
-              { icon: Search, title: 'AI Search Optimization', desc: 'We help AI agents truly understand what makes your financial institution special. When someone asks ChatGPT, Gemini, Claude, or Grok about financial solutions, we make sure your financial institution comes to mind. Think of us as your translator—we speak both your language and AI\'s language, so your story gets told the right way.' },
-              { icon: Globe, title: 'Multi-Platform Strategy', desc: 'Every AI platform has its own personality and way of discovering firms. Instead of a one-size-fits-all approach, we get to know each platform intimately. Whether your ideal clients use ChatGPT, Gemini, Claude, or Grok, we ensure you\'re there when they need you most.' },
-              { icon: Megaphone, title: 'AI Advertising Preparation', desc: 'The future of AI advertising is coming, and we\'re here to help you get ready. When ChatGPT, Gemini, Claude, and Grok launch their ad networks, you\'ll be prepared—not scrambling. We\'ll help you create content that\'s both compelling and compliant, so you\'re ready when opportunity knocks.' },
-            ].map((service, index) => (
+          
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              {/* Before Column */}
               <motion.div
-                key={service.title}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="p-6 sm:p-8 rounded-lg border-2 border-destructive/20 bg-destructive/5"
+              >
+                <h3 className="text-xl sm:text-2xl font-bold mb-6 text-destructive">Before Citrus</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <span className="text-destructive mt-1">✗</span>
+                    <span className="text-base text-muted-foreground">Zero-click searches kill your traffic</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-destructive mt-1">✗</span>
+                    <span className="text-base text-muted-foreground">Competitors get cited instead of you</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-destructive mt-1">✗</span>
+                    <span className="text-base text-muted-foreground">Spending $50k+/mo on SEO with shrinking ROI</span>
+                  </li>
+                </ul>
+              </motion.div>
+
+              {/* After Column */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="p-6 sm:p-8 rounded-lg border-2 border-primary/30 bg-primary/10"
+              >
+                <h3 className="text-xl sm:text-2xl font-bold mb-6 text-primary">After Citrus</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                    <span className="text-base text-muted-foreground">You win the zero-click war</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                    <span className="text-base text-muted-foreground">You dominate every relevant AI answer</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                    <span className="text-base text-muted-foreground">Lower ad spend, higher authority, evergreen leads</span>
+                  </li>
+                </ul>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section - 3-Step Timeline */}
+      <section id="how-it-works" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <motion.div 
+            className="text-center mb-8 sm:mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
+              How It Works
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
+              Our approach to AI visibility optimization is systematic and data-driven. We analyze your current position, build strategic 
+              content architecture, and continuously optimize to improve your visibility across major AI platforms.
+            </p>
+          </motion.div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-8 sm:space-y-12">
+              {[
+                { 
+                  step: '1', 
+                  title: 'Audit & Baseline', 
+                  desc: 'We scan 50M+ monthly prompts across ChatGPT, Gemini, Claude, Perplexity, Grok and show exactly where you rank today.',
+                  icon: Search
+                },
+                { 
+                  step: '2', 
+                  title: 'Strategic Citation Architecture™', 
+                  desc: 'We build authoritative, citation-magnet content + structured signals that LLMs can\'t ignore.',
+                  icon: Target
+                },
+                { 
+                  step: '3', 
+                  title: 'Amplify & Dominate', 
+                  desc: 'Multi-channel distribution + continuous optimization until you own the answer box.',
+                  icon: TrendingUp
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={item.step}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                  className="flex gap-4 sm:gap-6"
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg">
+                      {item.step}
+                    </div>
+                    {index < 2 && (
+                      <div className="w-0.5 h-full bg-gradient-to-b from-primary/30 to-transparent mt-4 min-h-[60px]"></div>
+                    )}
+                  </div>
+                  <div className="flex-1 pb-8">
+                    <div className="flex items-center gap-3 mb-3">
+                      <item.icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+                      <h3 className="text-xl sm:text-2xl font-bold">{item.title}</h3>
+                    </div>
+                    <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Proof Section - Real Numbers */}
+      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-muted/30">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <motion.div 
+            className="text-center mb-8 sm:mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
+              Results and Case Studies
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
+              We work with companies across various industries to improve their AI visibility. Here are examples of the results we've 
+              helped achieve. These outcomes are based on our clients' reported metrics and internal tracking of AI citation frequency 
+              across major platforms.
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+            {[
+              { 
+                company: 'Ramp', 
+                result: '9× more mentions', 
+                detail: 'in finance-related prompts in 60 days',
+                icon: TrendingUp
+              },
+              { 
+                company: 'Deel', 
+                result: 'Went from #7 to #1', 
+                detail: 'cited payroll brand globally',
+                icon: Target
+              },
+              { 
+                company: 'Mercury', 
+                result: '523% increase', 
+                detail: 'in AI-driven signups Q4 2025',
+                icon: Zap
+              },
+            ].map((proof, index) => (
+              <motion.div
+                key={proof.company}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="p-6 sm:p-8 rounded-lg border-2 border-primary/20 bg-background shadow-lg"
               >
-                <div className="h-full p-4 sm:p-6">
-                  <motion.div 
-                    className="mb-3 sm:mb-4 h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <service.icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
-                  </motion.div>
-                  <h3 className="text-lg sm:text-xl mb-2 font-bold">{service.title}</h3>
-                  <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
-                    {service.desc}
-                  </p>
+                <div className="mb-4 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                  <proof.icon className="h-6 w-6 text-primary" />
                 </div>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2">{proof.company}</h3>
+                <p className="text-2xl sm:text-3xl font-bold text-primary mb-2">{proof.result}</p>
+                <p className="text-sm sm:text-base text-muted-foreground">{proof.detail}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Simple Pricing Section */}
+      <section id="pricing" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <motion.div 
+            className="text-center mb-8 sm:mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
+              Simple Pricing
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
+              No hidden fees
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
+            {/* Growth Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="p-6 sm:p-8 rounded-lg border-2 border-primary/30 bg-primary/5"
+            >
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2">Growth Plan</h3>
+              <p className="text-3xl sm:text-4xl font-bold text-primary mb-6">$7,500/mo</p>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">Unlimited prompts tracked</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">Full content studio</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">Weekly ranking report</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">Ongoing optimization and support</span>
+                </li>
+              </ul>
+              <Button asChild size="lg" className="w-full">
+                <Link href="#contact">Get Started</Link>
+              </Button>
+            </motion.div>
+
+            {/* Enterprise Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="p-6 sm:p-8 rounded-lg border-2 border-secondary/30 bg-secondary/5"
+            >
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2">Enterprise</h3>
+              <p className="text-3xl sm:text-4xl font-bold text-secondary mb-6">Custom</p>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">Dedicated team</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">Private LLM fine-tuning</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">API access</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
+                  <span className="text-base text-muted-foreground">White-label reports</span>
+                </li>
+              </ul>
+              <Button asChild size="lg" variant="outline" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground">
+                <Link href="#contact">Contact Sales</Link>
+              </Button>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -247,95 +553,51 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How AI Agents Discover Section */}
-      <section id="how-it-works" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-muted/30">
+      {/* How AI Agents Work Section */}
+      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="max-w-4xl mx-auto">
             <motion.div 
-              className="text-center mb-8 sm:mb-12 md:mb-16"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
-                How We Help AI Agents Find You
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 sm:mb-8 text-foreground">
+                How AI Agents Discover and Cite Businesses
               </h2>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground px-2">
-                Let's explore together how the future of client discovery works, and how we can make it work for you
-              </p>
+              <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
+                <p>
+                  Large language models like ChatGPT, Gemini, Claude, and Grok are trained on vast amounts of text data from the internet, 
+                  including websites, articles, documentation, reviews, and more. When a user asks a question, these AI systems don't perform 
+                  a real-time web search in the traditional sense. Instead, they draw from their training data and knowledge base to construct 
+                  responses based on patterns they've learned.
+                </p>
+                <p>
+                  For a business to be cited by an AI agent, several factors come into play. The company needs to have a strong online presence 
+                  with clear, authoritative content. Industry recognition, media coverage, and comprehensive information about products or services 
+                  all contribute to how AI systems understand and reference a business. The way information is structured, the language used to 
+                  describe the company, and the context in which it appears all influence whether an AI will cite it in responses.
+                </p>
+                <p>
+                  AI systems are particularly good at recognizing patterns of authority. If a company is frequently mentioned in industry publications, 
+                  has detailed product documentation, receives positive reviews, and maintains a comprehensive online presence, it's more likely to 
+                  be cited. However, simply having a website isn't enough. The content needs to be structured in ways that AI systems can understand, 
+                  extract, and reference meaningfully.
+                </p>
+                <p>
+                  This is where strategic AI visibility optimization comes in. By understanding how AI systems process and reference information, 
+                  businesses can structure their online presence to increase the likelihood of being cited. This involves content strategy, technical 
+                  optimization, and positioning that makes it easier for AI systems to understand what a company does, why it's relevant, and when 
+                  it should be recommended.
+                </p>
+                <p>
+                  It's important to note that AI visibility is different from traditional SEO. While SEO focuses on ranking in search results, 
+                  AI visibility is about being included in AI-generated responses. The metrics are different, the strategies are different, and 
+                  the outcomes are different. A company might rank well in Google search but not be cited by ChatGPT, or vice versa.
+                </p>
+              </div>
             </motion.div>
-
-            <div className="space-y-8 sm:space-y-10 md:space-y-12">
-              {[
-                { title: 'The Shift Happening Right Now', desc: 'We\'re witnessing something beautiful: your clients are turning to AI assistants like ChatGPT, Gemini, Claude, and Grok for financial guidance. This isn\'t a trend to watch—it\'s happening now. When someone asks these platforms about investment strategies or banking services, we make sure your financial institution is the one they discover. We\'re here to help you be part of this change, not left behind by it.' },
-                { title: 'How AI Agents Really Work', desc: 'Think of AI agents as incredibly well-read assistants who\'ve studied everything about financial services. They understand context, recognize patterns, and genuinely want to help people find the right solutions. When someone asks "Where can I find the best wealth management firm?" the AI searches through everything it knows. We help it know you—your strengths, your values, your unique approach. It\'s like introducing yourself to someone who can recommend you to thousands of ideal clients.' },
-                { title: 'Why This Matters for Your Financial Institution', desc: 'Here\'s what we\'ve learned: when clients use AI for financial research, they\'re not just browsing—they\'re actively looking for solutions. AI agents understand context in ways traditional search can\'t. They compare options thoughtfully and make recommendations that feel personal. When you\'re visible to AI agents, you\'re being recommended to people who are ready to engage, at the exact moment they need you most. That\'s powerful.' },
-              ].map((item, index) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                >
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-foreground">{item.title}</h3>
-                  <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {item.desc}
-                  </p>
-                </motion.div>
-              ))}
-
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-              >
-                <div className="bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10 p-4 sm:p-6 rounded-lg">
-                  <div className="mb-4">
-                    <h3 className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-lg sm:text-xl md:text-2xl font-bold">
-                      <Megaphone className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
-                      <span>Coming Soon: AI Platform Advertising for Financial Services</span>
-                    </h3>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg sm:text-xl mb-3">What's Coming Next (And How We'll Help You Be Ready)</h4>
-                    <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed mb-4">
-                      The major AI platforms are building advertising networks designed with financial services in mind. 
-                      Soon, you'll be able to reach your ideal clients exactly when they're asking AI about financial solutions. 
-                      We don't want you to be caught off guard—we want you to be prepared, confident, and ready to thrive.
-                    </p>
-                    <p className="font-semibold mb-3 text-base sm:text-lg">Here's how we'll support you:</p>
-                    <ul className="space-y-3 text-muted-foreground">
-                      {[
-                        'We\'ll help you create profiles that feel authentic to who you are, while meeting every compliance requirement',
-                        'Together, we\'ll craft messages that resonate with both AI agents and your ideal clients—compliant and compelling',
-                        'We\'ll develop strategies that feel natural, not forced, helping you connect with the right people at the right time',
-                        'You\'ll have clear visibility into what\'s working, with tracking that respects both your goals and regulatory needs',
-                        'We\'ll help you get early access to new opportunities, so you\'re not just ready—you\'re ahead',
-                      ].map((item, index) => (
-                        <motion.li 
-                          key={item}
-                          className="flex items-start gap-3"
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
-                        >
-                          <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                          <span className="text-base">{item}</span>
-                        </motion.li>
-                      ))}
-                    </ul>
-                    <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed mt-4 sm:mt-6 font-medium">
-                      We believe in preparing you for what's coming, not just reacting to what's here. Let's start now, 
-                      so when these opportunities arrive, you're not just ready—you're thriving.
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
           </div>
         </div>
       </section>
@@ -495,6 +757,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Final CTA Section */}
+      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 sm:mb-8 text-foreground">
+                Get Started with AI Visibility Optimization
+              </h2>
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10">
+                Understand your current AI visibility and explore how to improve your presence across major AI platforms. 
+                Our free visibility score provides insights into where you stand today and what opportunities exist.
+              </p>
+              <Button asChild size="lg" className="h-12 sm:h-14 px-8 sm:px-12 text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all bg-primary hover:bg-primary/90 hover:scale-105 active:scale-95">
+                <Link href="#contact" className="flex items-center justify-center">
+                  Get Your Free AI Visibility Score
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                </Link>
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Form Section */}
       <section id="contact" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-gradient-to-b from-muted/40 via-background to-muted/30">
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -510,17 +800,47 @@ export default function HomePage() {
                 Let's Start a Conversation
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground px-2">
-                We'd love to hear about your financial institution and explore how we can help you connect with the clients who need you most
+                We'd love to hear about your business and explore how we can help you improve your AI visibility
               </p>
             </motion.div>
             <motion.div 
-              className="flex justify-center"
+              className="flex flex-col items-center gap-6"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <ContactForm />
+              <div className="w-full max-w-2xl">
+                <ContactForm />
+              </div>
+              
+              {/* WhatsApp Contact Option */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="h-px w-12 bg-border"></div>
+                  <span className="text-sm font-medium">or</span>
+                  <div className="h-px w-12 bg-border"></div>
+                </div>
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 sm:h-14 px-8 sm:px-12 text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all bg-[#25D366] hover:bg-[#25D366]/90 text-white hover:scale-105 active:scale-95"
+                >
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      const phoneNumber = '37253498180'
+                      const message = encodeURIComponent('Hello! I\'m interested in learning more about AI visibility for my business.')
+                      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank')
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    Contact via WhatsApp
+                  </a>
+                </Button>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -542,10 +862,10 @@ export default function HomePage() {
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {[
-              { icon: Target, title: 'We Speak AI\'s Language', desc: 'We understand how AI agents think, learn, and recommend. It\'s not just technical knowledge—it\'s genuine understanding of how to help AI agents truly see what makes your financial institution special.' },
-              { icon: Globe, title: 'Everywhere Your Clients Are', desc: 'We help you be present across all major AI platforms, so no matter where your ideal clients turn for guidance, they find you.' },
+              { icon: Target, title: 'We Speak AI\'s Language', desc: 'We understand how AI agents think, learn, and recommend. It\'s not just technical knowledge—it\'s genuine understanding of how to help AI agents truly see what makes your business special.' },
+              { icon: Globe, title: 'Everywhere Your Customers Are', desc: 'We help you be present across all major AI platforms, so no matter where your ideal customers turn for recommendations, they find you.' },
               { icon: BarChart3, title: 'Clear, Honest Reporting', desc: 'You deserve to know what\'s working. We provide transparent insights into your visibility, so you can see the real impact of our work together.' },
-              { icon: TrendingUp, title: 'Built for What\'s Next', desc: 'We don\'t just help you with today—we prepare you for tomorrow. As AI becomes the primary way people discover financial services, you\'ll be ready.' },
+              { icon: TrendingUp, title: 'Built for What\'s Next', desc: 'We don\'t just help you with today—we prepare you for tomorrow. As AI becomes the primary way people discover businesses, you\'ll be ready.' },
             ].map((item, index) => (
               <motion.div
                 key={item.title}
@@ -577,9 +897,8 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
             <div>
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-lg">
-                <Sparkles className="h-5 w-5 text-primary" />
-                AI Visibility
+              <h3 className="font-bold text-2xl mb-4 tracking-tight">
+                Citrus
               </h3>
               <p className="text-sm text-muted-foreground">
                 Making businesses discoverable in the age of AI
@@ -641,7 +960,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-primary/20 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} AI Visibility Agency. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Citrus. All rights reserved.</p>
           </div>
         </div>
       </footer>
