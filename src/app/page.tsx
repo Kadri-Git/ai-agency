@@ -30,7 +30,10 @@ import {
   Heart,
   Home,
   Users,
-  MessageCircle
+  MessageCircle,
+  Eye,
+  Brain,
+  Lightbulb
 } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'motion/react'
@@ -111,26 +114,7 @@ export default function HomePage() {
               </Button>
             </motion.div>
             
-            {/* Trust Signals */}
-            <motion.div 
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground px-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-            >
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                Used by 200+ fast-growing brands
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                Featured in TechCrunch, Forbes & The Information
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                2025 G2 High Performer
-              </span>
-            </motion.div>
+            {/* Trust Signals (temporarily removed per request) */}
           </motion.div>
 
           {/* Right side - Visualization */}
@@ -160,26 +144,78 @@ export default function HomePage() {
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 sm:mb-8 text-foreground">
                 Understanding AI Visibility and Citation
               </h2>
-              <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
-                <p>
-                  AI visibility refers to how discoverable and citable your e-commerce store is when users interact with large language models 
-                  like ChatGPT, Gemini, Claude, and Grok. Unlike SEO, which focuses on ranking in search results, AI visibility is about 
-                  being recommended and cited by AI agents when shoppers ask about products.
-                </p>
-                <p>
-                  When someone asks an AI assistant about products, the AI searches through its training data to provide recommendations. The e-commerce 
-                  stores that get mentioned are those with established authority, clear product positioning, and comprehensive online presence that AI 
-                  systems can understand and reference.
-                </p>
-                <p>
-                  This shift represents a fundamental change in how people discover products. Traditional search shows multiple options, but AI 
-                  responses provide direct answers with specific store and product recommendations. If your e-commerce store isn't being cited by AI 
-                  agents, you're missing out on a growing channel of customer discovery.
-                </p>
-                <p>
-                  AI systems don't work like search engines. They understand context, relationships, and authority signals. They learn from patterns 
-                  in how product information is presented and what e-commerce sources are considered authoritative.
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <motion.div
+                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <Eye className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2 text-foreground">What is AI Visibility?</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      How discoverable your store is when users ask ChatGPT, Gemini, Claude, and Grok about products. Unlike SEO rankings, AI visibility means being recommended and cited by AI agents.
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <Brain className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2 text-foreground">How AI Chooses Stores</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      AI systems understand context and authority signals. Stores with clear positioning, comprehensive presence, and established authority get cited most often.
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2 text-foreground">The New Discovery Channel</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      AI provides direct answers with specific recommendations—not just lists. If you're not being cited, you're missing a growing channel of customer discovery.
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <Lightbulb className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2 text-foreground">Different from Search</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      AI systems learn from patterns in how product information is presented. They recognize relationships and authority—not just keywords.
+                    </p>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -257,6 +293,52 @@ export default function HomePage() {
                 </ul>
               </motion.div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <motion.div 
+            className="text-center mb-8 sm:mb-12 md:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
+              What Makes Us Different
+            </h2>
+          </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
+            {[
+              { icon: Target, title: 'We Speak AI\'s Language', desc: 'We understand how AI agents think, learn, and recommend. It\'s not just technical knowledge—it\'s genuine understanding of how to help AI agents truly see what makes your e-commerce store special.' },
+              { icon: Globe, title: 'Everywhere Your Shoppers Are', desc: 'We help you be present across all major AI platforms, so no matter where your ideal shoppers turn for product recommendations, they find you.' },
+              { icon: BarChart3, title: 'Clear, Honest Reporting', desc: 'You deserve to know what\'s working. We provide transparent insights into your visibility, so you can see the real impact on your sales and traffic.' },
+              { icon: TrendingUp, title: 'Built for What\'s Next', desc: 'We don\'t just help you with today—we prepare you for tomorrow. As AI becomes the primary way people discover products, you\'ll be ready.' },
+            ].map((item, index) => (
+              <motion.div
+                key={item.title}
+                className="text-center"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <motion.div 
+                  className="mb-3 sm:mb-4 h-16 w-16 sm:h-20 sm:w-20 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center mx-auto border-2 border-primary/20 shadow-lg"
+                  whileHover={{ scale: 1.15, rotate: 10 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <item.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+                </motion.div>
+                <h3 className="text-lg sm:text-xl font-bold mb-2">{item.title}</h3>
+                <p className="text-sm sm:text-base text-muted-foreground px-2">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -391,94 +473,6 @@ export default function HomePage() {
                 <p className="text-sm sm:text-base text-muted-foreground">{proof.detail}</p>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Simple Pricing Section */}
-      <section id="pricing" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <motion.div 
-            className="text-center mb-8 sm:mb-12 md:mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
-              Simple Pricing
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
-              No hidden fees
-            </p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
-            {/* Growth Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="p-6 sm:p-8 rounded-lg border-2 border-primary/30 bg-primary/5"
-            >
-              <h3 className="text-2xl sm:text-3xl font-bold mb-2">Growth Plan</h3>
-              <p className="text-3xl sm:text-4xl font-bold text-primary mb-6">$500/mo</p>
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">Unlimited prompts tracked</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">Full content studio</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">Weekly ranking report</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">Ongoing optimization and support</span>
-                </li>
-              </ul>
-              <Button asChild size="lg" className="w-full">
-                <Link href="#contact">Get Started</Link>
-              </Button>
-            </motion.div>
-
-            {/* Enterprise Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="p-6 sm:p-8 rounded-lg border-2 border-secondary/30 bg-secondary/5"
-            >
-              <h3 className="text-2xl sm:text-3xl font-bold mb-2">Enterprise</h3>
-              <p className="text-3xl sm:text-4xl font-bold text-secondary mb-6">Custom</p>
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">Dedicated team</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">Private LLM fine-tuning</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">API access</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mt-1 shrink-0" />
-                  <span className="text-base text-muted-foreground">White-label reports</span>
-                </li>
-              </ul>
-              <Button asChild size="lg" variant="outline" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground">
-                <Link href="#contact">Contact Sales</Link>
-              </Button>
-            </motion.div>
           </div>
         </div>
       </section>
@@ -695,57 +689,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section id="faq" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <div className="max-w-3xl mx-auto">
-            <motion.div 
-              className="text-center mb-8 sm:mb-12 md:mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
-                Questions We Hear Often
-              </h2>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground px-2">
-                We believe in transparency. Here are honest answers to the questions on your mind.
-              </p>
-            </motion.div>
-            <Accordion type="single" collapsible className="w-full">
-              {[
-                { q: 'What exactly is AI visibility?', a: 'Think of AI visibility as helping AI agents truly understand your e-commerce store. When someone asks ChatGPT, Gemini, Claude, or Grok about products, we make sure your store is part of that conversation. It\'s about being discoverable in a way that feels authentic to your brand, not just being listed somewhere.' },
-                { q: 'How do AI agents actually find stores like mine?', a: 'AI agents learn from everything available online—your website, product descriptions, reviews, and industry content. They recognize patterns and understand context. When someone asks about products, they search through what they know. We help them know you—your products, your brand, your values. It\'s like introducing yourself to someone who can recommend you to thousands of ideal shoppers.' },
-                { q: 'Which AI platforms should we focus on?', a: 'We work with all the major platforms—ChatGPT, Gemini, Claude, Grok, and emerging ones too. Each has its own personality and user base. Rather than choosing just one, we help you be present across all of them. That way, no matter where your ideal shoppers turn, they find you. We\'ll help you prioritize based on where your shoppers actually are.' },
-                { q: 'What about AI advertising—is that coming?', a: 'Yes, and we want you to be ready. The major AI platforms are building advertising networks designed with e-commerce in mind. Soon, you\'ll be able to reach shoppers exactly when they\'re asking AI about products. We\'re already helping e-commerce stores prepare—optimizing product descriptions, creating compelling content, developing strategies. When these opportunities arrive, you\'ll be ready, not scrambling.' },
-                { q: 'How is this different from SEO?', a: 'Traditional SEO is about ranking in search results. AI visibility is about being recommended. AI agents don\'t just list options—they understand context, compare thoughtfully, and make personalized product recommendations. When someone asks about running shoes, the AI doesn\'t just show a list—it recommends stores it truly understands. We help it understand you.' },
-                { q: 'How quickly will we see results?', a: 'You\'ll start seeing improvements within 2-4 weeks as AI agents update their knowledge. But here\'s what we believe: this is a journey, not a one-time fix. We\'re in this with you for the long term, continuously monitoring, adjusting, and optimizing your presence. Your success is our success, and we\'re committed to both.' },
-                { q: 'Do we really need to be on every platform?', a: 'We understand that every e-commerce store has different priorities. While being on multiple platforms maximizes your reach, we\'ll help you focus on what matters most for your specific situation. We\'ll look at where your ideal shoppers actually are, what makes sense for your products, and help you make smart decisions. It\'s about what works for you, not a one-size-fits-all approach.' },
-                { q: 'Can you help us prepare for AI advertising?', a: 'Absolutely. We\'re already working with e-commerce stores to get ready for what\'s coming. We\'ll help you create product profiles that feel authentic, develop descriptions that are both compelling and optimized, and build strategies that work. When ChatGPT, Gemini, Claude, and Grok launch their ad networks, you won\'t just be ready—you\'ll be positioned to thrive. Let\'s start preparing together.' },
-              ].map((faq, index) => (
-                <motion.div
-                  key={faq.q}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                >
-                  <AccordionItem value={`item-${index}`} className="border-primary/20">
-                    <AccordionTrigger className="text-left text-sm sm:text-base font-semibold hover:text-primary transition-colors py-3 sm:py-4">
-                      {faq.q}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm sm:text-base text-muted-foreground leading-relaxed pb-3 sm:pb-4">
-                      {faq.a}
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
-              ))}
-            </Accordion>
-          </div>
-        </div>
-      </section>
-
       {/* Final CTA Section */}
       <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10">
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -835,52 +778,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <motion.div 
-            className="text-center mb-8 sm:mb-12 md:mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
-              What Makes Us Different
-            </h2>
-          </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
-            {[
-              { icon: Target, title: 'We Speak AI\'s Language', desc: 'We understand how AI agents think, learn, and recommend. It\'s not just technical knowledge—it\'s genuine understanding of how to help AI agents truly see what makes your e-commerce store special.' },
-              { icon: Globe, title: 'Everywhere Your Shoppers Are', desc: 'We help you be present across all major AI platforms, so no matter where your ideal shoppers turn for product recommendations, they find you.' },
-              { icon: BarChart3, title: 'Clear, Honest Reporting', desc: 'You deserve to know what\'s working. We provide transparent insights into your visibility, so you can see the real impact on your sales and traffic.' },
-              { icon: TrendingUp, title: 'Built for What\'s Next', desc: 'We don\'t just help you with today—we prepare you for tomorrow. As AI becomes the primary way people discover products, you\'ll be ready.' },
-            ].map((item, index) => (
-              <motion.div
-                key={item.title}
-                className="text-center"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <motion.div 
-                  className="mb-3 sm:mb-4 h-16 w-16 sm:h-20 sm:w-20 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center mx-auto border-2 border-primary/20 shadow-lg"
-                  whileHover={{ scale: 1.15, rotate: 10 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <item.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-                </motion.div>
-                <h3 className="text-lg sm:text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-sm sm:text-base text-muted-foreground px-2">
-                  {item.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="border-t bg-muted/30 py-8 sm:py-12">
         <div className="container mx-auto px-4 sm:px-6">
@@ -953,6 +850,57 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-background">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="max-w-3xl mx-auto">
+            <motion.div 
+              className="text-center mb-8 sm:mb-12 md:mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
+                Questions We Hear Often
+              </h2>
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground px-2">
+                We believe in transparency. Here are honest answers to the questions on your mind.
+              </p>
+            </motion.div>
+            <Accordion type="single" collapsible className="w-full">
+              {[
+                { q: 'What exactly is AI visibility?', a: 'Think of AI visibility as helping AI agents truly understand your e-commerce store. When someone asks ChatGPT, Gemini, Claude, or Grok about products, we make sure your store is part of that conversation. It\'s about being discoverable in a way that feels authentic to your brand, not just being listed somewhere.' },
+                { q: 'How do AI agents actually find stores like mine?', a: 'AI agents learn from everything available online—your website, product descriptions, reviews, and industry content. They recognize patterns and understand context. When someone asks about products, they search through what they know. We help them know you—your products, your brand, your values. It\'s like introducing yourself to someone who can recommend you to thousands of ideal shoppers.' },
+                { q: 'Which AI platforms should we focus on?', a: 'We work with all the major platforms—ChatGPT, Gemini, Claude, Grok, and emerging ones too. Each has its own personality and user base. Rather than choosing just one, we help you be present across all of them. That way, no matter where your ideal shoppers turn, they find you. We\'ll help you prioritize based on where your shoppers actually are.' },
+                { q: 'What about AI advertising—is that coming?', a: 'Yes, and we want you to be ready. The major AI platforms are building advertising networks designed with e-commerce in mind. Soon, you\'ll be able to reach shoppers exactly when they\'re asking AI about products. We\'re already helping e-commerce stores prepare—optimizing product descriptions, creating compelling content, developing strategies. When these opportunities arrive, you\'ll be ready, not scrambling.' },
+                { q: 'How is this different from SEO?', a: 'Traditional SEO is about ranking in search results. AI visibility is about being recommended. AI agents don\'t just list options—they understand context, compare thoughtfully, and make personalized product recommendations. When someone asks about running shoes, the AI doesn\'t just show a list—it recommends stores it truly understands. We help it understand you.' },
+                { q: 'How quickly will we see results?', a: 'You\'ll start seeing improvements within 2-4 weeks as AI agents update their knowledge. But here\'s what we believe: this is a journey, not a one-time fix. We\'re in this with you for the long term, continuously monitoring, adjusting, and optimizing your presence. Your success is our success, and we\'re committed to both.' },
+                { q: 'Do we really need to be on every platform?', a: 'We understand that every e-commerce store has different priorities. While being on multiple platforms maximizes your reach, we\'ll help you focus on what matters most for your specific situation. We\'ll look at where your ideal shoppers actually are, what makes sense for your products, and help you make smart decisions. It\'s about what works for you, not a one-size-fits-all approach.' },
+                { q: 'Can you help us prepare for AI advertising?', a: 'Absolutely. We\'re already working with e-commerce stores to get ready for what\'s coming. We\'ll help you create product profiles that feel authentic, develop descriptions that are both compelling and optimized, and build strategies that work. When ChatGPT, Gemini, Claude, and Grok launch their ad networks, you won\'t just be ready—you\'ll be positioned to thrive. Let\'s start preparing together.' },
+              ].map((faq, index) => (
+                <motion.div
+                  key={faq.q}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <AccordionItem value={`item-${index}`} className="border-primary/20">
+                    <AccordionTrigger className="text-left text-sm sm:text-base font-semibold hover:text-primary transition-colors py-3 sm:py-4">
+                      {faq.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm sm:text-base text-muted-foreground leading-relaxed pb-3 sm:pb-4">
+                      {faq.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                </motion.div>
+              ))}
+            </Accordion>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
