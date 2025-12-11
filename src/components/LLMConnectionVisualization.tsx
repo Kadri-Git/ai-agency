@@ -1,15 +1,47 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { ShoppingBag, Sparkles, Brain, Zap, MessageSquare } from 'lucide-react'
+import { Brain, MessageSquare, ShoppingBag, Sparkles, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const LLMs = [
-  { name: 'ChatGPT', icon: Brain, color: 'primary', delay: 0 },
-  { name: 'Gemini', icon: Sparkles, color: 'secondary', delay: 0.2 },
-  { name: 'Claude', icon: MessageSquare, color: 'primary', delay: 0.4 },
-  { name: 'Grok', icon: Zap, color: 'secondary', delay: 0.6 },
+  {
+    name: 'ChatGPT',
+    icon: Brain,
+    accent: '#0FA47F',
+    glow: 'from-emerald-400/30 via-emerald-300/20 to-emerald-200/10',
+    delay: 0,
+  },
+  {
+    name: 'Gemini',
+    icon: Sparkles,
+    accent: '#0B7CFA',
+    glow: 'from-sky-400/30 via-blue-500/20 to-cyan-300/10',
+    delay: 0.15,
+  },
+  {
+    name: 'Claude',
+    icon: MessageSquare,
+    accent: '#F59E0B',
+    glow: 'from-amber-400/30 via-orange-400/20 to-amber-200/10',
+    delay: 0.3,
+  },
+  {
+    name: 'Grok',
+    icon: Zap,
+    accent: '#5CFF8F',
+    glow: 'from-emerald-400/30 via-lime-400/20 to-emerald-200/10',
+    delay: 0.45,
+  },
 ]
+
+// Pre-set scattered positions to feel organic around the hub
+const LLM_POSITIONS = [
+  { top: '14%', left: '22%' },
+  { top: '18%', right: '18%' },
+  { bottom: '20%', left: '28%' },
+  { bottom: '16%', right: '24%' },
+] as const
 
 export function LLMConnectionVisualization() {
   const [isVisible, setIsVisible] = useState(false)
@@ -18,166 +50,94 @@ export function LLMConnectionVisualization() {
     setIsVisible(true)
   }, [])
 
-  // Color values matching our theme (cyan for primary, purple for secondary)
-  const primaryColor = '#3b82f6' // Cyan blue
-  const secondaryColor = '#a855f7' // Purple
-
   return (
-    <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5" />
-      
-      {/* Central E-commerce Store Node */}
+    <div className="relative flex h-[420px] w-full items-center justify-center overflow-hidden sm:h-[500px] md:h-[580px]">
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(59,130,246,0.14),transparent_40%),radial-gradient(circle_at_75%_50%,rgba(236,72,153,0.12),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.03)_5%,transparent_5%),linear-gradient(300deg,rgba(255,255,255,0.03)_7%,transparent_7%)] bg-[size:160px_160px]" />
+
+      {/* Central e-commerce company node */}
       <motion.div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
-        initial={{ scale: 0, opacity: 0 }}
+        className="relative z-20 flex h-32 w-32 items-center justify-center rounded-full bg-slate-900/80 backdrop-blur"
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={isVisible ? { scale: 1, opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 0.3 }}
+        transition={{ duration: 0.6, type: 'spring', stiffness: 180 }}
       >
         <motion.div
-          className="relative"
-          animate={{
-            scale: [1, 1.05, 1],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          className="relative flex flex-col items-center justify-center"
+          animate={{ scale: [1, 1.04, 1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl border-4 border-primary/30">
-            <ShoppingBag className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-primary-foreground" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-[0_18px_55px_-30px_rgba(59,130,246,0.75)] ring-2 ring-primary/20 sm:h-16 sm:w-16 md:h-20 md:w-20">
+            <ShoppingBag className="h-7 w-7 text-primary-foreground sm:h-8 sm:w-8 md:h-9 md:w-9" />
           </div>
-          {/* Pulsing ring effect */}
           <motion.div
-            className="absolute inset-0 rounded-2xl border-4 border-primary/20"
-            animate={{
-              scale: [1, 1.5, 1.8],
-              opacity: [0.5, 0.2, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeOut"
-            }}
+            className="absolute inset-0 rounded-2xl border-2 border-primary/15"
+            animate={{ scale: [1, 1.28, 1.55], opacity: [0.4, 0.14, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
           />
+          <motion.p
+            className="mt-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-100 sm:text-xs"
+            initial={{ opacity: 0, y: 6 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, delay: 0.5 }}
+          >
+            E-commerce
+          </motion.p>
         </motion.div>
-        <motion.p
-          className="text-center mt-3 sm:mt-4 text-xs sm:text-sm font-bold text-foreground"
-          initial={{ opacity: 0, y: 10 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          Your E-commerce Store
-        </motion.p>
       </motion.div>
 
-      {/* LLM Nodes positioned around the center */}
+      {/* LLM nodes placed around the hub */}
       {LLMs.map((llm, index) => {
-        const angle = (index * 360) / LLMs.length - 90 // Start from top
-        const radius = 180 // Distance from center
-        const x = Math.cos((angle * Math.PI) / 180) * radius
-        const y = Math.sin((angle * Math.PI) / 180) * radius
+        const position = LLM_POSITIONS[index % LLM_POSITIONS.length]
 
         return (
-          <div key={llm.name} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            {/* Connection Line */}
-            <motion.svg
-              className="absolute"
-              width="100%"
-              height="100%"
-              style={{
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: `${radius * 2}px`,
-                height: `${radius * 2}px`,
-              }}
-              initial={{ opacity: 0 }}
-              animate={isVisible ? { opacity: 1 } : {}}
-              transition={{ duration: 0.8, delay: 0.5 + llm.delay }}
-            >
-              <motion.line
-                x1="50%"
-                y1="50%"
-                x2={`${50 + (x / radius) * 50}%`}
-                y2={`${50 + (y / radius) * 50}%`}
-                stroke={llm.color === 'primary' ? primaryColor : secondaryColor}
-                strokeWidth="2"
-                strokeDasharray="5,5"
-                opacity={0.3}
-                initial={{ pathLength: 0 }}
-                animate={isVisible ? { pathLength: 1 } : {}}
-                transition={{ duration: 1, delay: 0.7 + llm.delay }}
-              />
-              {/* Animated pulse along the line */}
-              <motion.circle
-                r="4"
-                fill={llm.color === 'primary' ? primaryColor : secondaryColor}
-                opacity={0.6}
-                initial={{ pathLength: 0 }}
-                animate={{
-                  cx: [`${50 + (x / radius) * 50}%`, '50%'],
-                  cy: [`${50 + (y / radius) * 50}%`, '50%'],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "linear",
-                  delay: 1 + llm.delay
-                }}
-              />
-            </motion.svg>
-
-            {/* LLM Node */}
+          <motion.div
+            key={llm.name}
+            className="absolute text-center"
+            style={{
+              ...position,
+              transform: 'translate(-50%, -50%)',
+            }}
+            initial={{ scale: 0.75, opacity: 0 }}
+            animate={isVisible ? { scale: 1, opacity: 1 } : {}}
+            transition={{
+              duration: 0.55,
+              delay: 0.4 + llm.delay,
+              type: 'spring',
+              stiffness: 200,
+            }}
+          >
             <motion.div
-              className="absolute"
+              className="relative mx-auto h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-2xl border border-white/10 bg-slate-900/65 backdrop-blur"
               style={{
-                left: `calc(50% + ${x}px)`,
-                top: `calc(50% + ${y}px)`,
-                transform: 'translate(-50%, -50%)',
+                boxShadow: `0 10px 55px -28px ${llm.accent}aa`,
               }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={isVisible ? { scale: 1, opacity: 1 } : {}}
+              animate={{ y: [0, -6, 0] }}
               transition={{
-                duration: 0.5,
-                delay: 0.8 + llm.delay,
-                type: "spring",
-                stiffness: 200
+                duration: 3.4 + index * 0.2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: 1 + llm.delay,
               }}
             >
-              <motion.div
-                className={`h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-xl ${
-                  llm.color === 'primary'
-                    ? 'bg-gradient-to-br from-primary to-primary/80 border-primary/30'
-                    : 'bg-gradient-to-br from-secondary to-secondary/80 border-secondary/30'
-                } flex items-center justify-center shadow-xl border-2`}
-                animate={{
-                  y: [0, -10, 0],
-                }}
-                transition={{
-                  duration: 2 + index * 0.2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 1.2 + llm.delay
-                }}
-              >
-                <llm.icon className={`h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 ${
-                  llm.color === 'primary' ? 'text-primary-foreground' : 'text-secondary-foreground'
-                }`} />
-              </motion.div>
-              <motion.p
-                className={`text-center mt-2 text-xs sm:text-sm font-bold ${
-                  llm.color === 'primary' ? 'text-primary' : 'text-secondary'
-                }`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 1.1 + llm.delay }}
-              >
-                {llm.name}
-              </motion.p>
+              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${llm.glow} blur-xl opacity-60`} />
+              <div className="relative flex h-full w-full items-center justify-center">
+                <llm.icon
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10"
+                  color={llm.accent}
+                />
+              </div>
             </motion.div>
-          </div>
+            <motion.p
+              className="mt-2 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-100 sm:text-xs"
+              initial={{ opacity: 0, y: 8 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 1 + llm.delay }}
+            >
+              {llm.name}
+            </motion.p>
+          </motion.div>
         )
       })}
 
@@ -185,25 +145,24 @@ export function LLMConnectionVisualization() {
       {[...Array(6)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-2 h-2 rounded-full bg-primary/20"
+          className="absolute h-1.5 w-1.5 rounded-full bg-primary/25"
           style={{
-            left: `${20 + i * 15}%`,
-            top: `${30 + (i % 3) * 20}%`,
+            left: `${20 + i * 13}%`,
+            top: `${28 + (i % 3) * 18}%`,
           }}
           animate={{
-            y: [0, -30, 0],
-            opacity: [0.2, 0.5, 0.2],
-            scale: [1, 1.2, 1],
+            y: [0, -18, 0],
+            opacity: [0.15, 0.35, 0.15],
+            scale: [1, 1.15, 1],
           }}
           transition={{
-            duration: 3 + i * 0.3,
+            duration: 3.8 + i * 0.3,
             repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.2
+            ease: 'easeInOut',
+            delay: i * 0.25,
           }}
         />
       ))}
     </div>
   )
 }
-
