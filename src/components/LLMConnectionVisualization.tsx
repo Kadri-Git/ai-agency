@@ -52,13 +52,9 @@ export function LLMConnectionVisualization() {
 
   return (
     <div className="relative flex h-[420px] w-full items-center justify-center overflow-hidden sm:h-[500px] md:h-[580px]">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(59,130,246,0.14),transparent_40%),radial-gradient(circle_at_75%_50%,rgba(236,72,153,0.12),transparent_40%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.03)_5%,transparent_5%),linear-gradient(300deg,rgba(255,255,255,0.03)_7%,transparent_7%)] bg-[size:160px_160px]" />
-
       {/* Central e-commerce company node */}
       <motion.div
-        className="relative z-20 flex h-32 w-32 items-center justify-center rounded-full bg-slate-900/80 backdrop-blur"
+        className="relative z-20 flex h-32 w-32 items-center justify-center rounded-full"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={isVisible ? { scale: 1, opacity: 1 } : {}}
         transition={{ duration: 0.6, type: 'spring', stiffness: 180 }}
@@ -77,7 +73,7 @@ export function LLMConnectionVisualization() {
             transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
           />
           <motion.p
-            className="mt-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-100 sm:text-xs"
+            className="mt-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground sm:text-xs"
             initial={{ opacity: 0, y: 6 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.55, delay: 0.5 }}
@@ -109,7 +105,7 @@ export function LLMConnectionVisualization() {
             }}
           >
             <motion.div
-              className="relative mx-auto h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-2xl border border-white/10 bg-slate-900/65 backdrop-blur"
+              className="relative mx-auto h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-2xl border border-primary/20"
               style={{
                 boxShadow: `0 10px 55px -28px ${llm.accent}aa`,
               }}
@@ -130,7 +126,7 @@ export function LLMConnectionVisualization() {
               </div>
             </motion.div>
             <motion.p
-              className="mt-2 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-100 sm:text-xs"
+              className="mt-2 text-center text-[11px] font-semibold uppercase tracking-wide text-foreground sm:text-xs"
               initial={{ opacity: 0, y: 8 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 1 + llm.delay }}

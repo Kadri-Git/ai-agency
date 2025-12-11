@@ -74,7 +74,7 @@ export default function HomePage() {
             </motion.h1>
             
             <motion.p 
-              className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-2"
+              className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground leading-relaxed mb-4 sm:mb-6 md:mb-8 lg:mb-10 max-w-3xl mx-auto px-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -85,7 +85,7 @@ export default function HomePage() {
             </motion.p>
             
             <motion.p 
-              className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-2"
+              className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground leading-relaxed mb-4 sm:mb-6 md:mb-8 lg:mb-10 max-w-3xl mx-auto px-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -119,12 +119,14 @@ export default function HomePage() {
 
           {/* Right side - Visualization */}
           <motion.div
-            className="flex items-center justify-center"
+            className="flex items-center justify-center w-full mt-8 lg:mt-0"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <LLMConnectionVisualization />
+            <div className="w-full max-w-full">
+              <LLMConnectionVisualization />
+            </div>
           </motion.div>
           </div>
         </div>
@@ -144,74 +146,74 @@ export default function HomePage() {
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 sm:mb-8 text-foreground">
                 Understanding AI Visibility and Citation
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <motion.div
-                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
-                    <Eye className="h-6 w-6 text-primary" />
+                  <div className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold mb-2 text-foreground">What is AI Visibility?</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">What is AI Visibility?</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                       How discoverable your store is when users ask ChatGPT, Gemini, Claude, and Grok about products. Unlike SEO rankings, AI visibility means being recommended and cited by AI agents.
                     </p>
                   </div>
                 </motion.div>
 
                 <motion.div
-                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
-                    <Brain className="h-6 w-6 text-primary" />
+                  <div className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold mb-2 text-foreground">How AI Chooses Stores</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">How AI Chooses Stores</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                       AI systems understand context and authority signals. Stores with clear positioning, comprehensive presence, and established authority get cited most often.
                     </p>
                   </div>
                 </motion.div>
 
                 <motion.div
-                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
-                    <TrendingUp className="h-6 w-6 text-primary" />
+                  <div className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold mb-2 text-foreground">The New Discovery Channel</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">The New Discovery Channel</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                       AI provides direct answers with specific recommendations—not just lists. If you're not being cited, you're missing a growing channel of customer discovery.
                     </p>
                   </div>
                 </motion.div>
 
                 <motion.div
-                  className="flex gap-4 p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.3 }}
                 >
-                  <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
-                    <Lightbulb className="h-6 w-6 text-primary" />
+                  <div className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
+                    <Lightbulb className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold mb-2 text-foreground">Different from Search</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">Different from Search</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                       AI systems learn from patterns in how product information is presented. They recognize relationships and authority—not just keywords.
                     </p>
                   </div>
@@ -249,21 +251,21 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="p-6 sm:p-8 rounded-lg border-2 border-destructive/20 bg-destructive/5"
+                className="p-4 sm:p-6 md:p-8 rounded-lg border-2 border-destructive/20 bg-destructive/5"
               >
-                <h3 className="text-xl sm:text-2xl font-bold mb-6 text-destructive">Before Citrus</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start gap-3">
-                    <span className="text-destructive mt-1">✗</span>
-                    <span className="text-base text-muted-foreground">Zero-click searches kill your traffic</span>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-destructive">Before Citrus</h3>
+                <ul className="space-y-3 sm:space-y-4">
+                  <li className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-destructive mt-0.5 sm:mt-1 text-lg sm:text-xl">✗</span>
+                    <span className="text-sm sm:text-base text-muted-foreground">Zero-click searches kill your traffic</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-destructive mt-1">✗</span>
-                    <span className="text-base text-muted-foreground">Competitors get cited instead of you</span>
+                  <li className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-destructive mt-0.5 sm:mt-1 text-lg sm:text-xl">✗</span>
+                    <span className="text-sm sm:text-base text-muted-foreground">Competitors get cited instead of you</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-destructive mt-1">✗</span>
-                    <span className="text-base text-muted-foreground">Spending $50k+/mo on SEO with shrinking ROI</span>
+                  <li className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-destructive mt-0.5 sm:mt-1 text-lg sm:text-xl">✗</span>
+                    <span className="text-sm sm:text-base text-muted-foreground">Spending $50k+/mo on SEO with shrinking ROI</span>
                   </li>
                 </ul>
               </motion.div>
@@ -274,21 +276,21 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="p-6 sm:p-8 rounded-lg border-2 border-primary/30 bg-primary/10"
+                className="p-4 sm:p-6 md:p-8 rounded-lg border-2 border-primary/30 bg-primary/10"
               >
-                <h3 className="text-xl sm:text-2xl font-bold mb-6 text-primary">After Citrus</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                    <span className="text-base text-muted-foreground">You win the zero-click war</span>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-primary">After Citrus</h3>
+                <ul className="space-y-3 sm:space-y-4">
+                  <li className="flex items-start gap-2 sm:gap-3">
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 sm:mt-1 shrink-0" />
+                    <span className="text-sm sm:text-base text-muted-foreground">You win the zero-click war</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                    <span className="text-base text-muted-foreground">You dominate every relevant AI answer</span>
+                  <li className="flex items-start gap-2 sm:gap-3">
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 sm:mt-1 shrink-0" />
+                    <span className="text-sm sm:text-base text-muted-foreground">You dominate every relevant AI answer</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                    <span className="text-base text-muted-foreground">Lower ad spend, higher authority, evergreen leads</span>
+                  <li className="flex items-start gap-2 sm:gap-3">
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 sm:mt-1 shrink-0" />
+                    <span className="text-sm sm:text-base text-muted-foreground">Lower ad spend, higher authority, evergreen leads</span>
                   </li>
                 </ul>
               </motion.div>
@@ -340,6 +342,20 @@ export default function HomePage() {
               </motion.div>
             ))}
           </div>
+          <motion.div 
+            className="flex justify-center mt-8 sm:mt-12 px-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Button asChild size="lg" className="h-12 sm:h-14 w-full sm:w-auto px-6 sm:px-8 md:px-12 text-sm sm:text-base md:text-lg font-bold shadow-xl hover:shadow-2xl transition-all bg-primary hover:bg-primary/90 hover:scale-105 active:scale-95">
+              <Link href="#contact" className="flex items-center justify-center">
+                Get Your Free AI Visibility Score
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+              </Link>
+            </Button>
+          </motion.div>
         </div>
       </section>
 
@@ -413,67 +429,20 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Proof Section - Real Numbers */}
-      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div 
-            className="text-center mb-8 sm:mb-12 md:mb-16"
+            className="flex justify-center mt-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-foreground px-2">
-              Results and Case Studies
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
-              We work with companies across various industries to improve their AI visibility. Here are examples of the results we've 
-              helped achieve. These outcomes are based on our clients' reported metrics and internal tracking of AI citation frequency 
-              across major platforms.
-            </p>
+            <Button asChild size="lg" className="h-12 sm:h-14 px-8 sm:px-12 text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all bg-primary hover:bg-primary/90 hover:scale-105 active:scale-95">
+              <Link href="#contact" className="flex items-center justify-center">
+                Get Your Free AI Visibility Score
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+              </Link>
+            </Button>
           </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-            {[
-              { 
-                company: 'Ramp', 
-                result: '9× more mentions', 
-                detail: 'in finance-related prompts in 60 days',
-                icon: TrendingUp
-              },
-              { 
-                company: 'Deel', 
-                result: 'Went from #7 to #1', 
-                detail: 'cited payroll brand globally',
-                icon: Target
-              },
-              { 
-                company: 'Mercury', 
-                result: '523% increase', 
-                detail: 'in AI-driven signups Q4 2025',
-                icon: Zap
-              },
-            ].map((proof, index) => (
-              <motion.div
-                key={proof.company}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="p-6 sm:p-8 rounded-lg border-2 border-primary/20 bg-background shadow-lg"
-              >
-                <div className="mb-4 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center">
-                  <proof.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-2">{proof.company}</h3>
-                <p className="text-2xl sm:text-3xl font-bold text-primary mb-2">{proof.result}</p>
-                <p className="text-sm sm:text-base text-muted-foreground">{proof.detail}</p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -620,14 +589,14 @@ export default function HomePage() {
               >
                 <div className="h-full p-4 sm:p-6">
                   <motion.div 
-                    className="mb-4 h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center"
+                    className="mb-3 sm:mb-4 h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center"
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <benefit.icon className="h-7 w-7 text-primary" />
+                    <benefit.icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
                   </motion.div>
-                  <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-                  <p className="text-base leading-relaxed text-muted-foreground">
+                  <h3 className="text-lg sm:text-xl font-bold mb-2">{benefit.title}</h3>
+                  <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
                     {benefit.desc}
                   </p>
                 </div>
@@ -672,47 +641,19 @@ export default function HomePage() {
               >
                 <div className="h-full p-4 sm:p-6">
                   <motion.div 
-                    className="mb-4 h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center"
+                    className="mb-3 sm:mb-4 h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center"
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <benefit.icon className="h-7 w-7 text-primary" />
+                    <benefit.icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
                   </motion.div>
-                  <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-                  <p className="text-base leading-relaxed text-muted-foreground">
+                  <h3 className="text-lg sm:text-xl font-bold mb-2">{benefit.title}</h3>
+                  <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
                     {benefit.desc}
                   </p>
                 </div>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 sm:mb-8 text-foreground">
-                Get Started with AI Visibility Optimization
-              </h2>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10">
-                Understand your current AI visibility and explore how to improve your e-commerce store's presence across major AI platforms. 
-                Our free visibility score provides insights into where you stand today and what opportunities exist.
-              </p>
-              <Button asChild size="lg" className="h-12 sm:h-14 px-8 sm:px-12 text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl transition-all bg-primary hover:bg-primary/90 hover:scale-105 active:scale-95">
-                <Link href="#contact" className="flex items-center justify-center">
-                  Get Your Free AI Visibility Score
-                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-                </Link>
-              </Button>
-            </motion.div>
           </div>
         </div>
       </section>
@@ -732,7 +673,10 @@ export default function HomePage() {
                 Let's Start a Conversation
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground px-2">
-                We'd love to hear about your e-commerce store and explore how we can help you improve your AI visibility
+                AI visibility is the new front door to your store. Tell us about your brand and we’ll send a free AI Visibility Report showing where you stand—and how to get cited more often.
+              </p>
+              <p className="text-sm sm:text-base text-muted-foreground px-2 mt-2">
+                Fill in the form below to get your free visibility score and a tailored action plan.
               </p>
             </motion.div>
             <motion.div 

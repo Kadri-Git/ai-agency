@@ -7,19 +7,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { toast } from 'sonner'
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   mobile: z.string().min(10, 'Please enter a valid mobile number'),
-  budget: z.string().min(1, 'Please select a budget range'),
+  website: z
+    .string()
+    .url('Please enter a valid website URL (include http/https)')
+    .min(5, 'Please enter your website'),
   message: z.string().optional(),
 })
 
@@ -31,13 +27,9 @@ export function ContactForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setValue,
-    watch,
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   })
-
-  const budgetValue = watch('budget')
 
   const onSubmit = async (data: ContactFormData) => {
     // Simulate API call
@@ -91,31 +83,19 @@ export function ContactForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="budget" className="text-sm sm:text-base">
-              Monthly Ads Budget <span className="text-destructive">*</span>
+            <Label htmlFor="website" className="text-sm sm:text-base">
+              Website <span className="text-destructive">*</span>
             </Label>
-            <Select
-              value={budgetValue}
-              onValueChange={(value) => setValue('budget', value)}
-            >
-              <SelectTrigger
-                id="budget"
-                className="w-full h-11 sm:h-12 text-base"
-                aria-invalid={errors.budget ? 'true' : 'false'}
-              >
-                <SelectValue placeholder="Select budget range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="under-1k">Under $1,000</SelectItem>
-                <SelectItem value="1k-5k">$1,000 - $5,000</SelectItem>
-                <SelectItem value="5k-10k">$5,000 - $10,000</SelectItem>
-                <SelectItem value="10k-25k">$10,000 - $25,000</SelectItem>
-                <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
-                <SelectItem value="50k-plus">$50,000+</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.budget && (
-              <p className="text-xs sm:text-sm text-destructive">{errors.budget.message}</p>
+            <Input
+              id="website"
+              type="url"
+              placeholder="https://yourstore.com"
+              {...register('website')}
+              aria-invalid={errors.website ? 'true' : 'false'}
+              className="h-11 sm:h-12 text-base"
+            />
+            {errors.website && (
+              <p className="text-xs sm:text-sm text-destructive">{errors.website.message}</p>
             )}
           </div>
 
