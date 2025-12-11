@@ -148,7 +148,7 @@ export default function HomePage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <motion.div
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -166,7 +166,7 @@ export default function HomePage() {
                 </motion.div>
 
                 <motion.div
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -184,7 +184,7 @@ export default function HomePage() {
                 </motion.div>
 
                 <motion.div
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -202,7 +202,7 @@ export default function HomePage() {
                 </motion.div>
 
                 <motion.div
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 rounded-lg border border-primary/20 bg-primary/5"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -251,7 +251,6 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="p-4 sm:p-6 md:p-8 rounded-lg border-2 border-destructive/20 bg-destructive/5"
               >
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-destructive">Before Citrus</h3>
                 <ul className="space-y-3 sm:space-y-4">
@@ -276,7 +275,6 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="p-4 sm:p-6 md:p-8 rounded-lg border-2 border-primary/30 bg-primary/10"
               >
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-primary">After Citrus</h3>
                 <ul className="space-y-3 sm:space-y-4">
