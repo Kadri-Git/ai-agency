@@ -43,6 +43,20 @@ export const metadata: Metadata = {
     title: 'Citrus - AI Visibility Agency | Get Cited by ChatGPT, Gemini, Claude & Grok',
     description: 'Citrus helps e-commerce businesses improve their AI visibility and get cited by large language models. Learn how AI agents discover e-commerce stores and optimize your presence for ChatGPT, Gemini, Claude, and Grok.',
     type: 'website',
+    images: [
+      {
+        url: '/citrus-logosmall.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Citrus - AI Visibility Agency',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Citrus - AI Visibility Agency | Get Cited by ChatGPT, Gemini, Claude & Grok',
+    description: 'Citrus helps e-commerce businesses improve their AI visibility and get cited by large language models.',
+    images: ['/citrus-logosmall.jpg'],
   },
 }
 
