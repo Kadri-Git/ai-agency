@@ -1,146 +1,205 @@
-# Vibe-Coding Starter
+# Enterprise AI Visibility Analysis Platform v3.0
 
-You just got yourself a fully loaded website starter kit. Everything is already installed and configured. No setup headaches, no YouTube tutorials needed.
+A comprehensive SaaS application that provides enterprise-grade AI search visibility analysis with a visually stunning, easy-to-read interface and clear, actionable recommendations.
 
-### Why do you need this?
+## Features
 
-You do not need a computer science degree to build a website anymore. But if you start from scratch, you will spend days figuring out which tools to use, how to set them up, and why things are not working. This starter kit gives you a professional setup from day one. All the best practices, all the right tools, already configured. You do not need to know everything to create a product these days.
+- **Share of Voice Tracking** - Calculate market conversation percentage vs competitors
+- **Query Fanout Intelligence** - See actual AI sub-queries, not just user prompts
+- **Brand Narrative Analysis** - Understand AI's story about your brand
+- **Historical Comparison** - Track improvement over time
+- **Competitive Gap Analysis** - Identify where competitors beat you
+- **Actionable Recommendations** - AI-powered improvement suggestions with Top 3 prioritized actions
 
-### How does it work?
+## Tech Stack
 
-This kit is built for vibe coding. You describe what you want to an AI (like Cursor), and it writes the code for you. Your job is to have ideas and give feedback. The AI already knows how this project is structured, so it gives you better code that actually works.
-
-Inside you will find ready-to-use buttons, cards, forms, icons, dark mode, and a bunch of other goodies. Think of it as IKEA furniture that is already assembled. You just arrange it how you want.
+- **Frontend**: Next.js 16 (App Router), TypeScript, Tailwind CSS, Recharts
+- **Backend**: Next.js API Routes, Prisma ORM, PostgreSQL
+- **AI Integrations**: OpenAI (ChatGPT), Anthropic (Claude), Google (Gemini)
+- **UI Components**: shadcn/ui, Framer Motion
+- **Deployment**: Vercel-ready
 
 ## Getting Started
 
-Before you start, make sure you have [Node.js](https://nodejs.org) installed (version 20.9+ or 22.12+). Then open your terminal in the project folder.
+### Prerequisites
 
-### 1. First time setup (only once)
+- Node.js 18+ 
+- PostgreSQL database (local or cloud)
+- API keys for:
+  - OpenAI (ChatGPT)
+  - Anthropic (Claude)
+  - Google AI (Gemini)
 
+### Installation
+
+1. **Clone and install dependencies:**
 ```bash
 npm install
 ```
 
-Downloads all the packages your project needs. You only run this once when you first get the project, or when someone adds new packages.
+2. **Set up environment variables:**
+```bash
+cp .env.example .env
+```
 
-### 2. Every time you develop
+Edit `.env` and add your API keys:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/ai_visibility"
+OPENAI_API_KEY="your-openai-key"
+ANTHROPIC_API_KEY="your-anthropic-key"
+GOOGLE_AI_API_KEY="your-google-ai-key"
+```
 
+3. **Set up the database:**
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+4. **Run the development server:**
 ```bash
 npm run dev
 ```
 
-Starts your website at localhost:3000. Every change you make shows up here instantly. Keep this running while you work.
+Open [http://localhost:3000](http://localhost:3000) to see the dashboard.
 
-```bash
-npm run storybook
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/              # API routes
+│   │   ├── analyze/      # Analysis endpoints
+│   │   └── recommendations/ # Recommendations endpoint
+│   ├── page.tsx          # Main dashboard
+│   └── layout.tsx        # Root layout
+├── components/
+│   ├── dashboard/        # Dashboard-specific components
+│   │   ├── MetricCard.tsx
+│   │   ├── ChartContainer.tsx
+│   │   ├── ProgressBar.tsx
+│   │   ├── RecommendationsSection.tsx
+│   │   └── SovChart.tsx
+│   └── layout/
+│       └── DashboardHeader.tsx
+└── lib/
+    ├── prisma.ts         # Prisma client
+    └── ai-integrations.ts # AI platform integrations
 ```
 
-Opens the component playground at localhost:6006 (run in a second terminal). This shows all your buttons, cards, and components in isolation. Great for designing pieces without touching your main app.
+## Database Schema
 
-### 3. When you finish a feature
+The platform uses Prisma with PostgreSQL. Key models:
 
+- **Company** - Company profiles and settings
+- **Analysis** - Analysis runs with metrics
+- **Result** - Individual query results per platform
+- **BrandNarrative** - Brand narrative analysis
+- **TopicOpportunity** - Content opportunities
+- **ShareOfVoiceHistory** - Historical SOV tracking
+- **QueryFanout** - Query fanout analysis
+
+See `prisma/schema.prisma` for full schema.
+
+## API Endpoints
+
+### POST `/api/analyze`
+Start a new analysis for a company.
+
+**Body:**
+```json
+{
+  "company": "Acme Corp",
+  "domain": "acme.com",
+  "industry": "SaaS",
+  "config": {}
+}
+```
+
+**Response:**
+```json
+{
+  "id": "analysis-id",
+  "companyId": "company-id",
+  "status": "completed",
+  "shareOfVoice": 15.2,
+  "visibilityScore": 72
+}
+```
+
+### GET `/api/analyze?id=analysis-id`
+Get analysis results.
+
+### GET `/api/recommendations?analysisId=analysis-id`
+Get Top 3 recommendations for an analysis.
+
+## Design System
+
+- **Typography**: Inter Variable for body, Display font for hero numbers
+- **Colors**: Professional blue (#3b82f6) primary, semantic colors for status
+- **Spacing**: 8px scale (4, 8, 12, 16, 24, 32, 48, 64, 96)
+- **Animations**: 0.6s cubic-bezier transitions
+- **Layout**: Max-width 1400px, responsive grid, mobile-first
+
+## Key Metrics
+
+The dashboard displays:
+
+1. **Share of Voice (0-100%)** - Overall + by platform + trend
+2. **AI Visibility Score (0-100)** - Normalized visibility score
+3. **Monthly Audience** - Total exposure + growth rate
+4. **Favorable Sentiment** - Positive recommendations percentage
+
+## Top 3 Recommendations
+
+Every analysis includes a prominent "Top 3 Recommendations" section with:
+
+- Priority number (1, 2, 3) in gold badge
+- Clear, actionable title
+- Impact & effort badges (high/medium/low)
+- Estimated SOV gain percentage
+- Timeframe
+- Evidence section (current metric, benchmark, gap)
+- 3-5 specific action steps with checkboxes
+- Business justification
+
+## Development
+
+### Running Tests
 ```bash
 npm test
 ```
 
-Runs all your tests to make sure nothing broke. Do this before you share your code or deploy. Catches bugs before your users do.
+### Building for Production
+```bash
+npm run build
+```
 
-### 4. When you are ready to go live
+### Database Migrations
+```bash
+npx prisma migrate dev
+```
 
-Right now your website only works on your computer. To put it on the internet where anyone can visit it, you need two things:
+### Prisma Studio (Database GUI)
+```bash
+npx prisma studio
+```
 
-**GitHub** - Think of [GitHub](https://github.com) as a cloud backup for your code. You save your project there, and it keeps track of every change you make. It is free. Create an account, then use Cursor to "push" your code to GitHub.
+## Deployment
 
-**Vercel** - [Vercel](https://vercel.com) is like a web host, but way easier. It takes your code from GitHub and turns it into a real website with a URL anyone can visit. Also free for personal projects. Sign up with your GitHub account, click "Add New Project", pick your project, and hit "Deploy". Done.
+The platform is ready for Vercel deployment:
 
-The magic: every time you push new code to GitHub, Vercel notices and updates your website automatically. No extra steps needed.
+1. Push to GitHub
+2. Import to Vercel
+3. Add environment variables
+4. Deploy
 
-## What's Inside
-
-| Package | What it does |
-|---------|-------------|
-| [Next.js](https://nextjs.org/docs) | The Website Engine. This is what makes your website actually work. It turns your pages into a real website that loads fast and looks great on Google. |
-| [TypeScript](https://www.typescriptlang.org/docs) | Error Prevention. Catches mistakes before they become problems. It also helps AI understand your code better. |
-| [Tailwind CSS](https://tailwindcss.com/docs) | Styling System. How things look - colors, spacing, fonts. Just add words like "bg-blue-500" to make something blue. |
-| [Shadcn/ui](https://ui.shadcn.com) | Ready-Made Components. Buttons, cards, forms, dialogs, menus - all designed and ready to use in src/components/ui/. |
-| [Storybook](https://storybook.js.org/docs) | Component Playground. Run "npm run storybook" and get a visual catalog of all your components. |
-| [Zustand](https://zustand.docs.pmnd.rs) | Shared Data. When different parts of your website need to know the same thing. Check src/store/ for examples. |
-| [React Hook Form + Zod](https://react-hook-form.com/get-started) | Smart Forms. Forms that check if emails are real emails, passwords are long enough, and show helpful errors. |
-| [ESLint + Prettier](https://eslint.org/docs/latest) | Code Cleanup. Automatically makes your code look neat and catches silly mistakes. |
-| [Husky + lint-staged](https://typicode.github.io/husky) | Safety Net. Before you save your work, this checks if everything is okay. |
-| [next-themes](https://github.com/pacocoursey/next-themes) | Dark Mode. Light theme, dark theme - already working. |
-| [Lucide React](https://lucide.dev/icons) | Icons. Over 1000 beautiful icons included. |
-| [Sonner](https://sonner.emilkowal.ski) | Toast Notifications. Those little messages that pop up to tell you something worked. |
-| [Vitest + Playwright](https://vitest.dev/guide) | Testing Tools. Vitest for code logic, Playwright for testing like a real user would. |
-| [Motion](https://motion.dev/docs) | Animations. Make things move smoothly. Fade, slide, animate on hover. |
-
-## How to Prompt
-
-The magic of vibe coding is talking to AI and getting working code back. Here is how to get the best results.
-
-### 1. Be specific about what you want
-
-The more details you give, the better results you get. Instead of "make a form", try:
-
-> "Create a contact form with name, email, and message fields. Add a submit button. Show an error if email is invalid. Show a success message after submitting."
-
-### 2. Use existing components and Tailwind
-
-Your project uses [Shadcn/ui](https://ui.shadcn.com) components (in src/components/ui/) styled with [Tailwind CSS](https://tailwindcss.com/docs). Tell AI to use both:
-
-> "Create a pricing card using the Card component from @/components/ui/card and Button from @/components/ui/button. Style it with Tailwind classes. Add a blue gradient background and rounded corners."
-
-### 3. Use the playground
-
-Run "npm run storybook" first. Then you can say things like:
-
-> "I saw a card with a footer in Storybook. Create something similar but for a product with an image, title, price, and 'Add to cart' button."
-
-### 4. Ask for changes step by step
-
-Do not try to build everything at once. Start simple, then add:
-
-> First: "Create a simple navbar with a logo and three links."
-> Then: "Add a mobile menu that opens when you tap a hamburger icon."
-> Then: "Add dark mode toggle to the navbar."
-
-### 5. When something breaks, explain what you see
-
-AI cannot see your screen. Describe the problem:
-
-> "The button is there but nothing happens when I click it. I expected it to open a popup. Here is the code: [paste your code]"
-
-### 6. Ask AI to explain
-
-Do not just copy-paste. Learn as you go:
-
-> "This code works but I do not understand what useEffect does. Can you explain it like I am 10 years old?"
-
-### 7. Request mobile-friendly designs
-
-Always mention mobile. Otherwise you might get desktop-only layouts:
-
-> "Create a hero section with a headline, subtitle, and two buttons. Make sure it looks good on phones too."
-
-### 8. Save time with "similar to"
-
-If you see something you like on another website:
-
-> "Create a testimonial section similar to what Stripe has on their homepage. Use the Card component and add star ratings."
-
-### 9. Never use time to fix bugs
-
-If AI suggests using setTimeout or "wait 100ms" to fix a problem, reject it. That is a hack that will break later:
-
-> "This works only when I add a setTimeout. That feels wrong. Can you fix it properly? I want to wait for the actual data to load, not guess how long it takes."
-
-### 10. Ask AI to write and run tests
-
-Tests catch bugs before users do. Ask AI to create them for important features:
-
-> "Write tests for my checkout function. It should calculate the correct total, apply discounts, and handle empty carts. Run the tests and fix any failures."
+For database, use:
+- **Supabase** (recommended)
+- **Neon** (serverless Postgres)
+- **Railway** (simple Postgres)
 
 ## License
 
-MIT License - see [LICENSE](./LICENSE) for details.
+MIT
+

@@ -1,0 +1,187 @@
+// Prisma Schema for Enterprise AI Visibility Analysis Platform
+// Database models for tracking AI search visibility, share of voice, and recommendations
+
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Company {
+  id                String   @id @default(cuid())
+  name              String
+  domain            String   @unique
+  industry          String?
+  logoUrl           String?  @map("logo_url")
+  competitorIds     String[] @map("competitor_ids") @default([])
+  targetRegions     String[] @map("target_regions") @default([])
+  targetLanguages   String[] @map("target_languages") @default([])
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  analyses          Analysis[]
+  narratives        BrandNarrative[]
+  opportunities     TopicOpportunity[]
+  sovHistory        ShareOfVoiceHistory[]
+
+  @@map("companies")
+}
+
+model Analysis {
+  id                    String   @id @default(cuid())
+  companyId             String   @map("company_id")
+  shareOfVoice          Float    @map("share_of_voice") // 0-100
+  sovByPlatform         Json     @map("sov_by_platform") // { chatgpt: 15.2, claude: 12.5, ... }
+  visibilityScore       Float    @map("visibility_score") // 0-100
+  monthlyAudience       Int      @map("monthly_audience")
+  mentionCount          Int      @map("mention_count")
+  citationCount         Int      @map("citation_count")
+  favorableMentions     Int      @map("favorable_mentions")
+  neutralMentions       Int      @map("neutral_mentions")
+  negativeMentions      Int      @map("negative_mentions")
+  averagePosition       Float    @map("average_position")
+  totalFanoutQueries    Int      @map("total_fanout_queries")
+  avgFanoutPerPrompt    Float    @map("avg_fanout_per_prompt")
+  commonAddedTerms      Json     @map("common_added_terms") // ["best", "2025", "top"]
+  totalUniqueSources    Int      @map("total_unique_sources")
+  sourceDiversityScore  Float    @map("source_diversity_score") // 1-10
+  promptsAnalyzed       Int      @map("prompts_analyzed")
+  promptsMentioned      Int      @map("prompts_mentioned")
+  mentionRate           Float    @map("mention_rate") // 0-1
+  competitiveRank       Int?     @map("competitive_rank")
+  competitorsAnalyzed   String[] @map("competitors_analyzed") @default([])
+  config                Json     @default("{}") // Analysis configuration
+  consistencyScore      Float?   @map("consistency_score") // 0-1
+  startDate             DateTime @map("start_date")
+  endDate               DateTime @map("end_date")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  results               Result[]
+  queryFanouts         QueryFanout[]
+  narratives            BrandNarrative[]
+  opportunities         TopicOpportunity[]
+
+  @@index([companyId])
+  @@index([createdAt])
+  @@map("analyses")
+}
+
+model Result {
+  id                    String   @id @default(cuid())
+  analysisId            String   @map("analysis_id")
+  platform              String   // "chatgpt", "claude", "gemini", "perplexity"
+  prompt                String
+  promptCategory        String   @map("prompt_category")
+  estimatedSearchVolume Int?     @map("estimated_search_volume")
+  response              String   @db.Text
+  mentioned             Boolean  @default(false)
+  position              Int?     // 1, 2, 3, etc. (null if not mentioned)
+  contextSnippet        String?  @map("context_snippet") @db.Text
+  sentiment             String?  // "favorable", "neutral", "negative"
+  sentimentScore        Float?   @map("sentiment_score") // -1 to 1
+  competitorsMentioned  String[] @map("competitors_mentioned") @default([])
+  competitorPositions   Json?    @map("competitor_positions") // { "competitor1": 1, "competitor2": 3 }
+  citations             Json?    @default("[]") // Array of citation objects
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  analysis              Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  queryFanouts          QueryFanout[]
+
+  @@index([analysisId])
+  @@index([platform])
+  @@index([mentioned])
+  @@map("results")
+}
+
+model BrandNarrative {
+  id                    String   @id @default(cuid())
+  companyId             String   @map("company_id")
+  analysisId            String   @map("analysis_id")
+  brandArchetype        String?  @map("brand_archetype") // "Innovation Leader", "Market Leader", etc.
+  primaryNarrative      String?  @map("primary_narrative") @db.Text
+  secondaryNarratives   String[] @map("secondary_narratives") @default([])
+  recurringThemes       Json     @map("recurring_themes") @default("[]")
+  keyAssociations       Json     @map("key_associations") @default("{}")
+  positioning           String?  @db.Text
+  overallNarrativeTone  String?  @map("overall_narrative_tone")
+  consistencyScore      Float?   @map("consistency_score") // 0-1
+  narrativeGaps         String[] @map("narrative_gaps") @default([])
+  narrativeOpportunities String[] @map("narrative_opportunities") @default([])
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  analysis              Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([analysisId])
+  @@map("brand_narratives")
+}
+
+model TopicOpportunity {
+  id                String   @id @default(cuid())
+  companyId         String   @map("company_id")
+  analysisId        String   @map("analysis_id")
+  topicCategory     String   @map("topic_category")
+  prompt            String   @db.Text
+  estimatedVolume   Int      @map("estimated_volume")
+  difficultyScore   Float    @map("difficulty_score") // 1-10
+  impactScore       Float    @map("impact_score") // 1-10
+  competitorsRanking Json    @map("competitors_ranking") @default("[]")
+  marketLeader      String?  @map("market_leader")
+  whyMissing        String?  @map("why_missing") @db.Text
+  contentGaps       String[] @map("content_gaps") @default([])
+  citationGaps      String[] @map("citation_gaps") @default([])
+  recommendedActions String[] @map("recommended_actions") @default([])
+  priority          Int?     // 1, 2, 3 for top recommendations
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  analysis          Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([analysisId])
+  @@index([priority])
+  @@map("topic_opportunities")
+}
+
+model ShareOfVoiceHistory {
+  id                String   @id @default(cuid())
+  companyId         String   @map("company_id")
+  overallSov        Float    @map("overall_sov") // 0-100
+  sovByPlatform     Json     @map("sov_by_platform") // { chatgpt: 15.2, claude: 12.5, ... }
+  marketSize        Int      @map("market_size")
+  yourMentions      Int      @map("your_mentions")
+  topCompetitor     String?  @map("top_competitor")
+  topCompetitorSov  Float?   @map("top_competitor_sov")
+  yourRank          Int?     @map("your_rank")
+  changeFromPrev    Float?   @map("change_from_prev") // Percentage change
+  momentum          String?  // "up", "down", "stable"
+  measuredAt        DateTime @map("measured_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([measuredAt])
+  @@map("share_of_voice_history")
+}
+
+model QueryFanout {
+  id              String   @id @default(cuid())
+  analysisId      String   @map("analysis_id")
+  resultId        String   @map("result_id")
+  originalPrompt  String   @map("original_prompt") @db.Text
+  fanoutQueries   String[] @map("fanout_queries") @default([])
+  addedTerms      Json     @map("added_terms") @default("[]") // ["best", "2025"]
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  analysis        Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  result          Result   @relation(fields: [resultId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@index([resultId])
+  @@map("query_fanouts")
+}
