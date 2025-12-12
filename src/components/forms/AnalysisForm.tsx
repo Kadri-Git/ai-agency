@@ -16,7 +16,7 @@ import { Search, Loader2, Globe, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AnalysisFormProps {
-  onAnalysisStart?: (analysisId: string) => void
+  onAnalysisStart?: (analysisId: string, domain: string) => void
 }
 
 const regions = [
@@ -132,7 +132,12 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
       toast.success('Analysis started successfully!')
       
       if (onAnalysisStart) {
-        onAnalysisStart(data.id)
+        onAnalysisStart(data.id, domain)
+      }
+      
+      // Store domain for future page loads
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lastAnalyzedDomain', domain)
       }
 
       // Reset form

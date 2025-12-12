@@ -187,10 +187,57 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
+    const domain = searchParams.get('domain')
+    const latest = searchParams.get('latest') === 'true'
 
+    // Get latest analysis for a domain
+    if (latest && domain) {
+      const company = await prisma.company.findUnique({
+        where: { domain },
+        include: {
+          analyses: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            include: {
+              results: true,
+            },
+          },
+        },
+      })
+
+      if (!company || company.analyses.length === 0) {
+        return NextResponse.json(
+          { error: 'No analysis found for this domain' },
+          { status: 404 }
+        )
+      }
+
+      return NextResponse.json(company.analyses[0])
+    }
+
+    // Get previous analysis for comparison (second most recent)
+    if (domain && searchParams.get('previous') === 'true') {
+      const company = await prisma.company.findUnique({
+        where: { domain },
+        include: {
+          analyses: {
+            orderBy: { createdAt: 'desc' },
+            take: 2,
+          },
+        },
+      })
+
+      if (!company || company.analyses.length < 2) {
+        return NextResponse.json(null) // No previous analysis
+      }
+
+      return NextResponse.json(company.analyses[1]) // Second most recent
+    }
+
+    // Get analysis by ID
     if (!id) {
       return NextResponse.json(
-        { error: 'Analysis ID is required' },
+        { error: 'Analysis ID or domain is required' },
         { status: 400 }
       )
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DashboardHeader } from '@/components/layout/DashboardHeader'
 import { MetricCard } from '@/components/dashboard/MetricCard'
 import { ChartContainer } from '@/components/dashboard/ChartContainer'
@@ -17,101 +17,193 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import type { Recommendation } from '@/components/dashboard/RecommendationsSection'
 
-// Mock data - will be replaced with real API data
-const mockRecommendations = [
-  {
-    priority: 1 as const,
-    title: 'Optimize Content for High-Volume Queries',
-    impact: 'high' as const,
-    effort: 'medium' as const,
-    estimatedSovGain: 12.5,
-    timeframe: '2-3 months',
-    evidence: {
-      currentMetric: '15.2% SOV on ChatGPT',
-      benchmark: '28.5% SOV (top competitor)',
-      gap: '13.3 percentage points',
-    },
-    actionSteps: [
-      'Create comprehensive product comparison guides',
-      'Optimize existing content with structured data markup',
-      'Build authority through industry publication citations',
-      'Develop topic clusters around high-volume queries',
-      'Improve citation quality with expert quotes',
-    ],
-    businessJustification:
-      'High-volume queries represent 60% of total search volume. Improving visibility here will significantly increase brand awareness and qualified traffic.',
-  },
-  {
-    priority: 2 as const,
-    title: 'Expand Source Diversity Across Platforms',
-    impact: 'high' as const,
-    effort: 'low' as const,
-    estimatedSovGain: 8.3,
-    timeframe: '1-2 months',
-    evidence: {
-      currentMetric: 'Source diversity score: 4.2/10',
-      benchmark: '7.8/10 (industry average)',
-      gap: '3.6 points below average',
-    },
-    actionSteps: [
-      'Submit to 5 new industry directories',
-      'Secure 3 guest post opportunities',
-      'Create press releases for product launches',
-      'Build relationships with industry publications',
-    ],
-    businessJustification:
-      'AI models favor diverse, authoritative sources. Increasing source diversity improves credibility and citation frequency.',
-  },
-  {
-    priority: 3 as const,
-    title: 'Improve Sentiment in Product Recommendations',
-    impact: 'medium' as const,
-    effort: 'high' as const,
-    estimatedSovGain: 5.7,
-    timeframe: '3-4 months',
-    evidence: {
-      currentMetric: '68% favorable sentiment',
-      benchmark: '82% favorable (top performers)',
-      gap: '14 percentage points',
-    },
-    actionSteps: [
-      'Conduct customer satisfaction survey',
-      'Address negative review themes in content',
-      'Highlight unique value propositions more clearly',
-      'Create case studies showcasing success stories',
-      'Improve product descriptions with benefit-focused language',
-    ],
-    businessJustification:
-      'Positive sentiment directly correlates with recommendation frequency. Improving sentiment will increase AI agent confidence in recommending your brand.',
-  },
-]
+interface AnalysisData {
+  id: string
+  shareOfVoice: number
+  visibilityScore: number
+  monthlyAudience: number
+  favorableMentions: number
+  neutralMentions: number
+  negativeMentions: number
+  mentionCount: number
+  sovByPlatform: {
+    chatgpt?: number
+    claude?: number
+    gemini?: number
+    perplexity?: number
+  }
+  mentionRate: number
+  sourceDiversityScore: number
+}
+
+import type { Recommendation } from '@/components/dashboard/RecommendationsSection'
 
 export default function DashboardPage() {
-  // Mock metrics - will be replaced with real data
-  const metrics = {
-    shareOfVoice: 15.2,
-    visibilityScore: 72,
-    monthlyAudience: 125000,
-    favorableSentiment: 68,
-  }
-
-  const sovByPlatform = [
-    { platform: 'ChatGPT', yourSov: 15.2, topCompetitor: 28.5 },
-    { platform: 'Claude', yourSov: 12.8, topCompetitor: 24.3 },
-    { platform: 'Gemini', yourSov: 18.5, topCompetitor: 22.1 },
-    { platform: 'Perplexity', yourSov: 14.3, topCompetitor: 19.8 },
-  ]
-
   const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null)
+  const [currentDomain, setCurrentDomain] = useState<string | null>(null)
+  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
+  const [previousAnalysisData, setPreviousAnalysisData] = useState<AnalysisData | null>(null)
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleAnalysisStart = async (analysisId: string) => {
-    setCurrentAnalysisId(analysisId)
-    toast.success('Analysis started! Results will appear shortly.')
-    
-    // Poll for results (in a real app, you might use WebSockets or Server-Sent Events)
-    // For now, we'll just show a message
+  // Fetch recommendations for an analysis
+  const fetchRecommendations = async (analysisId: string) => {
+    try {
+      const response = await fetch(`/api/recommendations?analysisId=${analysisId}`)
+      if (response.ok) {
+        const data = await response.json()
+        setRecommendations(data)
+      }
+    } catch (error) {
+      console.error('Error fetching recommendations:', error)
+      // Not critical, so we don't show an error
+    }
   }
+
+  // Fetch analysis data
+  const fetchAnalysisData = async (analysisId: string) => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`/api/analyze?id=${analysisId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch analysis data')
+      }
+      const data = await response.json()
+      setAnalysisData(data)
+      // Also set domain if available
+      if (data.company?.domain) {
+        setCurrentDomain(data.company.domain)
+      }
+      // Fetch recommendations for this analysis
+      await fetchRecommendations(analysisId)
+    } catch (error) {
+      console.error('Error fetching analysis:', error)
+      toast.error('Failed to load analysis results')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Fetch previous analysis for comparison
+  const fetchPreviousAnalysis = async (domain: string) => {
+    try {
+      const response = await fetch(`/api/analyze?domain=${encodeURIComponent(domain)}&previous=true`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data && data.id) {
+          setPreviousAnalysisData(data)
+        } else {
+          setPreviousAnalysisData(null)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching previous analysis:', error)
+      // Not critical, so we don't show an error
+      setPreviousAnalysisData(null)
+    }
+  }
+
+  // Fetch latest analysis for a domain
+  const fetchLatestAnalysis = async (domain: string) => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`/api/analyze?domain=${encodeURIComponent(domain)}&latest=true`)
+      if (response.ok) {
+        const data = await response.json()
+        setAnalysisData(data)
+        setCurrentDomain(domain)
+        if (data.id) {
+          setCurrentAnalysisId(data.id)
+          // Fetch recommendations for this analysis
+          await fetchRecommendations(data.id)
+        }
+        // Also fetch previous analysis for comparison
+        await fetchPreviousAnalysis(domain)
+      }
+    } catch (error) {
+      console.error('Error fetching latest analysis:', error)
+      // Not critical if no analysis exists yet
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Load latest analysis on page load if domain is stored
+  useEffect(() => {
+    const storedDomain = localStorage.getItem('lastAnalyzedDomain')
+    if (storedDomain && !currentAnalysisId) {
+      fetchLatestAnalysis(storedDomain)
+    }
+  }, []) // Only run on mount
+
+  // Fetch data when analysis ID changes
+  useEffect(() => {
+    if (currentAnalysisId) {
+      fetchAnalysisData(currentAnalysisId)
+    }
+  }, [currentAnalysisId])
+
+  // Fetch previous analysis when domain changes
+  useEffect(() => {
+    if (currentDomain && analysisData) {
+      fetchPreviousAnalysis(currentDomain)
+    }
+  }, [currentDomain, analysisData?.id])
+
+  const handleAnalysisStart = async (analysisId: string, domain: string) => {
+    setCurrentAnalysisId(analysisId)
+    setCurrentDomain(domain)
+    // Store domain in localStorage for future page loads
+    localStorage.setItem('lastAnalyzedDomain', domain)
+    toast.success('Analysis completed! Loading results...')
+    // Fetch the analysis data immediately
+    await fetchAnalysisData(analysisId)
+    // Fetch previous analysis for comparison
+    await fetchPreviousAnalysis(domain)
+  }
+
+  // Calculate change from previous analysis
+  const calculateChange = (current: number, previous: number | null): { value: number; label: string } | undefined => {
+    if (previous === null || previous === undefined || previous === 0) {
+      return undefined
+    }
+    const change = current - previous
+    const percentChange = ((change / previous) * 100).toFixed(1)
+    return {
+      value: parseFloat(percentChange),
+      label: `vs previous analysis`,
+    }
+  }
+
+  // Calculate metrics from analysis data or use defaults
+  const metrics = analysisData ? {
+    shareOfVoice: analysisData.shareOfVoice || 0,
+    visibilityScore: analysisData.visibilityScore || 0,
+    monthlyAudience: analysisData.monthlyAudience || 0,
+    favorableSentiment: analysisData.mentionCount > 0 
+      ? Math.round((analysisData.favorableMentions / analysisData.mentionCount) * 100)
+      : 0,
+  } : {
+    shareOfVoice: 0,
+    visibilityScore: 0,
+    monthlyAudience: 0,
+    favorableSentiment: 0,
+  }
+
+  // Calculate SOV by platform from analysis data
+  const sovByPlatform = analysisData?.sovByPlatform ? [
+    { platform: 'ChatGPT', yourSov: analysisData.sovByPlatform.chatgpt || 0, topCompetitor: (analysisData.sovByPlatform.chatgpt || 0) * 1.8 },
+    { platform: 'Claude', yourSov: analysisData.sovByPlatform.claude || 0, topCompetitor: (analysisData.sovByPlatform.claude || 0) * 1.9 },
+    { platform: 'Gemini', yourSov: analysisData.sovByPlatform.gemini || 0, topCompetitor: (analysisData.sovByPlatform.gemini || 0) * 1.2 },
+    { platform: 'Perplexity', yourSov: analysisData.sovByPlatform.perplexity || 0, topCompetitor: (analysisData.sovByPlatform.perplexity || 0) * 1.4 },
+  ] : [
+    { platform: 'ChatGPT', yourSov: 0, topCompetitor: 0 },
+    { platform: 'Claude', yourSov: 0, topCompetitor: 0 },
+    { platform: 'Gemini', yourSov: 0, topCompetitor: 0 },
+    { platform: 'Perplexity', yourSov: 0, topCompetitor: 0 },
+  ]
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,8 +220,8 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <MetricCard
               title="Share of Voice"
-              value={`${metrics.shareOfVoice}%`}
-              change={{ value: 2.3, label: 'vs last month' }}
+              value={`${metrics.shareOfVoice.toFixed(1)}%`}
+              change={calculateChange(metrics.shareOfVoice, previousAnalysisData?.shareOfVoice ?? null)}
               context="Overall market conversation share"
               icon={<Target className="h-6 w-6" />}
               description="Your brand's percentage of total market conversations across all AI platforms."
@@ -137,8 +229,8 @@ export default function DashboardPage() {
             />
             <MetricCard
               title="AI Visibility Score"
-              value={metrics.visibilityScore}
-              change={{ value: 5.1, label: 'vs last month' }}
+              value={Math.round(metrics.visibilityScore)}
+              change={calculateChange(metrics.visibilityScore, previousAnalysisData?.visibilityScore ?? null)}
               context="Normalized visibility across all platforms"
               icon={<Eye className="h-6 w-6" />}
               description="A normalized score (0-100) representing your overall visibility across all AI platforms."
@@ -147,7 +239,7 @@ export default function DashboardPage() {
             <MetricCard
               title="Monthly Audience"
               value={metrics.monthlyAudience.toLocaleString('en-US')}
-              change={{ value: 12.5, label: 'growth' }}
+              change={calculateChange(metrics.monthlyAudience, previousAnalysisData?.monthlyAudience ?? null)}
               context="Total exposure across AI platforms"
               icon={<Users className="h-6 w-6" />}
               description="Estimated total number of users who see your brand mentioned in AI responses each month."
@@ -156,7 +248,12 @@ export default function DashboardPage() {
             <MetricCard
               title="Favorable Sentiment"
               value={`${metrics.favorableSentiment}%`}
-              change={{ value: -3.2, label: 'vs last month' }}
+              change={previousAnalysisData ? calculateChange(
+                metrics.favorableSentiment,
+                previousAnalysisData.mentionCount > 0 
+                  ? Math.round((previousAnalysisData.favorableMentions / previousAnalysisData.mentionCount) * 100)
+                  : null
+              ) : undefined}
               context="Positive recommendation percentage"
               icon={<MessageCircle className="h-6 w-6" />}
               description="Percentage of your brand mentions that are positive or favorable in AI responses."
@@ -169,8 +266,11 @@ export default function DashboardPage() {
         <section className="mb-12 md:mb-16">
           <ChartContainer
             title="Share of Voice by Platform"
-            insight={{
-              text: 'Your visibility is strongest on Gemini (18.5%) but weakest on ChatGPT (15.2%). Focus optimization efforts on ChatGPT to capture the largest market share.',
+            insight={analysisData ? {
+              text: `Your visibility is strongest on ${sovByPlatform.reduce((max, p) => p.yourSov > max.yourSov ? p : max, sovByPlatform[0]).platform} (${sovByPlatform.reduce((max, p) => p.yourSov > max.yourSov ? p : max, sovByPlatform[0]).yourSov.toFixed(1)}%) but weakest on ${sovByPlatform.reduce((min, p) => p.yourSov < min.yourSov ? p : min, sovByPlatform[0]).platform} (${sovByPlatform.reduce((min, p) => p.yourSov < min.yourSov ? p : min, sovByPlatform[0]).yourSov.toFixed(1)}%). Focus optimization efforts on the weakest platform to capture more market share.`,
+              type: 'info',
+            } : {
+              text: 'Run an analysis to see your Share of Voice by platform.',
               type: 'info',
             }}
           >
@@ -189,9 +289,15 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-black">Current Score</span>
-                  <span className="text-2xl font-bold text-black">4.2 / 10</span>
+                  <span className="text-2xl font-bold text-black">
+                    {analysisData ? `${analysisData.sourceDiversityScore.toFixed(1)} / 10` : '0 / 10'}
+                  </span>
                 </div>
-                <ProgressBar value={42} color="blue" showLabel />
+                <ProgressBar 
+                  value={analysisData ? Math.round(analysisData.sourceDiversityScore * 10) : 0} 
+                  color="blue" 
+                  showLabel 
+                />
                 <p className="text-sm text-black">
                   Industry average: 7.8/10. Focus on diversifying citation
                   sources to improve authority.
@@ -207,12 +313,19 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-black">Mention Rate</span>
-                  <span className="text-2xl font-bold text-black">68%</span>
+                  <span className="text-2xl font-bold text-black">
+                    {analysisData ? `${Math.round(analysisData.mentionRate * 100)}%` : '0%'}
+                  </span>
                 </div>
-                <ProgressBar value={68} color="green" showLabel />
+                <ProgressBar 
+                  value={analysisData ? Math.round(analysisData.mentionRate * 100) : 0} 
+                  color="green" 
+                  showLabel 
+                />
                 <p className="text-sm text-black">
-                  You're mentioned in 68% of relevant queries. Target: 85%+
-                  for market leadership.
+                  {analysisData 
+                    ? `You're mentioned in ${Math.round(analysisData.mentionRate * 100)}% of relevant queries. Target: 85%+ for market leadership.`
+                    : 'Run an analysis to see your mention rate.'}
                 </p>
               </div>
             </ChartContainer>
@@ -220,7 +333,9 @@ export default function DashboardPage() {
         </section>
 
         {/* Top 3 Recommendations - CRITICAL SECTION */}
-        <RecommendationsSection recommendations={mockRecommendations} />
+        <RecommendationsSection 
+          recommendations={recommendations.length > 0 ? recommendations : []} 
+        />
       </main>
     </div>
   )
