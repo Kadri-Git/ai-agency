@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { motion } from 'motion/react'
 import { Search, Loader2, Globe, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
@@ -35,6 +34,7 @@ const regions = [
   { value: 'no', label: 'Norway' },
   { value: 'dk', label: 'Denmark' },
   { value: 'fi', label: 'Finland' },
+  { value: 'ee', label: 'Estonia' },
   { value: 'jp', label: 'Japan' },
   { value: 'cn', label: 'China' },
   { value: 'in', label: 'India' },
@@ -50,14 +50,24 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const extractDomain = (urlString: string): string => {
-    try {
-      const urlObj = new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`)
-      return urlObj.hostname.replace('www.', '')
-    } catch {
-      // If URL parsing fails, try to extract domain manually
-      const cleaned = urlString.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]
-      return cleaned
-    }
+    // Remove leading/trailing whitespace
+    let cleaned = urlString.trim()
+    
+    // Remove protocol if present
+    cleaned = cleaned.replace(/^https?:\/\//, '')
+    
+    // Remove www. prefix if present
+    cleaned = cleaned.replace(/^www\./, '')
+    
+    // Remove trailing slashes and paths
+    cleaned = cleaned.split('/')[0]
+    
+    // Remove trailing dots
+    cleaned = cleaned.replace(/\.+$/, '')
+    
+    // If it's a partial domain like "www.andres..." or "andres...", 
+    // we'll use it as-is (the user might be typing)
+    return cleaned || urlString.trim()
   }
 
   const extractCompanyName = (domain: string): string => {
@@ -75,7 +85,12 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
     setIsLoading(true)
 
     try {
-      const domain = extractDomain(url)
+      // Automatically prepend https:// if not present
+      const urlWithProtocol = url.trim().startsWith('http://') || url.trim().startsWith('https://') 
+        ? url.trim() 
+        : `https://${url.trim()}`
+      
+      const domain = extractDomain(urlWithProtocol)
       const companyName = extractCompanyName(domain)
 
       const response = await fetch('/api/analyze', {
@@ -95,8 +110,22 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to start analysis')
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const error = await response.json()
+          const errorMessage = error.error || error.details || 'Failed to start analysis'
+          throw new Error(errorMessage)
+        } else {
+          const text = await response.text()
+          throw new Error(`Server error: ${response.status} ${response.statusText}. ${text.substring(0, 200)}`)
+        }
+      }
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Invalid response format from server')
       }
 
       const data = await response.json()
@@ -125,41 +154,46 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className="border-2 border-primary/20 bg-gradient-to-br from-white to-blue-50/50 dark:from-card dark:to-blue-950/20">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold tracking-tight flex items-center gap-2">
+      <div className="">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-black">
             <Search className="h-6 w-6 text-primary" />
             Analyze Your Company
-          </CardTitle>
-          <CardDescription className="text-base">
+          </h2>
+          <p className="text-base text-black mt-2">
             Enter your company URL and region to analyze your AI visibility across major platforms
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
+        </div>
+        <div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="url" className="text-sm font-semibold flex items-center gap-2">
+              <Label htmlFor="url" className="text-sm font-semibold flex items-center gap-2 text-black">
                 <Globe className="h-4 w-4" />
                 Company URL
               </Label>
-              <Input
-                id="url"
-                type="url"
-                placeholder="https://example.com or example.com"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                disabled={isLoading}
-                className="h-12 text-base"
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter your company website URL (with or without https://)
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-base pointer-events-none">
+                  https://
+                </span>
+                <Input
+                  id="url"
+                  type="text"
+                  placeholder="www.example.com or example.com"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  disabled={isLoading}
+                  className="h-12 text-base pl-20"
+                  required
+                />
+              </div>
+              <p className="text-xs text-black">
+                Enter your company domain (https:// is automatically added)
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="region" className="text-sm font-semibold flex items-center gap-2">
+                <Label htmlFor="region" className="text-sm font-semibold flex items-center gap-2 text-black">
                   <MapPin className="h-4 w-4" />
                   Target Region
                 </Label>
@@ -175,13 +209,13 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-black">
                   Primary market for analysis
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="industry" className="text-sm font-semibold">
+                <Label htmlFor="industry" className="text-sm font-semibold text-black">
                   Industry (Optional)
                 </Label>
                 <Input
@@ -193,7 +227,7 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
                   disabled={isLoading}
                   className="h-12 text-base"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-black">
                   Helps generate more relevant queries
                 </p>
               </div>
@@ -218,9 +252,10 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
               )}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }
+
 

@@ -11,7 +11,7 @@ export function DashboardHeader() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="sticky top-0 z-50 w-full border-b bg-white/95 dark:bg-gray-900/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-900/80"
+      className="sticky top-0 z-50 w-full border-b bg-white backdrop-blur-md supports-[backdrop-filter]:bg-white/95"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
         <div className="flex h-16 items-center justify-between">
@@ -39,4 +39,5 @@ export function DashboardHeader() {
     </motion.header>
   )
 }
+
 

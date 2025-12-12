@@ -2,11 +2,12 @@
 // Database models for tracking AI search visibility, share of voice, and recommendations
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Company {

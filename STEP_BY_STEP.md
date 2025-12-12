@@ -50,3 +50,4 @@ Or just paste them all at once, and I'll add them to your .env file automaticall
 
 **Quick Tip**: You can get all three keys in about 10 minutes. Start with Anthropic (easiest, free) or Google AI (also free), then do OpenAI (requires payment setup).
 
+

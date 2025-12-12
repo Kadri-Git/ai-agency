@@ -60,3 +60,4 @@ echo ""
 npm run check:keys 2>/dev/null || echo "Run 'npm run check:keys' to see current status"
 echo ""
 
+

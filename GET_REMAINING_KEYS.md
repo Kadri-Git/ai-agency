@@ -54,3 +54,4 @@ node scripts/setup-env.js "" "sk-ant-your-anthropic-key" "your-google-key"
 
 **Tip**: Both of these are free, so you can get them quickly and start using the platform right away!
 
+

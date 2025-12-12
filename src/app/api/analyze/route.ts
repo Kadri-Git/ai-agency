@@ -4,6 +4,9 @@ import { queryChatGPT, queryClaude, queryGemini, calculateShareOfVoice } from '@
 
 export async function POST(request: NextRequest) {
   try {
+    // Test database connection first
+    await prisma.$connect()
+    
     const body = await request.json()
     const { company, domain, industry, config = {} } = body
 
@@ -52,6 +55,7 @@ export async function POST(request: NextRequest) {
     const results = []
 
     // Run queries across platforms
+    // Note: This can take a while, so we'll run them sequentially for now
     for (const prompt of prompts) {
       for (const platform of platforms) {
         try {
@@ -68,7 +72,15 @@ export async function POST(request: NextRequest) {
             results.push(result)
           }
         } catch (error) {
-          console.error(`Error querying ${platform}:`, error)
+          console.error(`Error querying ${platform} with prompt "${prompt}":`, error)
+          // Continue with other platforms even if one fails
+          // Add a placeholder result to maintain structure
+          results.push({
+            platform,
+            prompt,
+            response: '',
+            mentioned: false,
+          })
         }
       }
     }
@@ -141,8 +153,31 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Analysis error:', error)
+    
+    // Provide more detailed error information
+    let errorMessage = 'Failed to run analysis'
+    let errorDetails = 'Unknown error'
+    
+    if (error instanceof Error) {
+      errorDetails = error.message
+      errorMessage = error.message
+      
+      // Check for specific error types
+      if (error.message.includes('Prisma') || error.message.includes('database')) {
+        errorMessage = 'Database connection error. Please check your database configuration.'
+      } else if (error.message.includes('API key') || error.message.includes('authentication')) {
+        errorMessage = 'API key error. Please check your API keys in the .env file.'
+      } else if (error.message.includes('rate limit') || error.message.includes('quota')) {
+        errorMessage = 'API rate limit exceeded. Please try again later.'
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to run analysis', details: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        error: errorMessage,
+        details: errorDetails,
+        stack: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined
+      },
       { status: 500 }
     )
   }

@@ -11,10 +11,10 @@ interface ProgressBarProps {
 }
 
 const colorClasses = {
-  blue: 'from-blue-500 to-blue-400',
-  green: 'from-green-500 to-green-400',
-  yellow: 'from-yellow-500 to-yellow-400',
-  red: 'from-red-500 to-red-400',
+  blue: 'from-[#facc15] to-[#facc15]',
+  green: 'from-[#facc15] to-[#facc15]',
+  yellow: 'from-[#facc15] to-[#facc15]',
+  red: 'from-[#facc15] to-[#facc15]',
 }
 
 export function ProgressBar({
@@ -29,13 +29,13 @@ export function ProgressBar({
     <div className={cn('w-full', className)}>
       {showLabel && (
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-foreground">Progress</span>
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-sm font-medium text-black">Progress</span>
+          <span className="text-sm font-medium text-black">
             {clampedValue.toFixed(1)}%
           </span>
         </div>
       )}
-      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+      <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
         <motion.div
           className={cn(
             'absolute inset-y-0 left-0 rounded-full bg-gradient-to-r',
@@ -50,4 +50,5 @@ export function ProgressBar({
     </div>
   )
 }
+
 

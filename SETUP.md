@@ -153,3 +153,4 @@ The `.env` file is already in `.gitignore`. Always keep your API keys secret.
 
 You can test the UI without API keys, but the analysis will fail. The form will still work and show error messages, allowing you to test the user experience.
 
+

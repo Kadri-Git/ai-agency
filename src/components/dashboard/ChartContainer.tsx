@@ -1,6 +1,5 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Tooltip,
   TooltipContent,
@@ -25,10 +24,10 @@ interface ChartContainerProps {
 }
 
 const insightColors = {
-  info: 'border-blue-500 bg-blue-50 dark:bg-blue-950/20',
-  success: 'border-green-500 bg-green-50 dark:bg-green-950/20',
-  warning: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20',
-  error: 'border-red-500 bg-red-50 dark:bg-red-950/20',
+  info: 'border-[#facc15] bg-transparent',
+  success: 'border-[#facc15] bg-transparent',
+  warning: 'border-[#facc15] bg-transparent',
+  error: 'border-[#facc15] bg-transparent',
 }
 
 export function ChartContainer({
@@ -62,19 +61,19 @@ export function ChartContainer({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className={cn('border shadow-sm', className)}>
-        <CardHeader className="flex flex-row items-center justify-between pb-4">
+      <div className={cn('', className)}>
+        <div className="flex flex-row items-center justify-between pb-4">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-xl font-semibold tracking-tight">
+            <h3 className="text-xl font-semibold tracking-tight text-black">
               {title}
-            </CardTitle>
+            </h3>
             {tooltipContent && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
+                      className="text-black hover:text-black/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
                       aria-label={`Learn more about ${title}`}
                     >
                       <Info className="h-4 w-4" />
@@ -82,7 +81,7 @@ export function ChartContainer({
                   </TooltipTrigger>
                   <TooltipContent
                     side="top"
-                    className="max-w-xs bg-foreground text-background p-4 shadow-lg"
+                    className="max-w-xs bg-black text-white p-4 shadow-lg"
                     sideOffset={8}
                   >
                     {tooltipContent}
@@ -92,8 +91,8 @@ export function ChartContainer({
             )}
           </div>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+        <div className="space-y-6">
           {insight && (
             <div
               className={cn(
@@ -102,14 +101,14 @@ export function ChartContainer({
               )}
             >
               <Info className="h-5 w-5 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-foreground leading-relaxed">
+              <p className="text-sm text-black leading-relaxed">
                 {insight.text}
               </p>
             </div>
           )}
           <div>{children}</div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }

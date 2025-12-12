@@ -44,3 +44,4 @@ console.log('  1. Run: npx prisma generate')
 console.log('  2. Run: npx prisma migrate dev')
 console.log('  3. Start the app: npm run dev')
 
+

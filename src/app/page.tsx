@@ -146,7 +146,7 @@ export default function DashboardPage() {
             />
             <MetricCard
               title="Monthly Audience"
-              value={metrics.monthlyAudience.toLocaleString()}
+              value={metrics.monthlyAudience.toLocaleString('en-US')}
               change={{ value: 12.5, label: 'growth' }}
               context="Total exposure across AI platforms"
               icon={<Users className="h-6 w-6" />}
@@ -188,11 +188,11 @@ export default function DashboardPage() {
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Current Score</span>
-                  <span className="text-2xl font-bold">4.2 / 10</span>
+                  <span className="text-sm font-medium text-black">Current Score</span>
+                  <span className="text-2xl font-bold text-black">4.2 / 10</span>
                 </div>
                 <ProgressBar value={42} color="blue" showLabel />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-black">
                   Industry average: 7.8/10. Focus on diversifying citation
                   sources to improve authority.
                 </p>
@@ -206,11 +206,11 @@ export default function DashboardPage() {
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Mention Rate</span>
-                  <span className="text-2xl font-bold">68%</span>
+                  <span className="text-sm font-medium text-black">Mention Rate</span>
+                  <span className="text-2xl font-bold text-black">68%</span>
                 </div>
                 <ProgressBar value={68} color="green" showLabel />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-black">
                   You're mentioned in 68% of relevant queries. Target: 85%+
                   for market leadership.
                 </p>

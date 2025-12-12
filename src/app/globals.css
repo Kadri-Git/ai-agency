@@ -51,23 +51,28 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   
-  /* Professional Blue Color System */
-  --color-blue-50: #eff6ff;
-  --color-blue-100: #dbeafe;
-  --color-blue-200: #bfdbfe;
-  --color-blue-300: #93c5fd;
-  --color-blue-400: #60a5fa;
-  --color-blue-500: #3b82f6;
-  --color-blue-600: #2563eb;
-  --color-blue-700: #1d4ed8;
-  --color-blue-800: #1e40af;
-  --color-blue-900: #1e3a8a;
+  /* Citrus Brand Color System - Orange/Citrus Theme */
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-200: #fed7aa;
+  --color-orange-300: #fdba74;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+  --color-orange-700: #c2410c;
+  --color-orange-800: #9a3412;
+  --color-orange-900: #7c2d12;
+  
+  /* Citrus Yellow Accent */
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-yellow-600: #ca8a04;
   
   /* Semantic Colors */
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-info: #facc15;
   
   /* Spacing Scale (8px base) */
   --spacing-1: 4px;
@@ -88,50 +93,50 @@
 :root {
   --radius: 0.75rem;
   
-  /* Professional Blue Theme */
+  /* Light Mode Only - Optimized for Readability */
   --background: #ffffff;
-  --foreground: #0f172a;
+  --foreground: #000000;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #000000;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  --popover-foreground: #000000;
   
-  /* Primary: Professional Blue (#3b82f6) */
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
+  /* 2-Color Scheme: Citrus Yellow (#FACC15) + Neutral */
+  --primary: #facc15;
+  --primary-foreground: #000000;
   
-  /* Secondary: Blue-100 for subtle backgrounds */
-  --secondary: #dbeafe;
-  --secondary-foreground: #1e40af;
+  /* Secondary: Neutral gray */
+  --secondary: #f1f5f9;
+  --secondary-foreground: #000000;
   
   --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted-foreground: #475569;
   
-  --accent: #3b82f6;
-  --accent-foreground: #ffffff;
+  --accent: #facc15;
+  --accent-foreground: #000000;
   
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   
   --border: #e2e8f0;
-  --input: #f1f5f9;
-  --ring: #3b82f6;
+  --input: #f8fafc;
+  --ring: #facc15;
   
-  /* Charts use blue gradient */
-  --chart-1: #3b82f6;
-  --chart-2: #60a5fa;
-  --chart-3: #93c5fd;
-  --chart-4: #2563eb;
-  --chart-5: #1d4ed8;
+  /* Charts use only citrus yellow (2-color scheme) */
+  --chart-1: #facc15;
+  --chart-2: #facc15;
+  --chart-3: #facc15;
+  --chart-4: #facc15;
+  --chart-5: #facc15;
   
   --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #facc15;
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #1e40af;
+  --sidebar-accent-foreground: #000000;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #3b82f6;
+  --sidebar-ring: #facc15;
 }
 
 .dark {
@@ -142,17 +147,18 @@
   --popover: #1e293b;
   --popover-foreground: #f8fafc;
   
-  /* Primary: Professional Blue (lighter for dark mode) */
-  --primary: #60a5fa;
+  /* Primary: Citrus Yellow (same for dark mode) */
+  --primary: #facc15;
   --primary-foreground: #0f172a;
   
-  --secondary: #1e3a8a;
-  --secondary-foreground: #dbeafe;
+  /* Secondary: Neutral gray */
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
   
   --muted: #1e293b;
   --muted-foreground: #94a3b8;
   
-  --accent: #60a5fa;
+  --accent: #facc15;
   --accent-foreground: #0f172a;
   
   --destructive: #f87171;
@@ -160,23 +166,23 @@
   
   --border: #334155;
   --input: #1e293b;
-  --ring: #60a5fa;
+  --ring: #facc15;
   
-  /* Charts for dark mode */
-  --chart-1: #60a5fa;
-  --chart-2: #3b82f6;
-  --chart-3: #93c5fd;
-  --chart-4: #2563eb;
-  --chart-5: #1d4ed8;
+  /* Charts for dark mode - citrus yellow only */
+  --chart-1: #facc15;
+  --chart-2: #facc15;
+  --chart-3: #facc15;
+  --chart-4: #facc15;
+  --chart-5: #facc15;
   
   --sidebar: #1e293b;
   --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #60a5fa;
+  --sidebar-primary: #facc15;
   --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #334155;
-  --sidebar-accent-foreground: #dbeafe;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
   --sidebar-border: #334155;
-  --sidebar-ring: #60a5fa;
+  --sidebar-ring: #facc15;
 }
 
 @layer base {

@@ -106,3 +106,4 @@ export function SovChart({ data, type = 'bar' }: SovChartProps) {
   )
 }
 
+

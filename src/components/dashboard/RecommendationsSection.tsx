@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
@@ -29,15 +28,15 @@ interface RecommendationsSectionProps {
 }
 
 const impactColors = {
-  high: 'bg-red-500 hover:bg-red-600',
-  medium: 'bg-yellow-500 hover:bg-yellow-600',
-  low: 'bg-blue-500 hover:bg-blue-600',
+  high: 'bg-black text-white hover:bg-black/90',
+  medium: 'bg-muted text-black hover:bg-muted/80',
+  low: 'bg-muted text-[#475569] hover:bg-muted/80',
 }
 
 const effortColors = {
-  high: 'bg-orange-500 hover:bg-orange-600',
-  medium: 'bg-yellow-500 hover:bg-yellow-600',
-  low: 'bg-green-500 hover:bg-green-600',
+  high: 'bg-muted text-black hover:bg-muted/80',
+  medium: 'bg-muted text-black hover:bg-muted/80',
+  low: 'bg-muted text-black hover:bg-muted/80',
 }
 
 export function RecommendationsSection({
@@ -45,17 +44,13 @@ export function RecommendationsSection({
   className,
 }: RecommendationsSectionProps) {
   return (
-    <section
+      <section
       className={cn(
         'relative w-full py-16 md:py-24 overflow-hidden',
-        'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700',
-        'dark:from-blue-700 dark:via-blue-800 dark:to-blue-900',
+        'bg-white dark:bg-card',
         className
       )}
     >
-      {/* Radial overlay for depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
-      
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -63,10 +58,10 @@ export function RecommendationsSection({
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4">
             Top 3 Recommendations
           </h2>
-          <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Data-driven actions prioritized by impact and feasibility
           </p>
         </motion.div>
@@ -79,14 +74,14 @@ export function RecommendationsSection({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <Card className="h-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-                <CardHeader className="pb-4">
+              <div className="h-full">
+                <div className="pb-4">
                   <div className="flex items-start justify-between mb-4">
                     <div
                       className={cn(
-                        'w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600',
-                        'flex items-center justify-center text-white font-bold text-lg shadow-lg',
-                        'ring-2 ring-yellow-300/50'
+                        'w-10 h-10 rounded-full bg-[#facc15]',
+                        'flex items-center justify-center text-foreground font-bold text-lg',
+                        'border-2 border-[#facc15]/30'
                       )}
                     >
                       {rec.priority}
@@ -94,7 +89,7 @@ export function RecommendationsSection({
                     <div className="flex flex-col gap-2">
                       <Badge
                         className={cn(
-                          'text-xs font-semibold text-white',
+                          'text-xs font-semibold',
                           impactColors[rec.impact]
                         )}
                       >
@@ -102,7 +97,7 @@ export function RecommendationsSection({
                       </Badge>
                       <Badge
                         className={cn(
-                          'text-xs font-semibold text-white',
+                          'text-xs font-semibold',
                           effortColors[rec.effort]
                         )}
                       >
@@ -110,23 +105,23 @@ export function RecommendationsSection({
                       </Badge>
                     </div>
                   </div>
-                  <CardTitle className="text-xl font-bold tracking-tight text-foreground">
+                  <h3 className="text-xl font-bold tracking-tight text-black">
                     {rec.title}
-                  </CardTitle>
-                </CardHeader>
+                  </h3>
+                </div>
 
-                <CardContent className="space-y-6">
+                <div className="space-y-6">
                   {/* Metrics Box */}
-                  <div className="border-2 border-border rounded-lg p-4 space-y-3 bg-muted/50">
+                  <div className="border-2 border-border rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-muted-foreground">
+                      <span className="text-sm font-medium text-black">
                         Estimated SOV Gain
                       </span>
                       <span className="text-lg font-bold text-primary">
                         +{rec.estimatedSovGain}%
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-black">
                       <Clock className="h-4 w-4" />
                       <span>Timeframe: {rec.timeframe}</span>
                     </div>
@@ -134,11 +129,11 @@ export function RecommendationsSection({
 
                   {/* Evidence Section */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-black flex items-center gap-2">
                       <Target className="h-4 w-4" />
                       Evidence
                     </h4>
-                    <div className="text-sm space-y-1 text-muted-foreground">
+                    <div className="text-sm space-y-1 text-black">
                       <p>
                         <span className="font-medium">Current:</span> {rec.evidence.currentMetric}
                       </p>
@@ -153,7 +148,7 @@ export function RecommendationsSection({
 
                   {/* Action Steps */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-black flex items-center gap-2">
                       <TrendingUp className="h-4 w-4" />
                       Action Steps
                     </h4>
@@ -161,7 +156,7 @@ export function RecommendationsSection({
                       {rec.actionSteps.map((step, stepIndex) => (
                         <div
                           key={stepIndex}
-                          className="flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors"
+                          className="flex items-start gap-3 p-2 rounded-md transition-colors"
                         >
                           <Checkbox
                             id={`rec-${rec.priority}-step-${stepIndex}`}
@@ -169,7 +164,7 @@ export function RecommendationsSection({
                           />
                           <label
                             htmlFor={`rec-${rec.priority}-step-${stepIndex}`}
-                            className="text-sm text-foreground leading-relaxed flex-1 cursor-pointer"
+                            className="text-sm text-black leading-relaxed flex-1 cursor-pointer"
                           >
                             {step}
                           </label>
@@ -180,13 +175,13 @@ export function RecommendationsSection({
 
                   {/* Business Justification */}
                   <div className="pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      <span className="font-semibold text-foreground">Why this matters:</span>{' '}
+                    <p className="text-sm text-black leading-relaxed">
+                      <span className="font-semibold text-black">Why this matters:</span>{' '}
                       {rec.businessJustification}
                     </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -194,4 +189,5 @@ export function RecommendationsSection({
     </section>
   )
 }
+
 

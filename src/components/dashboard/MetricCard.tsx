@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
   Tooltip,
@@ -63,18 +62,18 @@ export function MetricCard({
       transition={{ duration: 0.6 }}
       whileHover={{ y: -4 }}
     >
-      <Card
+      <div
         className={cn(
-          'relative overflow-hidden border bg-gradient-to-br from-white to-blue-50/50 dark:from-card dark:to-blue-950/20',
-          'hover:shadow-lg transition-all duration-300',
+          'relative overflow-hidden',
+          'transition-all duration-300',
           className
         )}
       >
-        <CardContent className="p-6">
+        <div className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                <p className="text-sm font-medium uppercase tracking-wide text-black">
                   {title}
                 </p>
                 {tooltipContent && (
@@ -83,7 +82,7 @@ export function MetricCard({
                       <TooltipTrigger asChild>
                         <button
                           type="button"
-                          className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
+                          className="text-black hover:text-black/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
                           aria-label={`Learn more about ${title}`}
                         >
                           <Info className="h-4 w-4" />
@@ -91,7 +90,7 @@ export function MetricCard({
                       </TooltipTrigger>
                       <TooltipContent
                         side="top"
-                        className="max-w-xs bg-foreground text-background p-4 shadow-lg"
+                        className="max-w-xs bg-black text-white p-4 shadow-lg"
                         sideOffset={8}
                       >
                         {tooltipContent}
@@ -123,16 +122,16 @@ export function MetricCard({
               </div>
             </div>
             {icon && (
-              <div className="text-blue-500 dark:text-blue-400">{icon}</div>
+              <div className="text-primary">{icon}</div>
             )}
           </div>
           {context && (
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-black leading-relaxed">
               {context}
             </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }
