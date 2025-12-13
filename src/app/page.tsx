@@ -17,7 +17,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Recommendation } from '@/components/dashboard/RecommendationsSection'
+import type { Recommendation as RecommendationType } from '@/components/dashboard/RecommendationsSection'
 
 interface AnalysisData {
   id: string
@@ -38,14 +38,12 @@ interface AnalysisData {
   sourceDiversityScore: number
 }
 
-import type { Recommendation } from '@/components/dashboard/RecommendationsSection'
-
 export default function DashboardPage() {
   const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null)
   const [currentDomain, setCurrentDomain] = useState<string | null>(null)
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
   const [previousAnalysisData, setPreviousAnalysisData] = useState<AnalysisData | null>(null)
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [recommendations, setRecommendations] = useState<RecommendationType[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   // Fetch recommendations for an analysis

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     const totalResults = analysis.results.length
     const mentionRate = analysis.mentionRate
     const avgPosition = analysis.averagePosition
-    const totalMentioned = analysis.results.filter(r => r.mentioned).length
+    const totalMentioned = analysis.results.filter((r: { mentioned: boolean }) => r.mentioned).length
     
     // Calculate platform-specific metrics
     const platformStats = {
