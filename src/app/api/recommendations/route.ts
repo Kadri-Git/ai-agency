@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
       perplexity: { mentioned: 0, total: 0, avgPosition: 0 },
     }
     
-    analysis.results.forEach(result => {
+    analysis.results.forEach((result: { platform: string; mentioned: boolean; position: number | null }) => {
       const platformKey = result.platform as keyof typeof platformStats
       if (platformStats[platformKey]) {
         platformStats[platformKey].total++
