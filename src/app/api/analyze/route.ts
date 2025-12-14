@@ -829,9 +829,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Group results by platform
-    const platforms = ['chatgpt', 'claude', 'gemini', 'perplexity'] as const
+    const platforms = ['chatgpt', 'claude', 'gemini'] as const
     for (const platform of platforms) {
-      const platformResults = analysis.results.filter((r) => r.platform === platform)
+      const platformResults = analysis.results.filter((r: { platform: string }) => r.platform === platform)
       
       // Collect all competitors mentioned across all results for this platform
       const competitorMap = new Map<string, typeof platformResults>()
