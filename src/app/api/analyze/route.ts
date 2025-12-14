@@ -347,12 +347,16 @@ export async function POST(request: NextRequest) {
       for (const [competitorName, competitorResults] of competitorMap) {
         // We need to include all platform results (mentioned + not mentioned) for proper SOV calculation
         // Create a full set of results where competitor is either mentioned or not
-        const allPlatformResultsForCompetitor = platformResults.map(result => {
+        const allPlatformResultsForCompetitor: QueryResult[] = platformResults.map((result: any) => {
           const isMentioned = result.competitorsMentioned?.includes(competitorName) || false
           return {
-            ...result,
+            platform: result.platform as Platform,
+            prompt: result.prompt,
+            response: result.response,
             mentioned: isMentioned,
             position: isMentioned ? (result.competitorPositions?.[competitorName] || undefined) : undefined,
+            sentiment: 'neutral' as const,
+            sentimentScore: 0,
           }
         })
         
@@ -637,7 +641,7 @@ export async function GET(request: NextRequest) {
         // Calculate SOV for each competitor on this platform
         for (const [competitorName, competitorResults] of competitorMap) {
           // Create QueryResult-like objects for SOV calculation
-          const queryResultsForCompetitor: QueryResult[] = platformResults.map(result => {
+          const queryResultsForCompetitor: QueryResult[] = platformResults.map((result: any) => {
             const competitorsMentioned = Array.isArray(result.competitorsMentioned) 
               ? result.competitorsMentioned 
               : []
@@ -743,7 +747,7 @@ export async function GET(request: NextRequest) {
         // Calculate SOV for each competitor on this platform
         for (const [competitorName, competitorResults] of competitorMap) {
           // Create QueryResult-like objects for SOV calculation
-          const queryResultsForCompetitor: QueryResult[] = platformResults.map(result => {
+          const queryResultsForCompetitor: QueryResult[] = platformResults.map((result: any) => {
             const competitorsMentioned = Array.isArray(result.competitorsMentioned) 
               ? result.competitorsMentioned 
               : []
