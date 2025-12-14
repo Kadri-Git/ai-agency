@@ -40,7 +40,7 @@ model Analysis {
   mentionCount          Int      @map("mention_count")
   citationCount         Int      @map("citation_count")
   favorableMentions     Int      @map("favorable_mentions")
-  neutralMentions       Int      @map("neutral_mentions")
+  neutralMentions     Int      @map("neutral_mentions")
   negativeMentions      Int      @map("negative_mentions")
   averagePosition       Float    @map("average_position")
   totalFanoutQueries    Int      @map("total_fanout_queries")
@@ -53,6 +53,8 @@ model Analysis {
   mentionRate           Float    @map("mention_rate") // 0-1
   competitiveRank       Int?     @map("competitive_rank")
   competitorsAnalyzed   String[] @map("competitors_analyzed") @default([])
+  websiteVisibilityScore Float?  @map("website_visibility_score") // 0-100
+  websiteAnalysis       Json?   @map("website_analysis") // Full website analysis data
   config                Json     @default("{}") // Analysis configuration
   consistencyScore      Float?   @map("consistency_score") // 0-1
   startDate             DateTime @map("start_date")

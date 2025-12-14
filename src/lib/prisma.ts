@@ -1,4 +1,3 @@
-// @ts-ignore - Prisma 7 generates client in .prisma/client
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {

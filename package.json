@@ -20,7 +20,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
-    "check:keys": "node scripts/check-api-keys.js"
+    "check:keys": "node scripts/check-api-keys.js",
+    "check:gemini": "node scripts/check-gemini-models.js"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

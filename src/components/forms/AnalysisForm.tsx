@@ -71,7 +71,12 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
   }
 
   const extractCompanyName = (domain: string): string => {
-    return domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1)
+    // Remove www. if still present
+    let cleaned = domain.replace(/^www\./, '')
+    // Get the first part before the first dot
+    const firstPart = cleaned.split('.')[0]
+    // Capitalize first letter
+    return firstPart.charAt(0).toUpperCase() + firstPart.slice(1)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,7 +149,9 @@ export function AnalysisForm({ onAnalysisStart }: AnalysisFormProps) {
       setUrl('')
       setIndustry('')
     } catch (error) {
-      console.error('Analysis error:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Analysis error:', error)
+      }
       toast.error(
         error instanceof Error ? error.message : 'Failed to start analysis. Please try again.'
       )

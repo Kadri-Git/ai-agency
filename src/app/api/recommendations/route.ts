@@ -31,13 +31,29 @@ export async function GET(request: NextRequest) {
 
     // Generate recommendations based on analysis data
     const recommendations: Recommendation[] = []
-
+    const companyName = analysis.company.name
+    const companyIndustry = analysis.company.industry || 'your industry'
+    
     // Calculate actual metrics from results
     const totalMentions = analysis.mentionCount
     const totalResults = analysis.results.length
     const mentionRate = analysis.mentionRate
     const avgPosition = analysis.averagePosition
     const totalMentioned = analysis.results.filter((r: { mentioned: boolean }) => r.mentioned).length
+    
+    // Analyze actual query results to understand what was asked and how the company was mentioned
+    const mentionedResults = analysis.results.filter((r: { mentioned: boolean }) => r.mentioned)
+    const notMentionedResults = analysis.results.filter((r: { mentioned: boolean }) => !r.mentioned)
+    
+    // Extract actual prompts that didn't mention the company
+    const promptsWithoutMention = notMentionedResults.map((r: { prompt: string }) => r.prompt).slice(0, 3)
+    
+    // Analyze sentiment breakdown for specific recommendations
+    const sentimentBreakdown = {
+      favorable: analysis.favorableMentions,
+      neutral: analysis.neutralMentions,
+      negative: analysis.negativeMentions,
+    }
     
     // Calculate platform-specific metrics
     const platformStats = {
@@ -80,25 +96,36 @@ export async function GET(request: NextRequest) {
       const estimatedGain = Math.min((20 - analysis.shareOfVoice) * 0.5, 12)
       recommendations.push({
         priority: 1,
-        title: 'Increase Overall Share of Voice',
+        title: `Increase ${companyName}'s Overall Share of Voice`,
         impact: 'high',
         effort: 'medium',
         estimatedSovGain: estimatedGain,
         timeframe: '2-3 months',
         evidence: {
-          currentMetric: `${analysis.shareOfVoice.toFixed(1)}% overall SOV`,
+          currentMetric: `${companyName}'s overall SOV: ${analysis.shareOfVoice.toFixed(1)}%`,
           benchmark: '20%+ SOV (competitive threshold)',
           gap: `${(20 - analysis.shareOfVoice).toFixed(1)} percentage points below threshold`,
         },
         actionSteps: [
-          'Create comprehensive product comparison guides',
-          'Optimize existing content with structured data markup',
-          'Build authority through industry publication citations',
-          'Develop topic clusters around high-volume queries',
-          'Improve citation quality with expert quotes',
-        ],
+          ...(companyIndustry !== 'your industry' ? [
+            `Create ${companyIndustry}-specific comparison content where ${companyName} is featured alongside competitors`,
+            `Publish ${companyIndustry} industry guides and resources that position ${companyName} as a thought leader`,
+          ] : [
+            `Create industry-specific comparison content where ${companyName} is featured alongside competitors`,
+            `Publish industry guides and resources that position ${companyName} as a thought leader`,
+          ]),
+          ...(mentionedResults.length > 0 ? [
+            `Analyze the ${mentionedResults.length} queries where ${companyName} was mentioned to identify successful content patterns`,
+            `Replicate successful mention patterns across ${totalResults - mentionedResults.length} queries where ${companyName} wasn't mentioned`,
+          ] : [
+            `Analyze why ${companyName} wasn't mentioned in any of the ${totalResults} queries tested`,
+            `Create content that directly addresses the query types tested: ${promptsWithoutMention.slice(0, 2).join(', ')}`,
+          ]),
+          `Build authoritative backlinks from ${companyIndustry} industry publications and directories`,
+          `Optimize existing ${companyName} content with structured data (JSON-LD) to improve AI discoverability`,
+        ].filter(Boolean),
         businessJustification:
-          'Your current Share of Voice is below the competitive threshold. Increasing SOV will significantly improve brand visibility and recommendation frequency across AI platforms.',
+          `${companyName}'s current Share of Voice is below the competitive threshold. Increasing ${companyName}'s SOV will significantly improve brand visibility and recommendation frequency across AI platforms.`,
       })
     }
 
@@ -107,25 +134,25 @@ export async function GET(request: NextRequest) {
       const platformGap = strongestPlatform.sov - weakestPlatform.sov
       recommendations.push({
         priority: recommendations.length + 1 as 1 | 2 | 3,
-        title: `Improve Visibility on ${weakestPlatform.name}`,
+        title: `Improve ${companyName}'s Visibility on ${weakestPlatform.name}`,
         impact: 'high',
         effort: 'medium',
         estimatedSovGain: Math.min(platformGap * 0.4, 10),
         timeframe: '2-3 months',
         evidence: {
-          currentMetric: `${weakestPlatform.sov.toFixed(1)}% SOV on ${weakestPlatform.name}`,
-          benchmark: `${strongestPlatform.sov.toFixed(1)}% SOV on ${strongestPlatform.name} (your best platform)`,
+          currentMetric: `${companyName}'s SOV on ${weakestPlatform.name}: ${weakestPlatform.sov.toFixed(1)}%`,
+          benchmark: `${companyName}'s best platform: ${strongestPlatform.sov.toFixed(1)}% SOV on ${strongestPlatform.name}`,
           gap: `${platformGap.toFixed(1)} percentage points difference`,
         },
         actionSteps: [
-          `Research ${weakestPlatform.name}-specific content preferences`,
-          'Optimize content for platform-specific query patterns',
-          'Increase citation frequency on this platform',
-          'Build platform-specific authority signals',
-          'Create content that aligns with platform algorithms',
+          `Research ${weakestPlatform.name}-specific content preferences for ${companyName}'s industry`,
+          `Optimize ${companyName}'s content for ${weakestPlatform.name}-specific query patterns`,
+          `Increase ${companyName}'s citation frequency on ${weakestPlatform.name}`,
+          `Build ${companyName}'s platform-specific authority signals for ${weakestPlatform.name}`,
+          `Create ${companyName} content that aligns with ${weakestPlatform.name} algorithms`,
         ],
         businessJustification:
-          `Your visibility on ${weakestPlatform.name} is significantly lower than your best-performing platform. Improving this will increase overall market coverage and reach more users.`,
+          `${companyName}'s visibility on ${weakestPlatform.name} is significantly lower than ${companyName}'s best-performing platform. Improving ${companyName}'s presence on ${weakestPlatform.name} will increase overall market coverage and reach more users.`,
       })
     }
 
@@ -146,12 +173,20 @@ export async function GET(request: NextRequest) {
           gap: `${diversityGap.toFixed(1)} points below average`,
         },
         actionSteps: [
-          'Submit to 5 new industry directories',
-          'Secure 3 guest post opportunities',
-          'Create press releases for product launches',
-          'Build relationships with industry publications',
-          `Currently cited by ${analysis.totalUniqueSources} unique sources - target 15+`,
-        ],
+          ...(companyIndustry !== 'your industry' ? [
+            `Submit ${companyName} to ${companyIndustry}-specific directories and listings`,
+            `Secure guest post opportunities on ${companyIndustry} industry blogs and publications`,
+          ] : [
+            `Submit ${companyName} to industry-specific directories and listings`,
+            `Secure guest post opportunities on industry blogs and publications`,
+          ]),
+          `Create press releases and news content about ${companyName} for industry publications`,
+          `Build relationships with ${companyIndustry} industry publications and journalists`,
+          `Currently cited by ${analysis.totalUniqueSources} unique sources - target 15+ unique authoritative sources`,
+          ...(analysis.totalUniqueSources < 5 ? [
+            `Focus on getting ${companyName} mentioned in at least 5-10 new authoritative sources in the next month`,
+          ] : []),
+        ].filter(Boolean),
         businessJustification:
           'AI models favor diverse, authoritative sources. Increasing source diversity improves credibility and citation frequency, leading to more recommendations.',
       })
@@ -162,25 +197,36 @@ export async function GET(request: NextRequest) {
       const mentionGap = 0.5 - mentionRate
       recommendations.push({
         priority: recommendations.length + 1 as 1 | 2 | 3,
-        title: 'Improve Mention Rate in AI Responses',
+        title: `Improve ${companyName}'s Mention Rate in AI Responses`,
         impact: 'high',
         effort: 'medium',
         estimatedSovGain: Math.min(mentionGap * 15, 12),
         timeframe: '2-3 months',
         evidence: {
-          currentMetric: `${(mentionRate * 100).toFixed(1)}% mention rate (${totalMentioned}/${totalResults} queries)`,
+          currentMetric: `${companyName}'s mention rate: ${(mentionRate * 100).toFixed(1)}% (${totalMentioned}/${totalResults} queries)`,
           benchmark: '50%+ mention rate (competitive standard)',
           gap: `${(mentionGap * 100).toFixed(1)} percentage points below target`,
         },
         actionSteps: [
-          'Optimize content for high-volume search queries',
-          'Improve brand visibility in industry discussions',
-          'Create content that answers common user questions',
-          'Build topical authority in your industry',
-          'Increase brand mentions in authoritative sources',
-        ],
+          ...(promptsWithoutMention.length > 0 ? [
+            `Create content specifically addressing queries where ${companyName} wasn't mentioned: "${promptsWithoutMention[0]?.substring(0, 80)}..."`,
+            ...(promptsWithoutMention.length > 1 ? [
+              `Address query patterns like: "${promptsWithoutMention[1]?.substring(0, 60)}..."`,
+            ] : []),
+          ] : [
+            `Analyze the ${totalResults} queries tested to identify content gaps for ${companyName}`,
+          ]),
+          ...(companyIndustry !== 'your industry' ? [
+            `Build ${companyName}'s authority in ${companyIndustry} through expert content and industry participation`,
+            `Create ${companyIndustry}-focused content that answers questions users ask about ${companyName}'s services`,
+          ] : [
+            `Build ${companyName}'s industry authority through expert content and industry participation`,
+            `Create content that answers questions users ask about ${companyName}'s services`,
+          ]),
+          `Increase ${companyName} brand mentions in authoritative ${companyIndustry} sources`,
+        ].filter(Boolean),
         businessJustification:
-          'Your brand is mentioned in less than half of relevant queries. Improving mention rate will significantly increase overall visibility and recommendation opportunities.',
+          `${companyName} is mentioned in less than half of relevant queries. Improving ${companyName}'s mention rate will significantly increase overall visibility and recommendation opportunities.`,
       })
     }
 
@@ -203,12 +249,18 @@ export async function GET(request: NextRequest) {
             gap: `${sentimentGap.toFixed(0)} percentage points below target`,
           },
           actionSteps: [
-            'Conduct customer satisfaction survey',
-            'Address negative review themes in content',
-            'Highlight unique value propositions more clearly',
-            'Create case studies showcasing success stories',
-            'Improve product descriptions with benefit-focused language',
-          ],
+            ...(sentimentBreakdown.negative > 0 ? [
+              `Address the ${sentimentBreakdown.negative} negative mention(s) by creating content that counters negative themes`,
+              `Monitor and respond to negative sentiment about ${companyName} in ${companyIndustry} discussions`,
+            ] : []),
+            `Conduct ${companyName} customer satisfaction research to identify improvement areas`,
+            `Create ${companyName} case studies and success stories showcasing positive outcomes`,
+            `Highlight ${companyName}'s unique value propositions in ${companyIndustry} more clearly in all content`,
+            `Improve ${companyName} product/service descriptions with benefit-focused language that emphasizes positive outcomes`,
+            ...(mentionedResults.length > 0 ? [
+              `Analyze the ${sentimentBreakdown.favorable} favorable mentions to understand what makes ${companyName} stand out positively`,
+            ] : []),
+          ].filter(Boolean),
           businessJustification:
             'Positive sentiment directly correlates with recommendation frequency. Improving sentiment will increase AI agent confidence in recommending your brand.',
         })
@@ -230,19 +282,179 @@ export async function GET(request: NextRequest) {
           gap: `${(avgPosition - 2).toFixed(1)} positions lower than ideal`,
         },
         actionSteps: [
-          'Optimize content for first-position visibility',
-          'Improve brand authority signals',
-          'Increase citation quality and frequency',
-          'Create more comprehensive, authoritative content',
-          'Build stronger topical relevance',
-        ],
+          ...(mentionedResults.length > 0 ? [
+            `Analyze the ${mentionedResults.filter((r: { position?: number | null }) => r.position !== null && r.position !== undefined && r.position <= 2).length} mentions where ${companyName} appeared in positions 1-2 to replicate successful patterns`,
+            `Improve content for the ${mentionedResults.filter((r: { position?: number | null }) => r.position !== null && r.position !== undefined && r.position > 3).length} mentions where ${companyName} appeared in position ${avgPosition.toFixed(0)}+`,
+          ] : []),
+          ...(companyIndustry !== 'your industry' ? [
+            `Build ${companyName}'s authority in ${companyIndustry} through expert content, industry awards, and thought leadership`,
+            `Create comprehensive ${companyIndustry} content that positions ${companyName} as the top choice`,
+          ] : [
+            `Build ${companyName}'s industry authority through expert content, industry awards, and thought leadership`,
+            `Create comprehensive content that positions ${companyName} as the top choice`,
+          ]),
+          `Increase high-quality citations from authoritative ${companyIndustry} sources`,
+          `Optimize ${companyName} content to directly answer the specific queries tested in this analysis`,
+        ].filter(Boolean),
         businessJustification:
           'When your brand is mentioned, it appears lower in the recommendation list. Improving position increases visibility and click-through rates.',
       })
     }
 
+    // Recommendation 7: Website Visibility for LLMs (ALWAYS generate if website analysis exists)
+    // This recommendation is generated for ALL companies with website analysis data
+    const websiteAnalysis = analysis.websiteAnalysis as {
+      overallVisibilityScore?: number
+      issues?: string[]
+      recommendations?: string[]
+      hasStructuredData?: boolean
+      hasMetaDescription?: boolean
+      hasOpenGraphTags?: boolean
+      hasSitemap?: boolean
+      hasGoogleSearchConsole?: boolean
+      semanticHTMLScore?: number
+      contentQualityScore?: number
+      accessibilityScore?: number
+    } | null
+
+    // Only generate website recommendation if there are actual issues to fix
+    // Don't generate if website is already well-optimized (score >= 85) or if no issues exist
+    const hasWebsiteIssues = websiteAnalysis && (
+      websiteAnalysis.overallVisibilityScore === undefined || 
+      websiteAnalysis.overallVisibilityScore === null ||
+      websiteAnalysis.overallVisibilityScore < 85 ||
+      (websiteAnalysis.issues && websiteAnalysis.issues.length > 0) ||
+      !websiteAnalysis.hasStructuredData ||
+      !websiteAnalysis.hasMetaDescription ||
+      !websiteAnalysis.hasOpenGraphTags ||
+      !websiteAnalysis.hasSitemap ||
+      (websiteAnalysis.semanticHTMLScore !== undefined && websiteAnalysis.semanticHTMLScore < 50) ||
+      (websiteAnalysis.contentQualityScore !== undefined && websiteAnalysis.contentQualityScore < 50) ||
+      (websiteAnalysis.accessibilityScore !== undefined && websiteAnalysis.accessibilityScore < 50)
+    )
+    
+    if (hasWebsiteIssues && websiteAnalysis && websiteAnalysis.overallVisibilityScore !== undefined && websiteAnalysis.overallVisibilityScore !== null) {
+      const websiteScore = websiteAnalysis.overallVisibilityScore
+      const scoreGap = Math.max(0, 70 - websiteScore)
+      const websiteIssues = websiteAnalysis.issues || []
+      const websiteRecs = websiteAnalysis.recommendations || []
+      
+      // Build company-specific action steps
+      const actionSteps: string[] = []
+      
+      if (!websiteAnalysis.hasStructuredData) {
+        actionSteps.push(`Add JSON-LD structured data to ${companyName}'s website using Schema.org vocabulary (Organization, WebSite, WebPage)`)
+      }
+      if (!websiteAnalysis.hasMetaDescription) {
+        actionSteps.push(`Add meta description tags to all pages on ${companyName}'s website for better search visibility`)
+      }
+      if (!websiteAnalysis.hasOpenGraphTags) {
+        actionSteps.push(`Add Open Graph tags (og:title, og:description, og:image) to ${companyName}'s homepage and key pages`)
+      }
+      if (!websiteAnalysis.hasSitemap) {
+        actionSteps.push(`Create and submit sitemap.xml for ${companyName}'s website to help AI crawlers discover all pages`)
+      }
+      
+      // Add specific recommendations from website analysis
+      // Filter out sitemap-related recommendations since we handle those above
+      const filteredRecs = websiteRecs.filter(rec => 
+        !rec.toLowerCase().includes('sitemap') && 
+        !rec.toLowerCase().includes('submit sitemap')
+      )
+      if (filteredRecs.length > 0) {
+        actionSteps.push(...filteredRecs.slice(0, 3).map(rec => `${companyName}: ${rec}`))
+      }
+      
+      // Add quality improvements if scores are low
+      if (websiteAnalysis.semanticHTMLScore !== undefined && websiteAnalysis.semanticHTMLScore < 50) {
+        actionSteps.push(`Improve semantic HTML structure on ${companyName}'s website (use proper heading hierarchy, semantic tags like <header>, <nav>, <main>, <article>)`)
+      }
+      if (websiteAnalysis.contentQualityScore !== undefined && websiteAnalysis.contentQualityScore < 50) {
+        actionSteps.push(`Enhance content quality on ${companyName}'s website (add more descriptive text, improve headings, add alt text to images)`)
+      }
+      if (websiteAnalysis.accessibilityScore !== undefined && websiteAnalysis.accessibilityScore < 50) {
+        actionSteps.push(`Improve accessibility on ${companyName}'s website (add ARIA labels, ensure proper contrast, add skip links)`)
+      }
+      
+      // Only recommend Google Search Console if not already verified
+      if (!websiteAnalysis.hasGoogleSearchConsole) {
+        if (websiteAnalysis.hasSitemap) {
+          // Sitemap exists but Search Console not verified - recommend adding to Search Console
+          actionSteps.push(`Add ${companyName}'s website to Google Search Console and submit the existing sitemap for better indexing`)
+        } else {
+          // No sitemap and no Search Console - recommend both
+          actionSteps.push(`Add ${companyName}'s website to Google Search Console for better indexing`)
+        }
+      }
+      // If Search Console is verified, we assume sitemap is already submitted if it exists
+      // No need to recommend submitting it again
+      
+      // Determine impact and effort based on score
+      let impact: 'high' | 'medium' | 'low' = 'medium'
+      let effort: 'high' | 'medium' | 'low' = 'medium'
+      
+      if (websiteScore < 50) {
+        impact = 'high'
+        effort = 'high'
+      } else if (websiteScore < 70) {
+        impact = 'high'
+        effort = 'medium'
+      } else if (websiteScore < 85) {
+        impact = 'medium'
+        effort = 'low'
+      } else {
+        impact = 'low'
+        effort = 'low'
+      }
+      
+      recommendations.push({
+        priority: recommendations.length + 1 as 1 | 2 | 3,
+        title: websiteScore < 70 
+          ? `Improve ${companyName}'s Website Visibility for LLMs`
+          : `Optimize ${companyName}'s Website for Better LLM Discovery`,
+        impact,
+        effort,
+        estimatedSovGain: websiteScore < 70 ? Math.min(scoreGap * 0.3, 15) : Math.min((100 - websiteScore) * 0.1, 5),
+        timeframe: websiteScore < 40 ? '3-4 months' : websiteScore < 70 ? '1-2 months' : '2-4 weeks',
+        evidence: {
+          currentMetric: `${companyName}'s website visibility score: ${websiteScore.toFixed(0)}/100`,
+          benchmark: '70+/100 (good LLM visibility)',
+          gap: websiteScore < 70 
+            ? `${scoreGap.toFixed(0)} points below target`
+            : `${(100 - websiteScore).toFixed(0)} points to perfect score`,
+        },
+        actionSteps: actionSteps.length > 0 ? actionSteps.slice(0, 7) : [], // Only include if there are actual steps
+        businessJustification: websiteScore < 70
+          ? `${companyName}'s website needs optimization for LLM discovery. LLMs rely on structured data and well-optimized websites to understand and recommend brands. Improving ${companyName}'s website visibility will directly increase the likelihood of being mentioned in AI responses.`
+          : `${companyName}'s website is well-optimized, but further improvements can enhance LLM understanding and recommendation frequency. Small optimizations can still provide incremental gains in AI visibility.`,
+      })
+    }
+
     // Sort recommendations by priority (impact and estimated gain)
+    // ALWAYS prioritize website recommendations for ALL companies (they're critical for LLM visibility)
+    const websiteRecIndex = recommendations.findIndex(rec => 
+      rec.title.includes("Website Visibility") || rec.title.includes("Website for Better")
+    )
+    const hasWebsiteRec = websiteRecIndex >= 0
+    const hasLowWebsiteScore = hasWebsiteRec && 
+      websiteAnalysis && 
+      websiteAnalysis.overallVisibilityScore !== undefined && 
+      websiteAnalysis.overallVisibilityScore < 70
+
     recommendations.sort((a, b) => {
+      // ALWAYS prioritize website recommendations for ALL companies (they apply to every website analyzed)
+      const aIsWebsite = a.title.includes("Website Visibility") || a.title.includes("Website for Better")
+      const bIsWebsite = b.title.includes("Website Visibility") || b.title.includes("Website for Better")
+      
+      // Website recommendations get priority, especially if score < 70
+      if (aIsWebsite && !bIsWebsite) {
+        return hasLowWebsiteScore ? -2 : -1 // Extra priority if score is low
+      }
+      if (!aIsWebsite && bIsWebsite) {
+        return hasLowWebsiteScore ? 2 : 1 // Extra priority if score is low
+      }
+      
+      // If both are website or both are not, sort by impact and gain
       // First sort by impact (high > medium > low)
       const impactOrder = { high: 3, medium: 2, low: 1 }
       if (impactOrder[a.impact] !== impactOrder[b.impact]) {
@@ -253,36 +465,37 @@ export async function GET(request: NextRequest) {
     })
 
     // Assign priorities 1, 2, 3 to top recommendations
-    const topRecommendations = recommendations.slice(0, 3).map((rec, index) => ({
+    // Ensure website recommendation is ALWAYS in top 3 for ALL companies (if it exists)
+    let topRecommendations = recommendations.slice(0, 3).map((rec, index) => ({
       ...rec,
       priority: (index + 1) as 1 | 2 | 3,
     }))
 
-    // If we have fewer than 3, add a generic monitoring recommendation
-    while (topRecommendations.length < 3) {
-      topRecommendations.push({
-        priority: (topRecommendations.length + 1) as 1 | 2 | 3,
-        title: 'Continue Monitoring and Optimization',
-        impact: 'low' as const,
-        effort: 'low' as const,
-        estimatedSovGain: 2.0,
-        timeframe: 'Ongoing',
-        evidence: {
-          currentMetric: 'Baseline established',
-          benchmark: 'Industry standards',
-          gap: 'Maintain current performance',
-        },
-        actionSteps: [
-          'Continue tracking metrics weekly',
-          'Review competitor strategies monthly',
-          'Update content based on query trends',
-        ],
-        businessJustification:
-          'Consistent monitoring ensures you maintain visibility gains and identify new opportunities early.',
-      })
+    // If website recommendation exists but isn't in top 3, ensure it's included
+    if (hasWebsiteRec && websiteRecIndex >= 0) {
+      const websiteRec = recommendations[websiteRecIndex]
+      const isInTop3 = topRecommendations.some(rec => 
+        rec.title === websiteRec.title
+      )
+      
+      if (!isInTop3 && topRecommendations.length >= 3) {
+        // Replace the lowest priority recommendation with website recommendation
+        topRecommendations[2] = {
+          ...websiteRec,
+          priority: 3 as 1 | 2 | 3,
+        }
+      } else if (!isInTop3 && topRecommendations.length < 3) {
+        // Add website recommendation if we have fewer than 3
+        topRecommendations.push({
+          ...websiteRec,
+          priority: (topRecommendations.length + 1) as 1 | 2 | 3,
+        })
+      }
     }
 
-    return NextResponse.json(topRecommendations)
+    // Only return recommendations that are actually relevant - no generic fallbacks
+    // Return top 3 if we have them, otherwise return what we have
+    return NextResponse.json(topRecommendations.slice(0, 3))
   } catch (error) {
     console.error('Recommendations error:', error)
     return NextResponse.json(
