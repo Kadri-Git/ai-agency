@@ -10,9 +10,6 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    plugins: {
-      'jsx-a11y': jsxA11y,
-    },
     rules: {
       // TypeScript unused variables - crucial for AI code cleanup
       '@typescript-eslint/no-unused-vars': [

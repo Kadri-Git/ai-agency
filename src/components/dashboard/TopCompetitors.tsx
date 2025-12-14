@@ -1,7 +1,17 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import {
+  getRegionDisplayName,
+  getLocationFromRegion,
+} from '@/lib/region-mapping'
 
 interface Competitor {
   name: string
@@ -17,15 +27,27 @@ interface Competitor {
 interface TopCompetitorsProps {
   competitors: Competitor[]
   companyName: string
+  region?: string
 }
 
-export function TopCompetitors({ competitors, companyName }: TopCompetitorsProps) {
+export function TopCompetitors({
+  competitors,
+  companyName,
+  region,
+}: TopCompetitorsProps) {
+  const regionDisplayName = region ? getRegionDisplayName(region) : null
+  const location = region ? getLocationFromRegion(region) : null
+
   if (!competitors || competitors.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Top Competitors</CardTitle>
-          <CardDescription>Competitors mentioned in LLM responses</CardDescription>
+          <CardDescription>
+            {regionDisplayName && location
+              ? `Competitors mentioned in LLM responses for ${location}, ${regionDisplayName}`
+              : 'Competitors mentioned in LLM responses'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
@@ -41,7 +63,9 @@ export function TopCompetitors({ competitors, companyName }: TopCompetitorsProps
       <CardHeader>
         <CardTitle>Top 5 Competitors</CardTitle>
         <CardDescription>
-          Top competitor companies mentioned in LLM responses across all platforms
+          {regionDisplayName && location
+            ? `Top competitor companies mentioned in LLM responses for ${location}, ${regionDisplayName}`
+            : 'Top competitor companies mentioned in LLM responses across all platforms'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -59,17 +83,22 @@ export function TopCompetitors({ competitors, companyName }: TopCompetitorsProps
                       {rank}
                     </div>
                     <div>
-                      <div className="font-semibold text-base">{competitor.name}</div>
+                      <div className="font-semibold text-base">
+                        {competitor.name}
+                      </div>
                       <div className="text-xs text-muted-foreground">
-                        Total SOV: {competitor.totalSov.toFixed(1)}%
+                        Visibility: {competitor.totalSov.toFixed(1)}% •{' '}
+                        {competitor.mentionCount} mention
+                        {competitor.mentionCount !== 1 ? 's' : ''}
                       </div>
                     </div>
                   </div>
                   <Badge variant="secondary" className="text-xs">
-                    {competitor.mentionCount} platform{competitor.mentionCount !== 1 ? 's' : ''}
+                    {competitor.mentionCount} platform
+                    {competitor.mentionCount !== 1 ? 's' : ''}
                   </Badge>
                 </div>
-                
+
                 {/* Progress bar */}
                 <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
@@ -81,13 +110,19 @@ export function TopCompetitors({ competitors, companyName }: TopCompetitorsProps
                 {/* Platform breakdown */}
                 <div className="flex gap-4 text-xs text-muted-foreground">
                   {competitor.byPlatform.chatgpt > 0 && (
-                    <span>ChatGPT: {competitor.byPlatform.chatgpt.toFixed(1)}%</span>
+                    <span>
+                      ChatGPT: {competitor.byPlatform.chatgpt.toFixed(1)}%
+                    </span>
                   )}
                   {competitor.byPlatform.claude > 0 && (
-                    <span>Claude: {competitor.byPlatform.claude.toFixed(1)}%</span>
+                    <span>
+                      Claude: {competitor.byPlatform.claude.toFixed(1)}%
+                    </span>
                   )}
                   {competitor.byPlatform.gemini > 0 && (
-                    <span>Gemini: {competitor.byPlatform.gemini.toFixed(1)}%</span>
+                    <span>
+                      Gemini: {competitor.byPlatform.gemini.toFixed(1)}%
+                    </span>
                   )}
                 </div>
               </div>
@@ -104,4 +139,3 @@ export function TopCompetitors({ competitors, companyName }: TopCompetitorsProps
     </Card>
   )
 }
-

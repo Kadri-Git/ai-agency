@@ -50,21 +50,33 @@ interface AnalysisData {
   company?: {
     name: string
     domain: string
+    targetRegions?: string[]
+  }
+  config?: {
+    region?: string
+    targetRegions?: string[]
   }
 }
 
 export default function DashboardPage() {
-  const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null)
+  const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(
+    null
+  )
   const [currentDomain, setCurrentDomain] = useState<string | null>(null)
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
-  const [previousAnalysisData, setPreviousAnalysisData] = useState<AnalysisData | null>(null)
-  const [recommendations, setRecommendations] = useState<RecommendationType[]>([])
+  const [previousAnalysisData, setPreviousAnalysisData] =
+    useState<AnalysisData | null>(null)
+  const [recommendations, setRecommendations] = useState<RecommendationType[]>(
+    []
+  )
   const [isLoading, setIsLoading] = useState(false)
 
   // Fetch recommendations for an analysis
   const fetchRecommendations = async (analysisId: string) => {
     try {
-      const response = await fetch(`/api/recommendations?analysisId=${analysisId}`)
+      const response = await fetch(
+        `/api/recommendations?analysisId=${analysisId}`
+      )
       if (response.ok) {
         const data = await response.json()
         setRecommendations(data)
@@ -106,7 +118,9 @@ export default function DashboardPage() {
   // Fetch previous analysis for comparison
   const fetchPreviousAnalysis = async (domain: string) => {
     try {
-      const response = await fetch(`/api/analyze?domain=${encodeURIComponent(domain)}&previous=true`)
+      const response = await fetch(
+        `/api/analyze?domain=${encodeURIComponent(domain)}&previous=true`
+      )
       if (response.ok) {
         const data = await response.json()
         if (data && data.id) {
@@ -128,7 +142,9 @@ export default function DashboardPage() {
   const fetchLatestAnalysis = async (domain: string) => {
     try {
       setIsLoading(true)
-      const response = await fetch(`/api/analyze?domain=${encodeURIComponent(domain)}&latest=true`)
+      const response = await fetch(
+        `/api/analyze?domain=${encodeURIComponent(domain)}&latest=true`
+      )
       if (response.ok) {
         const data = await response.json()
         setAnalysisData(data)
@@ -186,7 +202,10 @@ export default function DashboardPage() {
   }
 
   // Calculate change from previous analysis
-  const calculateChange = (current: number, previous: number | null): { value: number; label: string } | undefined => {
+  const calculateChange = (
+    current: number,
+    previous: number | null
+  ): { value: number; label: string } | undefined => {
     if (previous === null || previous === undefined || previous === 0) {
       return undefined
     }
@@ -199,19 +218,25 @@ export default function DashboardPage() {
   }
 
   // Calculate metrics from analysis data or use defaults
-  const metrics = analysisData ? {
-    shareOfVoice: analysisData.shareOfVoice || 0,
-    visibilityScore: analysisData.visibilityScore || 0,
-    monthlyAudience: analysisData.monthlyAudience || 0,
-    favorableSentiment: analysisData.mentionCount > 0 
-      ? Math.round((analysisData.favorableMentions / analysisData.mentionCount) * 100)
-      : 0,
-  } : {
-    shareOfVoice: 0,
-    visibilityScore: 0,
-    monthlyAudience: 0,
-    favorableSentiment: 0,
-  }
+  const metrics = analysisData
+    ? {
+        shareOfVoice: analysisData.shareOfVoice || 0,
+        visibilityScore: analysisData.visibilityScore || 0,
+        monthlyAudience: analysisData.monthlyAudience || 0,
+        favorableSentiment:
+          analysisData.mentionCount > 0
+            ? Math.round(
+                (analysisData.favorableMentions / analysisData.mentionCount) *
+                  100
+              )
+            : 0,
+      }
+    : {
+        shareOfVoice: 0,
+        visibilityScore: 0,
+        monthlyAudience: 0,
+        favorableSentiment: 0,
+      }
 
   // Calculate SOV by platform from analysis data with real competitor data
   // Handle both JSON string and object formats from database
@@ -219,7 +244,7 @@ export default function DashboardPage() {
     if (!analysisData?.sovByPlatform) {
       return null
     }
-    
+
     // Prisma returns JSON fields as objects, but handle string case too
     let sovData = analysisData.sovByPlatform
     if (typeof sovData === 'string') {
@@ -229,19 +254,24 @@ export default function DashboardPage() {
         return null
       }
     }
-    
+
     // Ensure it's an object with the expected structure
     if (typeof sovData !== 'object' || sovData === null) {
       return null
     }
-    
-    return sovData as { chatgpt?: number; claude?: number; gemini?: number; perplexity?: number }
+
+    return sovData as {
+      chatgpt?: number
+      claude?: number
+      gemini?: number
+      perplexity?: number
+    }
   }
-  
+
   // Calculate SOV by platform from analysis data with real competitor data
   // Get company name for labels
   const companyName = analysisData?.company?.name || 'Your Company'
-  
+
   // Calculate top 5 competitors across all platforms
   const topCompetitors = (() => {
     if (!analysisData?.competitorSovByPlatform) {
@@ -249,23 +279,28 @@ export default function DashboardPage() {
     }
 
     const competitorSov = analysisData.competitorSovByPlatform
-    const competitorMap = new Map<string, {
-      name: string
-      totalSov: number
-      byPlatform: { chatgpt: number; claude: number; gemini: number }
-      mentionCount: number
-    }>()
+    const competitorMap = new Map<
+      string,
+      {
+        name: string
+        totalSov: number
+        byPlatform: { chatgpt: number; claude: number; gemini: number }
+        mentionCount: number
+      }
+    >()
 
     // Aggregate SOV across all platforms for each competitor
     const platforms = ['chatgpt', 'claude', 'gemini'] as const
     for (const platform of platforms) {
       const platformCompetitors = competitorSov[platform]
       if (platformCompetitors && typeof platformCompetitors === 'object') {
-        for (const [competitorName, sov] of Object.entries(platformCompetitors)) {
+        for (const [competitorName, sov] of Object.entries(
+          platformCompetitors
+        )) {
           if (!isValidCompetitorName(competitorName)) {
             continue
           }
-          
+
           if (!competitorMap.has(competitorName)) {
             competitorMap.set(competitorName, {
               name: competitorName,
@@ -274,7 +309,7 @@ export default function DashboardPage() {
               mentionCount: 0,
             })
           }
-          
+
           const competitor = competitorMap.get(competitorName)!
           const sovValue = typeof sov === 'number' ? sov : 0
           competitor.totalSov += sovValue
@@ -298,56 +333,151 @@ export default function DashboardPage() {
     if (!name || name.trim().length < 3) {
       return false
     }
-    
+
     const invalidNames = new Set([
-      'nordic', 'finland', 'finnish', 'sweden', 'swedish', 'norway', 'norwegian',
-      'denmark', 'danish', 'european', 'scandinavian', 'baltic', 'regional',
-      'global', 'international', 'leading', 'top', 'major', 'best', 'largest',
-      'notable', 'prominent', 'key', 'main', 'primary', 'quality', 'reliability',
-      'innovation', 'service', 'services', 'solution', 'solutions', 'provider',
-      'operators', 'vendor', 'brand', 'firm', 'business', 'market', 'industry',
-      'region', 'country', 'countries', 'area', 'areas', 'zone', 'zones',
+      'nordic',
+      'finland',
+      'finnish',
+      'sweden',
+      'swedish',
+      'norway',
+      'norwegian',
+      'denmark',
+      'danish',
+      'european',
+      'scandinavian',
+      'baltic',
+      'regional',
+      'global',
+      'international',
+      'leading',
+      'top',
+      'major',
+      'best',
+      'largest',
+      'notable',
+      'prominent',
+      'key',
+      'main',
+      'primary',
+      'quality',
+      'reliability',
+      'innovation',
+      'service',
+      'services',
+      'solution',
+      'solutions',
+      'provider',
+      'operators',
+      'vendor',
+      'brand',
+      'firm',
+      'business',
+      'market',
+      'industry',
+      'region',
+      'country',
+      'countries',
+      'area',
+      'areas',
+      'zone',
+      'zones',
       // Common words that appear in responses (not companies)
-      'their', 'however', 'pricing', 'competitors', 'competitor', 'companies',
-      'company', 'options', 'option', 'choice', 'choices', 'selection',
-      'alternatives', 'alternative', 'comparison', 'compare', 'versus',
-      'overview', 'summary', 'conclusion', 'recommendation', 'recommendations',
-      'consideration', 'considerations', 'factors', 'factor', 'aspects',
-      'aspect', 'features', 'feature', 'benefits', 'benefit', 'advantages',
-      'advantage', 'disadvantages', 'disadvantage', 'pros', 'cons',
-      'important', 'note', 'notes', 'information', 'details', 'detail',
-      'example', 'examples', 'instance', 'instances', 'case', 'cases',
-      'scenario', 'scenarios', 'situation', 'situations', 'context'
+      'their',
+      'however',
+      'pricing',
+      'competitors',
+      'competitor',
+      'companies',
+      'company',
+      'options',
+      'option',
+      'choice',
+      'choices',
+      'selection',
+      'alternatives',
+      'alternative',
+      'comparison',
+      'compare',
+      'versus',
+      'overview',
+      'summary',
+      'conclusion',
+      'recommendation',
+      'recommendations',
+      'consideration',
+      'considerations',
+      'factors',
+      'factor',
+      'aspects',
+      'aspect',
+      'features',
+      'feature',
+      'benefits',
+      'benefit',
+      'advantages',
+      'advantage',
+      'disadvantages',
+      'disadvantage',
+      'pros',
+      'cons',
+      'important',
+      'note',
+      'notes',
+      'information',
+      'details',
+      'detail',
+      'example',
+      'examples',
+      'instance',
+      'instances',
+      'case',
+      'cases',
+      'scenario',
+      'scenarios',
+      'situation',
+      'situations',
+      'context',
     ])
-    
+
     const lowerName = name.toLowerCase().trim()
     const firstWord = lowerName.split(' ')[0]
-    
+
     if (invalidNames.has(lowerName) || invalidNames.has(firstWord)) {
       return false
     }
-    
+
     return true
   }
-  
+
   const sovByPlatform = (() => {
     const sovData = getSovByPlatform()
-    
+
     // Only include platforms that exist (excluding Perplexity)
     const platforms = [
       { key: 'chatgpt', label: 'ChatGPT' },
       { key: 'claude', label: 'Claude' },
       { key: 'gemini', label: 'Gemini' },
     ]
-    
+
     return platforms.map(({ key, label }) => {
-      const yourSov = sovData ? (Number(sovData[key as keyof typeof sovData]) || 0) : 0
-      const topCompetitor = analysisData?.topCompetitorByPlatform?.[key as keyof typeof analysisData.topCompetitorByPlatform]?.sov 
-        ? Number(analysisData.topCompetitorByPlatform[key as keyof typeof analysisData.topCompetitorByPlatform].sov) 
+      const yourSov = sovData
+        ? Number(sovData[key as keyof typeof sovData]) || 0
         : 0
-      const competitorName = analysisData?.topCompetitorByPlatform?.[key as keyof typeof analysisData.topCompetitorByPlatform]?.name 
-        || 'Top Competitor'
-      
+      const topCompetitor = analysisData?.topCompetitorByPlatform?.[
+        key as keyof typeof analysisData.topCompetitorByPlatform
+      ]?.sov
+        ? Number(
+            analysisData.topCompetitorByPlatform[
+              key as keyof typeof analysisData.topCompetitorByPlatform
+            ].sov
+          )
+        : 0
+      const competitorName =
+        analysisData?.topCompetitorByPlatform?.[
+          key as keyof typeof analysisData.topCompetitorByPlatform
+        ]?.name || 'Top Competitor'
+
       return {
         platform: label,
         yourSov,
@@ -374,7 +504,10 @@ export default function DashboardPage() {
             <MetricCard
               title="Share of Voice"
               value={`${metrics.shareOfVoice.toFixed(1)}%`}
-              change={calculateChange(metrics.shareOfVoice, previousAnalysisData?.shareOfVoice ?? null)}
+              change={calculateChange(
+                metrics.shareOfVoice,
+                previousAnalysisData?.shareOfVoice ?? null
+              )}
               context="Overall market conversation share"
               icon={<Target className="h-6 w-6" />}
               description="Your brand's percentage of total market conversations across all AI platforms."
@@ -383,7 +516,10 @@ export default function DashboardPage() {
             <MetricCard
               title="AI Visibility Score"
               value={Math.round(metrics.visibilityScore)}
-              change={calculateChange(metrics.visibilityScore, previousAnalysisData?.visibilityScore ?? null)}
+              change={calculateChange(
+                metrics.visibilityScore,
+                previousAnalysisData?.visibilityScore ?? null
+              )}
               context="Normalized visibility across all platforms"
               icon={<Eye className="h-6 w-6" />}
               description="A normalized score (0-100) representing your overall visibility across all AI platforms."
@@ -392,7 +528,10 @@ export default function DashboardPage() {
             <MetricCard
               title="Monthly Audience"
               value={metrics.monthlyAudience.toLocaleString('en-US')}
-              change={calculateChange(metrics.monthlyAudience, previousAnalysisData?.monthlyAudience ?? null)}
+              change={calculateChange(
+                metrics.monthlyAudience,
+                previousAnalysisData?.monthlyAudience ?? null
+              )}
               context="Total exposure across AI platforms"
               icon={<Users className="h-6 w-6" />}
               description="Estimated total number of users who see your brand mentioned in AI responses each month."
@@ -401,31 +540,44 @@ export default function DashboardPage() {
             <MetricCard
               title="Favorable Sentiment"
               value={`${metrics.favorableSentiment}%`}
-              change={previousAnalysisData ? calculateChange(
-                metrics.favorableSentiment,
-                previousAnalysisData.mentionCount > 0 
-                  ? Math.round((previousAnalysisData.favorableMentions / previousAnalysisData.mentionCount) * 100)
-                  : null
-              ) : undefined}
+              change={
+                previousAnalysisData
+                  ? calculateChange(
+                      metrics.favorableSentiment,
+                      previousAnalysisData.mentionCount > 0
+                        ? Math.round(
+                            (previousAnalysisData.favorableMentions /
+                              previousAnalysisData.mentionCount) *
+                              100
+                          )
+                        : null
+                    )
+                  : undefined
+              }
               context="Positive recommendation percentage"
               icon={<MessageCircle className="h-6 w-6" />}
               description="Percentage of your brand mentions that are positive or favorable in AI responses."
               measurementDetails="Analyzed using natural language processing to detect positive indicators (e.g., 'best', 'recommended', 'excellent') vs negative indicators (e.g., 'avoid', 'issues', 'poor') in the context around your brand name. Formula: (favorable_mentions / total_mentions) × 100. Higher sentiment increases the likelihood of AI agents recommending your brand and improves your weighted Share of Voice."
             />
-            {analysisData?.websiteVisibilityScore !== null && analysisData?.websiteVisibilityScore !== undefined && (
-              <MetricCard
-                title="Website Visibility"
-                value={`${Math.round(analysisData.websiteVisibilityScore)}/100`}
-                change={previousAnalysisData?.websiteVisibilityScore ? calculateChange(
-                  analysisData.websiteVisibilityScore,
-                  previousAnalysisData.websiteVisibilityScore
-                ) : undefined}
-                context="LLM-friendly website score"
-                icon={<Globe className="h-6 w-6" />}
-                description="How well your website is optimized for LLM discovery and understanding."
-                measurementDetails="Evaluates structured data (JSON-LD), meta tags, semantic HTML, sitemap availability, robots.txt configuration, mobile-friendliness, accessibility, and content quality. Score ranges from 0-100, where 70+ indicates good LLM visibility. Higher scores increase the likelihood of LLMs finding and recommending your brand based on your website content."
-              />
-            )}
+            {analysisData?.websiteVisibilityScore !== null &&
+              analysisData?.websiteVisibilityScore !== undefined && (
+                <MetricCard
+                  title="Website Visibility"
+                  value={`${Math.round(analysisData.websiteVisibilityScore)}/100`}
+                  change={
+                    previousAnalysisData?.websiteVisibilityScore
+                      ? calculateChange(
+                          analysisData.websiteVisibilityScore,
+                          previousAnalysisData.websiteVisibilityScore
+                        )
+                      : undefined
+                  }
+                  context="LLM-friendly website score"
+                  icon={<Globe className="h-6 w-6" />}
+                  description="How well your website is optimized for LLM discovery and understanding."
+                  measurementDetails="Evaluates structured data (JSON-LD), meta tags, semantic HTML, sitemap availability, robots.txt configuration, mobile-friendliness, accessibility, and content quality. Score ranges from 0-100, where 70+ indicates good LLM visibility. Higher scores increase the likelihood of LLMs finding and recommending your brand based on your website content."
+                />
+              )}
           </div>
         </section>
 
@@ -434,46 +586,71 @@ export default function DashboardPage() {
           <ChartContainer
             title="Share of Voice by Platform"
             description={`${companyName}'s Share of Voice percentage compared to top competitor across AI platforms.`}
-            insight={analysisData ? (() => {
-              const hasData = sovByPlatform.some(p => p.yourSov > 0)
-              if (!hasData) {
-                return {
-                  text: 'Run an analysis to see your Share of Voice by platform.',
-                  type: 'info' as const,
-                }
-              }
-              
-              const strongest = sovByPlatform.reduce((max, p) => p.yourSov > max.yourSov ? p : max, sovByPlatform[0])
-              const platformsWithData = sovByPlatform.filter(p => p.yourSov > 0)
-              const weakest = platformsWithData.length > 0 
-                ? platformsWithData.reduce((min, p) => p.yourSov < min.yourSov ? p : min, platformsWithData[0])
-                : strongest
-              const hasCompetitorData = sovByPlatform.some(p => p.topCompetitor > 0 && p.competitorName && p.competitorName !== 'Top Competitor')
-              
-              if (hasCompetitorData) {
-                const topCompetitorPlatform = sovByPlatform.find(p => p.topCompetitor > 0 && p.competitorName && p.competitorName !== 'Top Competitor')
-                if (topCompetitorPlatform) {
-                  return {
-                    text: `Your SOV is strongest on ${strongest.platform} (${strongest.yourSov.toFixed(1)}%) and weakest on ${weakest.platform} (${weakest.yourSov.toFixed(1)}%). ${topCompetitorPlatform.competitorName} leads on ${topCompetitorPlatform.platform} with ${topCompetitorPlatform.topCompetitor.toFixed(1)}% SOV.`,
+            insight={
+              analysisData
+                ? (() => {
+                    const hasData = sovByPlatform.some((p) => p.yourSov > 0)
+                    if (!hasData) {
+                      return {
+                        text: 'Run an analysis to see your Share of Voice by platform.',
+                        type: 'info' as const,
+                      }
+                    }
+
+                    const strongest = sovByPlatform.reduce(
+                      (max, p) => (p.yourSov > max.yourSov ? p : max),
+                      sovByPlatform[0]
+                    )
+                    const platformsWithData = sovByPlatform.filter(
+                      (p) => p.yourSov > 0
+                    )
+                    const weakest =
+                      platformsWithData.length > 0
+                        ? platformsWithData.reduce(
+                            (min, p) => (p.yourSov < min.yourSov ? p : min),
+                            platformsWithData[0]
+                          )
+                        : strongest
+                    const hasCompetitorData = sovByPlatform.some(
+                      (p) =>
+                        p.topCompetitor > 0 &&
+                        p.competitorName &&
+                        p.competitorName !== 'Top Competitor'
+                    )
+
+                    if (hasCompetitorData) {
+                      const topCompetitorPlatform = sovByPlatform.find(
+                        (p) =>
+                          p.topCompetitor > 0 &&
+                          p.competitorName &&
+                          p.competitorName !== 'Top Competitor'
+                      )
+                      if (topCompetitorPlatform) {
+                        return {
+                          text: `Your SOV is strongest on ${strongest.platform} (${strongest.yourSov.toFixed(1)}%) and weakest on ${weakest.platform} (${weakest.yourSov.toFixed(1)}%). ${topCompetitorPlatform.competitorName} leads on ${topCompetitorPlatform.platform} with ${topCompetitorPlatform.topCompetitor.toFixed(1)}% SOV.`,
+                          type: 'info' as const,
+                        }
+                      }
+                    }
+
+                    return {
+                      text: `Your SOV is strongest on ${strongest.platform} (${strongest.yourSov.toFixed(1)}%) and weakest on ${weakest.platform} (${weakest.yourSov.toFixed(1)}%). Focus on improving visibility on ${weakest.platform}.`,
+                      type: 'info' as const,
+                    }
+                  })()
+                : {
+                    text: 'Run an analysis to see your Share of Voice by platform.',
                     type: 'info' as const,
                   }
-                }
-              }
-              
-              return {
-                text: `Your SOV is strongest on ${strongest.platform} (${strongest.yourSov.toFixed(1)}%) and weakest on ${weakest.platform} (${weakest.yourSov.toFixed(1)}%). Focus on improving visibility on ${weakest.platform}.`,
-                type: 'info' as const,
-              }
-            })() : {
-              text: 'Run an analysis to see your Share of Voice by platform.',
-              type: 'info' as const,
-            }}
+            }
           >
             {sovByPlatform && sovByPlatform.length > 0 ? (
               <SovChart data={sovByPlatform} type="bar" />
             ) : (
               <div className="flex items-center justify-center h-[300px] border border-dashed rounded">
-                <p className="text-muted-foreground">No chart data available. Please run an analysis.</p>
+                <p className="text-muted-foreground">
+                  No chart data available. Please run an analysis.
+                </p>
               </div>
             )}
           </ChartContainer>
@@ -482,7 +659,15 @@ export default function DashboardPage() {
         {/* Top Competitors Section */}
         {topCompetitors.length > 0 && (
           <section className="mb-12 md:mb-16">
-            <TopCompetitors competitors={topCompetitors} companyName={companyName} />
+            <TopCompetitors
+              competitors={topCompetitors}
+              companyName={companyName}
+              region={
+                analysisData?.config?.region ||
+                analysisData?.company?.targetRegions?.[0] ||
+                undefined
+              }
+            />
           </section>
         )}
 
@@ -496,15 +681,23 @@ export default function DashboardPage() {
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-black">Current Score</span>
+                  <span className="text-sm font-medium text-black">
+                    Current Score
+                  </span>
                   <span className="text-2xl font-bold text-black">
-                    {analysisData ? `${analysisData.sourceDiversityScore.toFixed(1)} / 10` : '0 / 10'}
+                    {analysisData
+                      ? `${analysisData.sourceDiversityScore.toFixed(1)} / 10`
+                      : '0 / 10'}
                   </span>
                 </div>
-                <ProgressBar 
-                  value={analysisData ? Math.round(analysisData.sourceDiversityScore * 10) : 0} 
-                  color="blue" 
-                  showLabel 
+                <ProgressBar
+                  value={
+                    analysisData
+                      ? Math.round(analysisData.sourceDiversityScore * 10)
+                      : 0
+                  }
+                  color="blue"
+                  showLabel
                 />
                 <p className="text-sm text-black">
                   Industry average: 7.8/10. Focus on diversifying citation
@@ -520,18 +713,26 @@ export default function DashboardPage() {
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-black">Mention Rate</span>
+                  <span className="text-sm font-medium text-black">
+                    Mention Rate
+                  </span>
                   <span className="text-2xl font-bold text-black">
-                    {analysisData ? `${Math.round(analysisData.mentionRate * 100)}%` : '0%'}
+                    {analysisData
+                      ? `${Math.round(analysisData.mentionRate * 100)}%`
+                      : '0%'}
                   </span>
                 </div>
-                <ProgressBar 
-                  value={analysisData ? Math.round(analysisData.mentionRate * 100) : 0} 
-                  color="green" 
-                  showLabel 
+                <ProgressBar
+                  value={
+                    analysisData
+                      ? Math.round(analysisData.mentionRate * 100)
+                      : 0
+                  }
+                  color="green"
+                  showLabel
                 />
                 <p className="text-sm text-black">
-                  {analysisData 
+                  {analysisData
                     ? `You're mentioned in ${Math.round(analysisData.mentionRate * 100)}% of relevant queries. Target: 85%+ for market leadership.`
                     : 'Run an analysis to see your mention rate.'}
                 </p>
@@ -541,8 +742,8 @@ export default function DashboardPage() {
         </section>
 
         {/* Top 3 Recommendations - CRITICAL SECTION */}
-        <RecommendationsSection 
-          recommendations={recommendations.length > 0 ? recommendations : []} 
+        <RecommendationsSection
+          recommendations={recommendations.length > 0 ? recommendations : []}
         />
       </main>
     </div>
