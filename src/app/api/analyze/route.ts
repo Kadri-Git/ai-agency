@@ -860,7 +860,7 @@ export async function GET(request: NextRequest) {
       // Calculate SOV for each competitor on this platform
       for (const [competitorName, competitorResults] of competitorMap) {
         // Create QueryResult-like objects for SOV calculation
-        const queryResultsForCompetitor: QueryResult[] = platformResults.map(result => {
+        const queryResultsForCompetitor: QueryResult[] = platformResults.map((result: any) => {
           const competitorsMentioned = Array.isArray(result.competitorsMentioned) 
             ? result.competitorsMentioned 
             : []
