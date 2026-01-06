@@ -1,4 +1,11 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+// API URL configuration
+// In production, set NEXT_PUBLIC_API_URL environment variable in Vercel
+// For local development, defaults to localhost:8000
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : '') // Will use environment variable in production
 
 export interface LoginRequest {
   email: string
@@ -76,15 +83,21 @@ class ApiClient {
       })
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ 
-          detail: `HTTP error! status: ${response.status}` 
+        const error = await response.json().catch(() => ({
+          detail: `HTTP error! status: ${response.status}`,
         }))
         // Handle validation errors from FastAPI
         if (error.detail && Array.isArray(error.detail)) {
           const firstError = error.detail[0]
-          throw new Error(firstError.msg || firstError.message || JSON.stringify(error.detail))
+          throw new Error(
+            firstError.msg || firstError.message || JSON.stringify(error.detail)
+          )
         }
-        throw new Error(error.detail || error.message || `HTTP error! status: ${response.status}`)
+        throw new Error(
+          error.detail ||
+            error.message ||
+            `HTTP error! status: ${response.status}`
+        )
       }
 
       return response.json()
@@ -92,7 +105,7 @@ class ApiClient {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new Error(
           `Cannot connect to backend server at ${API_BASE_URL}. ` +
-          `Make sure the backend is running: cd backend && uvicorn main:app --reload`
+            `Make sure the backend is running: cd backend && uvicorn main:app --reload`
         )
       }
       throw error
@@ -119,4 +132,3 @@ class ApiClient {
 }
 
 export const api = new ApiClient()
-
