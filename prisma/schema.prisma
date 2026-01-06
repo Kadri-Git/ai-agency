@@ -188,3 +188,19 @@ model QueryFanout {
   @@index([resultId])
   @@map("query_fanouts")
 }
+
+// Multi-tenant client model for GA4 dashboard
+model Client {
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  passwordHash          String   @map("password_hash")
+  companyName           String   @map("company_name")
+  ga4PropertyId         String   @map("ga4_property_id")
+  ga4ServiceAccountJson String   @map("ga4_service_account_json") @db.Text
+  isActive              Boolean  @default(true) @map("is_active")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@map("clients")
+}

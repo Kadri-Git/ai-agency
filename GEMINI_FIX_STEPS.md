@@ -138,3 +138,5 @@ If none of the above works:
 3. **Verify your API key** is from Google AI Studio (not Vertex AI)
 4. **Try a different API key** - create a new one in Google AI Studio
 
+
+
