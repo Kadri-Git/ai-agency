@@ -32,6 +32,7 @@ import {
   ArrowDownRight,
   Settings,
 } from 'lucide-react'
+import Link from 'next/link'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -197,10 +198,12 @@ export default function DashboardPage() {
               <option value={30}>Last 30 days</option>
               <option value={90}>Last 90 days</option>
             </select>
-            <Button variant="outline" onClick={() => router.push('/settings')}>
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Button>
+            <Link href="/settings">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Settings
+              </Button>
+            </Link>
             <Button variant="outline" onClick={handleLogout}>
               Logout
             </Button>

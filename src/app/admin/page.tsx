@@ -129,10 +129,12 @@ export default function AdminPage() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => router.push('/settings')}>
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Button>
+            <Link href="/settings">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Settings
+              </Button>
+            </Link>
             <Button variant="outline" onClick={handleLogout}>
               Logout
             </Button>
