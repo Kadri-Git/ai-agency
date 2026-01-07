@@ -67,13 +67,11 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const token = this.getToken()
+    // Build headers as a plain object to avoid HeadersInit typing issues
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
-    }
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     }
 
     try {
