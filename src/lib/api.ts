@@ -1,11 +1,27 @@
 // API URL configuration
 // In production, set NEXT_PUBLIC_API_URL environment variable in Vercel
 // For local development, defaults to localhost:8000
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:8000'
-    : '') // Will use environment variable in production
+function getApiBaseUrl(): string {
+  // Check environment variable first
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL
+  }
+
+  // In browser, check if we're on localhost
+  if (typeof window !== 'undefined') {
+    if (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    ) {
+      return 'http://localhost:8000'
+    }
+  }
+
+  // Fallback: return empty string (will cause clear error)
+  return ''
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 export interface LoginRequest {
   email: string
@@ -75,6 +91,14 @@ class ApiClient {
     }
 
     try {
+      // Validate API URL is set
+      if (!API_BASE_URL) {
+        throw new Error(
+          'API URL not configured. Please set NEXT_PUBLIC_API_URL environment variable in Vercel. ' +
+            'Go to Vercel Dashboard → Settings → Environment Variables → Add NEXT_PUBLIC_API_URL with your Railway backend URL.'
+        )
+      }
+
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         headers,
