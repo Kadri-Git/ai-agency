@@ -42,9 +42,16 @@ export interface RegisterRequest {
   email: string
   password: string
   company_name: string
-  ga4_property_id?: string
-  ga4_service_account_json?: string
-  is_demo?: boolean
+}
+
+export interface UpdateGA4CredentialsRequest {
+  ga4_property_id: string
+  ga4_service_account_json: string
+}
+
+export interface GA4StatusResponse {
+  has_credentials: boolean
+  ga4_property_id: string | null
 }
 
 export interface TokenResponse {
@@ -176,6 +183,22 @@ class ApiClient {
 
   async getDashboardMetrics(days: number = 30): Promise<DashboardData> {
     return this.request<DashboardData>(`/api/dashboard/metrics?days=${days}`)
+  }
+
+  async updateGA4Credentials(
+    data: UpdateGA4CredentialsRequest
+  ): Promise<{ message: string; ga4_property_id: string }> {
+    return this.request<{ message: string; ga4_property_id: string }>(
+      '/api/settings/ga4-credentials',
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }
+    )
+  }
+
+  async getGA4Status(): Promise<GA4StatusResponse> {
+    return this.request<GA4StatusResponse>('/api/settings/ga4-status')
   }
 }
 

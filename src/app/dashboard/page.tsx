@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { api, DashboardData } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ConnectGA4 } from '@/components/dashboard/ConnectGA4'
 import {
   LineChart,
   Line,
@@ -32,10 +33,12 @@ import {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { isAuthenticated, clearAuth, isDemo } = useAuthStore()
+  const { isAuthenticated, clearAuth } = useAuthStore()
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [days, setDays] = useState(30)
+  const [hasGA4Credentials, setHasGA4Credentials] = useState(false)
+  const [isCheckingGA4, setIsCheckingGA4] = useState(true)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -43,9 +46,21 @@ export default function DashboardPage() {
       return
     }
 
+    checkGA4Status()
     fetchDashboardData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, days])
+
+  const checkGA4Status = async () => {
+    try {
+      const status = await api.getGA4Status()
+      setHasGA4Credentials(status.has_credentials)
+    } catch (error) {
+      console.error('Failed to check GA4 status:', error)
+    } finally {
+      setIsCheckingGA4(false)
+    }
+  }
 
   const fetchDashboardData = async () => {
     try {
@@ -65,12 +80,17 @@ export default function DashboardPage() {
     }
   }
 
+  const handleGA4Connected = () => {
+    checkGA4Status()
+    fetchDashboardData()
+  }
+
   const handleLogout = () => {
     clearAuth()
     router.push('/login')
   }
 
-  if (!isAuthenticated || isLoading) {
+  if (!isAuthenticated || isLoading || isCheckingGA4) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -101,10 +121,12 @@ export default function DashboardPage() {
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">AI Shopping Visibility Dashboard</h1>
-            {isDemo && (
+            <h1 className="text-2xl font-bold">
+              AI Shopping Visibility Dashboard
+            </h1>
+            {!hasGA4Credentials && (
               <p className="text-sm text-muted-foreground mt-1">
-                Demo Mode - Showing mock data
+                Showing sample data - Connect GA4 to see real analytics
               </p>
             )}
           </div>
@@ -126,6 +148,22 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Connect GA4 Section */}
+        <ConnectGA4
+          hasCredentials={hasGA4Credentials}
+          onConnected={handleGA4Connected}
+        />
+
+        {/* Sample Data Banner */}
+        {!hasGA4Credentials && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-sm text-blue-900 dark:text-blue-100">
+              <strong>Sample Data:</strong> You&apos;re currently viewing sample
+              data. Connect your GA4 account above to see real analytics.
+            </p>
+          </div>
+        )}
+
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <MetricCard
@@ -214,10 +252,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
-              <BarChart
-                data={top_landing_pages.slice(0, 10)}
-                layout="vertical"
-              >
+              <BarChart data={top_landing_pages.slice(0, 10)} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
                 <YAxis
@@ -284,4 +319,3 @@ function MetricCard({
     </Card>
   )
 }
-

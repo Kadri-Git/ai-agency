@@ -23,14 +23,8 @@ async def register(client_data: ClientRegister, db: Session = Depends(get_db)):
             detail="Email already registered"
         )
     
-    # Validate: if not demo mode, GA4 credentials are required
-    if not client_data.is_demo:
-        if not client_data.ga4_property_id or not client_data.ga4_service_account_json:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="GA4 credentials are required for non-demo accounts"
-            )
-        # Validate JSON
+    # Validate GA4 JSON if provided
+    if client_data.ga4_service_account_json:
         try:
             import json
             json.loads(client_data.ga4_service_account_json)
@@ -40,7 +34,7 @@ async def register(client_data: ClientRegister, db: Session = Depends(get_db)):
                 detail="Invalid GA4 service account JSON"
             )
     
-    # Create new client
+    # Create new client (GA4 credentials optional - can be added later)
     try:
         hashed_password = get_password_hash(client_data.password)
     except Exception as e:
@@ -55,7 +49,7 @@ async def register(client_data: ClientRegister, db: Session = Depends(get_db)):
         company_name=client_data.company_name,
         ga4_property_id=client_data.ga4_property_id,
         ga4_service_account_json=client_data.ga4_service_account_json,
-        is_demo=client_data.is_demo
+        is_demo=False  # All accounts start with mock data, not demo mode
     )
     
     try:
@@ -75,7 +69,7 @@ async def register(client_data: ClientRegister, db: Session = Depends(get_db)):
         data={
             "client_id": new_client.id,
             "email": new_client.email,
-            "is_demo": new_client.is_demo
+            "is_demo": False  # Always False now - mock data shown if GA4 not connected
         },
         expires_delta=access_token_expires
     )

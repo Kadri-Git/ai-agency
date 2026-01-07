@@ -25,8 +25,8 @@ async def get_dashboard_metrics(
     Client data is automatically isolated based on JWT token.
     """
     try:
-        # If demo mode, return mock data
-        if current_client.is_demo:
+        # If GA4 credentials are missing, return mock data
+        if not current_client.ga4_property_id or not current_client.ga4_service_account_json:
             mock_data = generate_mock_dashboard_data(days)
             return DashboardData(
                 metrics=AITrafficMetrics(**mock_data["metrics"]),

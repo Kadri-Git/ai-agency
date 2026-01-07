@@ -5,9 +5,13 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { api, RegisterRequest } from '@/lib/api'
 import { useAuthStore } from '@/store/useAuthStore'
 import { toast } from 'sonner'
@@ -17,14 +21,10 @@ export default function RegisterPage() {
   const router = useRouter()
   const setAuth = useAuthStore((state) => state.setAuth)
   const [isLoading, setIsLoading] = useState(false)
-  const [isDemoMode, setIsDemoMode] = useState(false)
   const [formData, setFormData] = useState<RegisterRequest>({
     email: '',
     password: '',
     company_name: '',
-    ga4_property_id: '',
-    ga4_service_account_json: '',
-    is_demo: false,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,30 +32,16 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const submitData = {
-        ...formData,
-        is_demo: isDemoMode,
-      }
-
-      // If not demo mode, validate GA4 credentials
-      if (!isDemoMode) {
-        if (!submitData.ga4_property_id || !submitData.ga4_service_account_json) {
-          throw new Error('GA4 credentials are required when not in demo mode')
-        }
-        // Validate JSON
-        try {
-          JSON.parse(submitData.ga4_service_account_json!)
-        } catch {
-          throw new Error('GA4 service account JSON is invalid')
-        }
-      }
-
-      const response = await api.register(submitData)
-      setAuth(response.access_token, formData.email, isDemoMode)
-      toast.success(isDemoMode ? 'Demo account created! Using mock data.' : 'Account created successfully!')
+      const response = await api.register(formData)
+      setAuth(response.access_token, formData.email, false)
+      toast.success(
+        'Account created successfully! You can connect GA4 on the dashboard.'
+      )
       router.push('/dashboard')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Registration failed')
+      toast.error(
+        error instanceof Error ? error.message : 'Registration failed'
+      )
     } finally {
       setIsLoading(false)
     }
@@ -72,28 +58,6 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
-              <Checkbox
-                id="demo-mode"
-                checked={isDemoMode}
-                onCheckedChange={(checked) => {
-                  setIsDemoMode(checked === true)
-                  if (checked) {
-                    setFormData({
-                      ...formData,
-                      ga4_property_id: '',
-                      ga4_service_account_json: '',
-                    })
-                  }
-                }}
-              />
-              <label
-                htmlFor="demo-mode"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-              >
-                Use Demo Mode (No GA4 credentials required - uses mock data)
-              </label>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -132,52 +96,21 @@ export default function RegisterPage() {
                 required
               />
             </div>
-            {!isDemoMode && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="ga4_property_id">GA4 Property ID</Label>
-                  <Input
-                    id="ga4_property_id"
-                    placeholder="123456789"
-                    value={formData.ga4_property_id}
-                    onChange={(e) =>
-                      setFormData({ ...formData, ga4_property_id: e.target.value })
-                    }
-                    required={!isDemoMode}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Find this in Google Analytics: Admin → Property Settings → Property ID
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ga4_service_account_json">GA4 Service Account JSON</Label>
-                  <Textarea
-                    id="ga4_service_account_json"
-                    placeholder='{"type": "service_account", "project_id": "...", ...}'
-                    value={formData.ga4_service_account_json}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        ga4_service_account_json: e.target.value,
-                      })
-                    }
-                    className="font-mono text-sm"
-                    rows={8}
-                    required={!isDemoMode}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Create a service account in Google Cloud Console and download the JSON key file.
-                    Paste the entire JSON content here.
-                  </p>
-                </div>
-              </>
-            )}
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                You&apos;ll be able to connect your GA4 account after
+                registration. The dashboard will show sample data until you
+                connect GA4.
+              </p>
+            </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Creating account...' : 'Register'}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
+            <span className="text-muted-foreground">
+              Already have an account?{' '}
+            </span>
             <Link href="/login" className="text-primary hover:underline">
               Login
             </Link>
@@ -187,4 +120,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-
