@@ -242,6 +242,20 @@ class ApiClient {
       `/api/admin/clients/${clientId}/dashboard?days=${days}`
     )
   }
+
+  async deleteClient(clientId: string): Promise<{
+    message: string
+    deleted_email: string
+    deleted_company: string
+  }> {
+    return this.request<{
+      message: string
+      deleted_email: string
+      deleted_company: string
+    }>(`/api/admin/clients/${clientId}`, {
+      method: 'DELETE',
+    })
+  }
 }
 
 export const api = new ApiClient()

@@ -217,3 +217,54 @@ async def get_client_dashboard(
             detail=f"Error fetching dashboard data: {str(e)}"
         )
 
+@router.delete("/clients/{client_id}")
+async def delete_client_account(
+    client_id: str,
+    current_admin: Client = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a client account.
+    ONLY admins can delete accounts.
+    Admin accounts cannot be deleted through this endpoint.
+    """
+    # Find the client to delete
+    client_to_delete = db.query(Client).filter(Client.id == client_id).first()
+    
+    if not client_to_delete:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Client account not found"
+        )
+    
+    # Prevent deletion of admin accounts
+    if client_to_delete.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot delete admin accounts. Admin accounts must be managed manually."
+        )
+    
+    # Prevent self-deletion (admin deleting themselves)
+    if client_to_delete.id == current_admin.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own admin account"
+        )
+    
+    try:
+        # Delete the client account
+        db.delete(client_to_delete)
+        db.commit()
+        
+        return {
+            "message": f"Client account {client_to_delete.email} deleted successfully",
+            "deleted_email": client_to_delete.email,
+            "deleted_company": client_to_delete.company_name
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting client account: {str(e)}"
+        )
+

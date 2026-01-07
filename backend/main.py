@@ -11,9 +11,13 @@ from app.database import engine, Base
 load_dotenv()
 
 # Create database tables
+# IMPORTANT: create_all() only creates tables if they don't exist
+# It NEVER drops or deletes existing tables or data
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    # This is safe - it only creates missing tables, never deletes data
+    # Accounts are preserved across deployments as long as DATABASE_URL is persistent
     Base.metadata.create_all(bind=engine)
     yield
     # Shutdown
