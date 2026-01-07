@@ -115,3 +115,71 @@ async def login(client_data: ClientLogin, db: Session = Depends(get_db)):
     
     return {"access_token": access_token, "token_type": "bearer"}
 
+@router.post("/create-admin")
+async def create_admin_endpoint(
+    email: str = "admin@visibility-report.com",
+    password: str = "Admin123!",
+    company_name: str = "Admin Account",
+    secret_key: str = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Create admin account endpoint.
+    For security, requires a secret key (set ADMIN_SECRET_KEY env var).
+    """
+    import os
+    required_secret = os.getenv("ADMIN_SECRET_KEY", "change-this-secret-key")
+    
+    if secret_key != required_secret:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid secret key"
+        )
+    
+    # Check if admin already exists
+    existing = db.query(Client).filter(Client.email == email).first()
+    if existing:
+        if existing.is_admin:
+            return {"message": f"Admin account with email {email} already exists", "email": email}
+        else:
+            # Update to admin
+            existing.is_admin = True
+            existing.password_hash = get_password_hash(password)
+            existing.company_name = company_name
+            db.commit()
+            return {"message": f"Updated account to admin: {email}", "email": email}
+    
+    # Create new admin
+    try:
+        hashed_password = get_password_hash(password)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error hashing password: {str(e)}"
+        )
+    
+    admin = Client(
+        email=email,
+        password_hash=hashed_password,
+        company_name=company_name,
+        is_admin=True,
+        is_active=True,
+        is_demo=False
+    )
+    
+    try:
+        db.add(admin)
+        db.commit()
+        db.refresh(admin)
+        return {
+            "message": "Admin account created successfully",
+            "email": email,
+            "company": company_name
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating admin: {str(e)}"
+        )
+
