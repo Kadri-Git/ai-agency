@@ -37,7 +37,7 @@ export function SuggestionsSection({ data }: SuggestionsSectionProps) {
       description: `Your AI traffic converts at ${metrics.ai_conversion_rate.toFixed(2)}%, which is ${Math.abs(metrics.ai_vs_site_conversion_rate).toFixed(2)}% below your site average. Optimize landing pages that AI assistants link to.`,
       priority: 'high',
       icon: <Target className="h-5 w-5" />,
-      action: 'Review top landing pages below',
+      action: 'Review the Top Landing Pages chart above',
     })
   } else if (metrics.ai_vs_site_conversion_rate > 2) {
     suggestions.push({
@@ -255,11 +255,11 @@ export function SuggestionsSection({ data }: SuggestionsSectionProps) {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800'
+        return 'border-red-200 bg-red-50 dark:bg-red-950/50 dark:border-red-800'
       case 'medium':
-        return 'border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800'
+        return 'border-orange-200 bg-orange-50 dark:bg-orange-950/50 dark:border-orange-800'
       case 'low':
-        return 'border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800'
+        return 'border-blue-200 bg-blue-50 dark:bg-blue-950/50 dark:border-blue-800'
       default:
         return 'border-gray-200 bg-gray-50 dark:bg-gray-950 dark:border-gray-800'
     }
@@ -269,19 +269,19 @@ export function SuggestionsSection({ data }: SuggestionsSectionProps) {
     switch (priority) {
       case 'high':
         return (
-          <span className="text-xs font-medium px-2 py-1 rounded bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+          <span className="text-xs font-medium px-2 py-1 rounded bg-red-100 text-red-900 dark:bg-red-900/80 dark:text-red-100">
             High Priority
           </span>
         )
       case 'medium':
         return (
-          <span className="text-xs font-medium px-2 py-1 rounded bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+          <span className="text-xs font-medium px-2 py-1 rounded bg-orange-100 text-orange-900 dark:bg-orange-900/80 dark:text-orange-100">
             Medium Priority
           </span>
         )
       case 'low':
         return (
-          <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-900 dark:bg-blue-900/80 dark:text-blue-100">
             Low Priority
           </span>
         )
@@ -318,11 +318,11 @@ export function SuggestionsSection({ data }: SuggestionsSectionProps) {
                     </h4>
                     {getPriorityBadge(suggestion.priority)}
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="text-sm text-foreground mb-2">
                     {suggestion.description}
                   </p>
                   {suggestion.action && (
-                    <div className="flex items-center gap-1 text-xs text-primary mt-2">
+                    <div className="flex items-center gap-1 text-xs font-medium text-primary mt-2">
                       <ArrowRight className="h-3 w-3" />
                       <span>{suggestion.action}</span>
                     </div>
