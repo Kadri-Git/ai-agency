@@ -4,7 +4,17 @@
 function getApiBaseUrl(): string {
   // Check environment variable first
   if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL
+    let url = process.env.NEXT_PUBLIC_API_URL.trim()
+
+    // Remove trailing slash if present
+    url = url.replace(/\/$/, '')
+
+    // Auto-add https:// if protocol is missing
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`
+    }
+
+    return url
   }
 
   // In browser, check if we're on localhost
