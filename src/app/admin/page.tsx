@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/useAuthStore'
 import { api, ClientSummary } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import {
@@ -14,6 +22,8 @@ import {
   XCircle,
   Eye,
   TrendingUp,
+  Search,
+  ArrowRight,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -21,6 +31,9 @@ export default function AdminPage() {
   const router = useRouter()
   const { isAuthenticated, isAdmin, clearAuth } = useAuthStore()
   const [clients, setClients] = useState<ClientSummary[]>([])
+  const [filteredClients, setFilteredClients] = useState<ClientSummary[]>([])
+  const [selectedClientId, setSelectedClientId] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -38,11 +51,27 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, isAdmin])
 
+  useEffect(() => {
+    // Filter clients based on search query
+    if (!searchQuery.trim()) {
+      setFilteredClients(clients)
+    } else {
+      const query = searchQuery.toLowerCase()
+      const filtered = clients.filter(
+        (client) =>
+          client.company_name.toLowerCase().includes(query) ||
+          client.email.toLowerCase().includes(query)
+      )
+      setFilteredClients(filtered)
+    }
+  }, [searchQuery, clients])
+
   const fetchClients = async () => {
     try {
       setIsLoading(true)
       const data = await api.getClientsList()
       setClients(data.clients)
+      setFilteredClients(data.clients)
     } catch (error) {
       if (error instanceof Error && error.message.includes('403')) {
         toast.error('Admin access required')
@@ -54,6 +83,16 @@ export default function AdminPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleClientSelect = (clientId: string) => {
+    if (clientId) {
+      router.push(`/admin/clients/${clientId}`)
+    }
+  }
+
+  const handleClientClick = (clientId: string) => {
+    router.push(`/admin/clients/${clientId}`)
   }
 
   const handleLogout = () => {
@@ -97,6 +136,80 @@ export default function AdminPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Client Selector Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Select Client Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <label
+                  htmlFor="client-select"
+                  className="text-sm font-medium mb-2 block"
+                >
+                  Quick Select Client
+                </label>
+                <Select
+                  value={selectedClientId}
+                  onValueChange={(value) => {
+                    setSelectedClientId(value)
+                    handleClientSelect(value)
+                  }}
+                >
+                  <SelectTrigger id="client-select" className="w-full">
+                    <SelectValue placeholder="Choose a client to view their dashboard..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clients.map((client) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.company_name} ({client.email})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
+                <label
+                  htmlFor="client-search"
+                  className="text-sm font-medium mb-2 block"
+                >
+                  Search Clients
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="client-search"
+                    placeholder="Search by company name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+            </div>
+            {selectedClientId && (
+              <div className="mt-4 p-3 bg-primary/10 rounded-lg flex items-center justify-between">
+                <span className="text-sm">
+                  Selected:{' '}
+                  <strong>
+                    {
+                      clients.find((c) => c.id === selectedClientId)
+                        ?.company_name
+                    }
+                  </strong>
+                </span>
+                <Button
+                  size="sm"
+                  onClick={() => handleClientSelect(selectedClientId)}
+                >
+                  View Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -169,12 +282,18 @@ export default function AdminPage() {
         {/* Clients Table */}
         <Card>
           <CardHeader>
-            <CardTitle>All Clients</CardTitle>
+            <CardTitle>
+              All Clients ({filteredClients.length} of {clients.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {clients.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
                 No clients registered yet
+              </p>
+            ) : filteredClients.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No clients match your search query
               </p>
             ) : (
               <div className="overflow-x-auto">
@@ -194,10 +313,11 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {clients.map((client) => (
+                    {filteredClients.map((client) => (
                       <tr
                         key={client.id}
-                        className="border-b hover:bg-muted/50"
+                        className="border-b hover:bg-muted/50 cursor-pointer transition-colors"
+                        onClick={() => handleClientClick(client.id)}
                       >
                         <td className="p-4 font-medium">
                           {client.company_name}
@@ -238,7 +358,10 @@ export default function AdminPage() {
                         <td className="p-4 text-right">
                           {client.ai_conversion_rate.toFixed(2)}%
                         </td>
-                        <td className="p-4 text-center">
+                        <td
+                          className="p-4 text-center"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <Link href={`/admin/clients/${client.id}`}>
                             <Button variant="outline" size="sm">
                               <Eye className="h-4 w-4 mr-1" />
