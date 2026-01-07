@@ -219,6 +219,16 @@ class ApiClient {
     return this.request<GA4StatusResponse>('/api/settings/ga4-status')
   }
 
+  async changePassword(data: {
+    current_password: string
+    new_password: string
+  }): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/api/settings/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
   // Admin endpoints
   async getClientsList(): Promise<ClientsListResponse> {
     return this.request<ClientsListResponse>('/api/admin/clients')
