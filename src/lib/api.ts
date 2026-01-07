@@ -99,12 +99,28 @@ class ApiClient {
         )
       }
 
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const fullUrl = `${API_BASE_URL}${endpoint}`
+
+      // Debug logging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[API] ${options.method || 'GET'} ${fullUrl}`)
+      }
+
+      const response = await fetch(fullUrl, {
         ...options,
         headers,
       })
 
       if (!response.ok) {
+        // 405 specifically means Method Not Allowed - likely wrong endpoint
+        if (response.status === 405) {
+          throw new Error(
+            `Method not allowed (405). The request went to: ${fullUrl}. ` +
+              `Make sure NEXT_PUBLIC_API_URL is set to your Railway backend URL in Vercel environment variables. ` +
+              `Current API URL: ${API_BASE_URL || 'NOT SET'}`
+          )
+        }
+
         const error = await response.json().catch(() => ({
           detail: `HTTP error! status: ${response.status}`,
         }))
@@ -118,7 +134,7 @@ class ApiClient {
         throw new Error(
           error.detail ||
             error.message ||
-            `HTTP error! status: ${response.status}`
+            `HTTP error! status: ${response.status}. Request URL: ${fullUrl}`
         )
       }
 
