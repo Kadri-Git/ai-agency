@@ -5,7 +5,13 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { api, LoginRequest } from '@/lib/api'
 import { useAuthStore } from '@/store/useAuthStore'
 import { toast } from 'sonner'
@@ -55,7 +61,7 @@ export default function LoginPage() {
       // Try to login with demo credentials, or register if doesn't exist
       const demoEmail = 'demo@example.com'
       const demoPassword = 'demo123'
-      
+
       try {
         const response = await api.login({
           email: demoEmail,
@@ -79,34 +85,38 @@ export default function LoginPage() {
         // If login fails, try to register
         console.log('Login failed, trying to register:', loginError)
       }
-      
+
       // Try to register
       try {
         const response = await api.register({
           email: demoEmail,
           password: demoPassword,
           company_name: 'Demo Company',
-          is_demo: true,
         })
-        setAuth(response.access_token, demoEmail, true)
+        // All accounts start without GA4, so they'll see sample data
+        setAuth(response.access_token, demoEmail, false)
         toast.success('Demo account created and logged in!')
         router.push('/dashboard')
       } catch (registerError) {
         // If registration fails, it might be because account exists with wrong password
         // Try to show a more helpful error
-        const errorMessage = registerError instanceof Error 
-          ? registerError.message 
-          : 'Failed to setup demo account'
-        
+        const errorMessage =
+          registerError instanceof Error
+            ? registerError.message
+            : 'Failed to setup demo account'
+
         if (errorMessage.includes('already registered')) {
-          toast.error('Demo account exists but password is incorrect. Please use the register page to create a new demo account.')
+          toast.error(
+            'Demo account exists but password is incorrect. Please use the register page to create a new demo account.'
+          )
         } else {
           toast.error(`Failed to setup demo account: ${errorMessage}`)
         }
         console.error('Registration error:', registerError)
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to setup demo account'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to setup demo account'
       toast.error(`Failed to setup demo account: ${errorMessage}`)
       console.error('Demo login error:', error)
     } finally {
@@ -160,7 +170,9 @@ export default function LoginPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or
+                </span>
               </div>
             </div>
             <Button
@@ -174,7 +186,9 @@ export default function LoginPage() {
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            <span className="text-muted-foreground">Don&apos;t have an account? </span>
+            <span className="text-muted-foreground">
+              Don&apos;t have an account?{' '}
+            </span>
             <Link href="/register" className="text-primary hover:underline">
               Register
             </Link>
@@ -184,4 +198,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
