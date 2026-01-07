@@ -7,6 +7,7 @@ import { api, DashboardData } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConnectGA4 } from '@/components/dashboard/ConnectGA4'
+import { SuggestionsSection } from '@/components/dashboard/SuggestionsSection'
 import {
   LineChart,
   Line,
@@ -341,6 +342,9 @@ export default function DashboardPage() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
+        {/* AI Visibility Recommendations */}
+        <SuggestionsSection data={dashboardData} />
       </main>
     </div>
   )
