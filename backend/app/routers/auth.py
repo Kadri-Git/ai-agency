@@ -134,6 +134,37 @@ async def login(client_data: ClientLogin, db: Session = Depends(get_db)):
     
     return {"access_token": access_token, "token_type": "bearer"}
 
+@router.post("/diagnose-login")
+async def diagnose_login(
+    email: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Diagnostic endpoint to help identify login issues.
+    Returns information about the account without requiring password.
+    """
+    client = db.query(Client).filter(Client.email == email).first()
+    
+    if not client:
+        return {
+            "email": email,
+            "exists": False,
+            "message": "Account not found with this email"
+        }
+    
+    return {
+        "email": client.email,
+        "exists": True,
+        "is_active": client.is_active,
+        "is_admin": client.is_admin,
+        "is_demo": client.is_demo,
+        "has_password_hash": bool(client.password_hash),
+        "password_hash_scheme": client.password_hash[:30] + "..." if client.password_hash else None,
+        "password_hash_length": len(client.password_hash) if client.password_hash else 0,
+        "company_name": client.company_name,
+        "created_at": str(client.created_at) if hasattr(client, 'created_at') else None,
+    }
+
 @router.post("/create-admin")
 async def create_admin_endpoint(
     email: str = "admin@visibility-report.com",
