@@ -140,7 +140,12 @@ async def create_admin_endpoint(
     existing = db.query(Client).filter(Client.email == email).first()
     if existing:
         if existing.is_admin:
-            return {"message": f"Admin account with email {email} already exists", "email": email}
+            # Update password even if already admin (for password reset)
+            existing.password_hash = get_password_hash(password)
+            if company_name:
+                existing.company_name = company_name
+            db.commit()
+            return {"message": f"Admin account password updated: {email}", "email": email}
         else:
             # Update to admin
             existing.is_admin = True
