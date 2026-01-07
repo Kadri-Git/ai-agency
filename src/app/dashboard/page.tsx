@@ -41,6 +41,15 @@ export default function DashboardPage() {
   const [isCheckingGA4, setIsCheckingGA4] = useState(true)
 
   useEffect(() => {
+    // Check if we have a token in localStorage (for initial load)
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token')
+      if (!token && !isAuthenticated) {
+        router.push('/login')
+        return
+      }
+    }
+
     if (!isAuthenticated) {
       router.push('/login')
       return
@@ -68,13 +77,26 @@ export default function DashboardPage() {
       const data = await api.getDashboardMetrics(days)
       setDashboardData(data)
     } catch (error) {
-      if (error instanceof Error && error.message.includes('401')) {
+      // If 401 or authentication error, redirect to login
+      if (
+        error instanceof Error &&
+        (error.message.includes('401') ||
+          error.message.includes('Unauthorized') ||
+          error.message.includes('Session expired'))
+      ) {
         clearAuth()
         router.push('/login')
         toast.error('Session expired. Please login again.')
-      } else {
-        toast.error('Failed to load dashboard data')
+        return
       }
+
+      // For other errors, show error but keep trying
+      console.error('Failed to load dashboard data:', error)
+      toast.error('Failed to load dashboard data. Please try again.')
+
+      // Set empty data to prevent "No data available" screen
+      // The error toast will inform the user
+      setDashboardData(null)
     } finally {
       setIsLoading(false)
     }
@@ -90,6 +112,7 @@ export default function DashboardPage() {
     router.push('/login')
   }
 
+  // Show loading while checking auth or fetching data
   if (!isAuthenticated || isLoading || isCheckingGA4) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -101,12 +124,44 @@ export default function DashboardPage() {
     )
   }
 
+  // If no data and not loading, show error state with retry button
   if (!dashboardData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-muted-foreground">No data available</p>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Unable to Load Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              We couldn&apos;t load your dashboard data. This might be due to:
+            </p>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-2">
+              <li>Network connection issues</li>
+              <li>Backend server not responding</li>
+              <li>Session expired</li>
+            </ul>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  setIsLoading(true)
+                  fetchDashboardData()
+                }}
+                className="flex-1"
+              >
+                Retry
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  clearAuth()
+                  router.push('/login')
+                }}
+                className="flex-1"
+              >
+                Go to Login
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

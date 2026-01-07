@@ -2,19 +2,23 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/store/useAuthStore'
 
 export default function HomePage() {
   const router = useRouter()
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard')
-    } else {
-      router.push('/login')
+    // Check localStorage for token to determine initial auth state
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token')
+      if (token) {
+        // Has token, redirect to dashboard
+        router.push('/dashboard')
+      } else {
+        // No token, redirect to login
+        router.push('/login')
+      }
     }
-  }, [isAuthenticated, router])
+  }, [router])
 
   return (
     <div className="min-h-screen flex items-center justify-center">
