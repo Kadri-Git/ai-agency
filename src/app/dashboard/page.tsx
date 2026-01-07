@@ -203,18 +203,18 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Connect GA4 Section */}
+        {/* Connect GA4 Section - Compact and collapsible */}
         <ConnectGA4
           hasCredentials={hasGA4Credentials}
           onConnected={handleGA4Connected}
         />
 
-        {/* Sample Data Banner */}
+        {/* Sample Data Banner - Only show when GA4 not connected */}
         {!hasGA4Credentials && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <p className="text-sm text-blue-900 dark:text-blue-100">
-              <strong>Sample Data:</strong> You&apos;re currently viewing sample
-              data. Connect your GA4 account above to see real analytics.
+          <div className="mb-6 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-xs text-blue-900 dark:text-blue-100">
+              <strong>Sample Data:</strong> You&apos;re viewing sample data.
+              Connect GA4 above for real analytics.
             </p>
           </div>
         )}

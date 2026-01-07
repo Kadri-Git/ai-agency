@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/card'
 import { api, UpdateGA4CredentialsRequest } from '@/lib/api'
 import { toast } from 'sonner'
-import { CheckCircle2, AlertCircle } from 'lucide-react'
+import { CheckCircle2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface ConnectGA4Props {
   onConnected: () => void
@@ -54,105 +54,121 @@ export function ConnectGA4({ onConnected, hasCredentials }: ConnectGA4Props) {
     }
   }
 
+  // Collapsed state when credentials exist
   if (hasCredentials && !isOpen) {
     return (
-      <Card className="mb-8 border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <div>
-                <p className="font-medium text-green-900 dark:text-green-100">
-                  GA4 Connected
-                </p>
-                <p className="text-sm text-green-700 dark:text-green-300">
-                  Your dashboard is showing real GA4 data
-                </p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => setIsOpen(true)}>
-              Update Credentials
-            </Button>
+      <div className="mb-4">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="w-full flex items-center justify-between p-3 text-sm border rounded-lg hover:bg-muted/50 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <span className="text-muted-foreground">GA4 Connected</span>
           </div>
-        </CardContent>
-      </Card>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        </button>
+      </div>
     )
   }
 
   return (
-    <Card className="mb-8 border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          <div>
-            <CardTitle className="text-amber-900 dark:text-amber-100">
-              Connect Your GA4 Account
-            </CardTitle>
-            <CardDescription className="text-amber-700 dark:text-amber-300">
-              Connect your Google Analytics 4 account to see real data. Until
-              then, you&apos;ll see sample data.
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="ga4_property_id">GA4 Property ID</Label>
-            <Input
-              id="ga4_property_id"
-              placeholder="123456789"
-              value={formData.ga4_property_id}
-              onChange={(e) =>
-                setFormData({ ...formData, ga4_property_id: e.target.value })
-              }
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Find this in Google Analytics: Admin → Property Settings →
-              Property ID
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="ga4_service_account_json">
-              GA4 Service Account JSON
-            </Label>
-            <Textarea
-              id="ga4_service_account_json"
-              placeholder='{"type": "service_account", "project_id": "...", ...}'
-              value={formData.ga4_service_account_json}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  ga4_service_account_json: e.target.value,
-                })
-              }
-              className="font-mono text-sm"
-              rows={8}
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Create a service account in Google Cloud Console and download the
-              JSON key file. Paste the entire JSON content here.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Connecting...' : 'Connect GA4'}
-            </Button>
+    <div className="mb-4">
+      <Card className="border">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {hasCredentials ? (
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              )}
+              <CardTitle className="text-base">
+                {hasCredentials ? 'GA4 Settings' : 'Connect GA4 Account'}
+              </CardTitle>
+            </div>
             {hasCredentials && (
               <Button
-                type="button"
-                variant="outline"
+                variant="ghost"
+                size="sm"
                 onClick={() => setIsOpen(false)}
-                disabled={isLoading}
+                className="h-8 w-8 p-0"
               >
-                Cancel
+                <ChevronUp className="h-4 w-4" />
               </Button>
             )}
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          {!hasCredentials && (
+            <CardDescription className="text-sm mt-1">
+              Connect your Google Analytics 4 account to see real data
+            </CardDescription>
+          )}
+        </CardHeader>
+        <CardContent className="pt-0">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="ga4_property_id" className="text-sm">
+                GA4 Property ID
+              </Label>
+              <Input
+                id="ga4_property_id"
+                placeholder="123456789"
+                value={formData.ga4_property_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, ga4_property_id: e.target.value })
+                }
+                className="h-9"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Admin → Property Settings → Property ID
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ga4_service_account_json" className="text-sm">
+                Service Account JSON
+              </Label>
+              <Textarea
+                id="ga4_service_account_json"
+                placeholder='{"type": "service_account", ...}'
+                value={formData.ga4_service_account_json}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    ga4_service_account_json: e.target.value,
+                  })
+                }
+                className="font-mono text-xs"
+                rows={6}
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Download JSON key from Google Cloud Console
+              </p>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button type="submit" size="sm" disabled={isLoading}>
+                {isLoading
+                  ? 'Connecting...'
+                  : hasCredentials
+                    ? 'Update'
+                    : 'Connect'}
+              </Button>
+              {hasCredentials && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsOpen(false)}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
