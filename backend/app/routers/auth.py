@@ -84,21 +84,40 @@ async def login(client_data: ClientLogin, db: Session = Depends(get_db)):
     if not client:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
-        )
-    
-    # Verify password
-    if not verify_password(client_data.password, client.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
+            detail="Account not found: No account exists with this email address. Please check your email or register a new account."
         )
     
     # Check if client is active
     if not client.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Client account is inactive"
+            detail="Account inactive: Your account has been deactivated. Please contact support."
+        )
+    
+    # Verify password with detailed error handling
+    try:
+        password_valid = verify_password(client_data.password, client.password_hash)
+        if not password_valid:
+            # Log for debugging (helps identify password hash issues)
+            import os
+            if os.getenv("DEBUG", "false").lower() == "true":
+                print(f"[DEBUG] Password verification failed for {client.email}")
+                print(f"[DEBUG] Password hash scheme: {client.password_hash[:30] if client.password_hash else 'None'}...")
+                print(f"[DEBUG] Password hash length: {len(client.password_hash) if client.password_hash else 0}")
+            
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect password: The password you entered is incorrect. Please check your password or use the 'Forgot Password' option if available."
+            )
+    except HTTPException:
+        # Re-raise HTTP exceptions (like the one above)
+        raise
+    except Exception as e:
+        # Catch any other errors during password verification
+        print(f"[ERROR] Password verification error for {client.email}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Password verification failed: {str(e)}. Please try again or contact support."
         )
     
     # Create access token

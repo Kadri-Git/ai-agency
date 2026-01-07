@@ -27,16 +27,43 @@ security = HTTPBearer()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
+        # Validate inputs
+        if not plain_password:
+            print("[ERROR] verify_password: plain_password is empty")
+            return False
+        if not hashed_password:
+            print("[ERROR] verify_password: hashed_password is empty")
+            return False
+        
         # Ensure password is a string and not too long
         if not isinstance(plain_password, str):
             plain_password = str(plain_password)
+        if not isinstance(hashed_password, str):
+            hashed_password = str(hashed_password)
+        
         # Bcrypt has a 72 byte limit
         if len(plain_password.encode('utf-8')) > 72:
             plain_password = plain_password[:72]
-        return pwd_context.verify(plain_password, hashed_password)
+        
+        # Try to verify password
+        result = pwd_context.verify(plain_password, hashed_password)
+        
+        # Log for debugging if verification fails
+        if not result:
+            import os
+            if os.getenv("DEBUG", "false").lower() == "true":
+                print(f"[DEBUG] Password verification failed")
+                print(f"[DEBUG] Hash scheme: {hashed_password[:30]}...")
+                print(f"[DEBUG] Hash length: {len(hashed_password)}")
+                print(f"[DEBUG] Password length: {len(plain_password)}")
+        
+        return result
     except Exception as e:
-        # Log error for debugging
-        print(f"Password verification error: {e}")
+        # Log detailed error for debugging
+        print(f"[ERROR] Password verification exception: {type(e).__name__}: {e}")
+        print(f"[ERROR] Hash scheme detected: {hashed_password[:30] if hashed_password else 'None'}...")
+        import traceback
+        traceback.print_exc()
         return False
 
 def get_password_hash(password: str) -> str:
