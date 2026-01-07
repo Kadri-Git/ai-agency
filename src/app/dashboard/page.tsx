@@ -281,10 +281,15 @@ export default function DashboardPage() {
                   textAnchor="end"
                   height={80}
                 />
-                <YAxis tick={{ fontSize: 12 }} />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value: number) =>
+                    `$${Math.round(value).toLocaleString()}`
+                  }
+                />
                 <Tooltip
                   formatter={(value: number) =>
-                    `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    `$${Math.round(value).toLocaleString()}`
                   }
                 />
                 <Legend />
@@ -309,14 +314,26 @@ export default function DashboardPage() {
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={top_landing_pages.slice(0, 10)} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
+                <XAxis
+                  type="number"
+                  tickFormatter={(value: number) =>
+                    `$${Math.round(value).toLocaleString()}`
+                  }
+                />
                 <YAxis
                   dataKey="page_path"
                   type="category"
                   width={200}
                   tick={{ fontSize: 12 }}
                 />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value: number, name: string) => {
+                    if (name === 'Revenue ($)') {
+                      return `$${Math.round(value).toLocaleString()}`
+                    }
+                    return value.toLocaleString()
+                  }}
+                />
                 <Legend />
                 <Bar dataKey="sessions" fill="#8884d8" name="Sessions" />
                 <Bar dataKey="revenue" fill="#82ca9d" name="Revenue ($)" />
