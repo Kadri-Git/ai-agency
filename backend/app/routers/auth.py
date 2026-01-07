@@ -134,7 +134,7 @@ async def login(client_data: ClientLogin, db: Session = Depends(get_db)):
     
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("/diagnose-login")
+@router.get("/diagnose-login")
 async def diagnose_login(
     email: str,
     db: Session = Depends(get_db)
