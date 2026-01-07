@@ -24,6 +24,7 @@ import {
   TrendingUp,
   Search,
   ArrowRight,
+  Settings,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -128,6 +129,10 @@ export default function AdminPage() {
             </p>
           </div>
           <div className="flex items-center gap-4">
+            <Button variant="outline" onClick={() => router.push('/settings')}>
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </Button>
             <Button variant="outline" onClick={handleLogout}>
               Logout
             </Button>
