@@ -25,15 +25,22 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware
+# CORS middleware - Allow all origins for development/production flexibility
+# In production, you may want to restrict this
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://visibility-report.vercel.app",
+    "https://*.vercel.app",
+]
+
+# Allow all origins if in development or if ALLOW_ALL_ORIGINS is set
+if os.getenv("ALLOW_ALL_ORIGINS", "false").lower() == "true":
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://visibility-report.vercel.app",
-        "https://*.vercel.app",  # Allow all Vercel preview deployments
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

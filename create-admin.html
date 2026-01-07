@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Admin Account - Production</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .result.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .info {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0c5460;
+        }
+        .info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Create Admin Account</h1>
+        <p class="subtitle">Create an admin account for visibility-report.vercel.app</p>
+        
+        <div class="info">
+            <strong>💡 Need help finding your Railway URL?</strong>
+            Go to <a href="https://railway.app" target="_blank">railway.app</a> → Your Service → Copy the URL
+        </div>
+
+        <form id="adminForm">
+            <div class="form-group">
+                <label for="railwayUrl">Railway Backend URL *</label>
+                <input 
+                    type="url" 
+                    id="railwayUrl" 
+                    placeholder="https://xxx.up.railway.app" 
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Admin Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    value="admin@visibility-report.com"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Admin Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    value="Admin123!"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="secretKey">Admin Secret Key</label>
+                <input 
+                    type="text" 
+                    id="secretKey" 
+                    value="change-this-secret-key"
+                    placeholder="Must match ADMIN_SECRET_KEY in Railway"
+                >
+            </div>
+            
+            <button type="submit" id="submitBtn">Create Admin Account</button>
+        </form>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('adminForm');
+        const result = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const railwayUrl = document.getElementById('railwayUrl').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const secretKey = document.getElementById('secretKey').value || 'change-this-secret-key';
+
+            // Validate URL
+            if (!railwayUrl.startsWith('http://') && !railwayUrl.startsWith('https://')) {
+                showResult('error', '❌ URL must start with http:// or https://');
+                return;
+            }
+
+            // Show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            showResult('loading', '⏳ Creating admin account...');
+
+            try {
+                const url = `${railwayUrl.replace(/\/$/, '')}/api/auth/create-admin?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&secret_key=${encodeURIComponent(secretKey)}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult('success', `
+                        ✅ <strong>Success! Admin account created.</strong><br><br>
+                        <strong>Account Details:</strong><br>
+                        Email: ${email}<br>
+                        Password: ${password}<br>
+                        Company: ${data.company || 'Admin Account'}<br><br>
+                        <strong>Next Steps:</strong><br>
+                        1. Go to <a href="https://visibility-report.vercel.app/login" target="_blank">visibility-report.vercel.app/login</a><br>
+                        2. Login with: ${email} / ${password}<br>
+                        3. You'll be redirected to /admin dashboard
+                    `);
+                } else {
+                    showResult('error', `
+                        ❌ <strong>Error:</strong> ${data.detail || data.message || 'Failed to create admin account'}<br><br>
+                        <strong>Possible issues:</strong><br>
+                        • Secret key doesn't match ADMIN_SECRET_KEY in Railway<br>
+                        • Backend is not running<br>
+                        • Email already exists<br>
+                        • Check Railway logs for errors
+                    `);
+                }
+            } catch (error) {
+                showResult('error', `
+                    ❌ <strong>Connection Error:</strong> ${error.message}<br><br>
+                    <strong>Possible issues:</strong><br>
+                    • Cannot connect to Railway backend<br>
+                    • Check that your Railway URL is correct<br>
+                    • Make sure backend is deployed and running<br>
+                    • Check CORS settings
+                `);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Admin Account';
+            }
+        });
+
+        function showResult(type, message) {
+            result.className = `result ${type}`;
+            result.innerHTML = message;
+            result.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
