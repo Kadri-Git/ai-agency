@@ -69,7 +69,8 @@ async def register(client_data: ClientRegister, db: Session = Depends(get_db)):
         data={
             "client_id": new_client.id,
             "email": new_client.email,
-            "is_demo": False  # Always False now - mock data shown if GA4 not connected
+            "is_demo": False,  # Always False now - mock data shown if GA4 not connected
+            "is_admin": new_client.is_admin
         },
         expires_delta=access_token_expires
     )
@@ -106,7 +107,8 @@ async def login(client_data: ClientLogin, db: Session = Depends(get_db)):
         data={
             "client_id": client.id,
             "email": client.email,
-            "is_demo": client.is_demo
+            "is_demo": client.is_demo,
+            "is_admin": client.is_admin
         },
         expires_delta=access_token_expires
     )

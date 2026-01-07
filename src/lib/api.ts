@@ -54,6 +54,24 @@ export interface GA4StatusResponse {
   ga4_property_id: string | null
 }
 
+export interface ClientSummary {
+  id: string
+  email: string
+  company_name: string
+  has_ga4: boolean
+  is_demo: boolean
+  is_active: boolean
+  created_at: string
+  ai_sessions: number
+  ai_revenue: number
+  ai_conversion_rate: number
+}
+
+export interface ClientsListResponse {
+  clients: ClientSummary[]
+  total: number
+}
+
 export interface TokenResponse {
   access_token: string
   token_type: string
@@ -199,6 +217,20 @@ class ApiClient {
 
   async getGA4Status(): Promise<GA4StatusResponse> {
     return this.request<GA4StatusResponse>('/api/settings/ga4-status')
+  }
+
+  // Admin endpoints
+  async getClientsList(): Promise<ClientsListResponse> {
+    return this.request<ClientsListResponse>('/api/admin/clients')
+  }
+
+  async getClientDashboard(
+    clientId: string,
+    days: number = 30
+  ): Promise<DashboardData> {
+    return this.request<DashboardData>(
+      `/api/admin/clients/${clientId}/dashboard?days=${days}`
+    )
   }
 }
 

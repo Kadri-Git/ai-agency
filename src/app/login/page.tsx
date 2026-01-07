@@ -36,16 +36,24 @@ export default function LoginPage() {
       // For now, we'll check the email or decode the token
       const tokenParts = response.access_token.split('.')
       let isDemo = false
+      let isAdmin = false
       if (tokenParts.length === 3) {
         try {
           const payload = JSON.parse(atob(tokenParts[1]))
           isDemo = payload.is_demo === true
+          isAdmin = payload.is_admin === true
         } catch {
           // Fallback: check email
           isDemo = formData.email.toLowerCase().includes('demo')
         }
       }
-      setAuth(response.access_token, formData.email, isDemo)
+      setAuth(response.access_token, formData.email, isDemo, isAdmin)
+
+      // Redirect admin to admin dashboard
+      if (isAdmin) {
+        router.push('/admin')
+        return
+      }
       toast.success('Logged in successfully!')
       router.push('/dashboard')
     } catch (error) {
@@ -69,15 +77,23 @@ export default function LoginPage() {
         })
         const tokenParts = response.access_token.split('.')
         let isDemo = false
+        let isAdmin = false
         if (tokenParts.length === 3) {
           try {
             const payload = JSON.parse(atob(tokenParts[1]))
             isDemo = payload.is_demo === true
+            isAdmin = payload.is_admin === true
           } catch {
             isDemo = true // Assume demo if we can't decode
           }
         }
-        setAuth(response.access_token, demoEmail, isDemo)
+        setAuth(response.access_token, demoEmail, isDemo, isAdmin)
+
+        // Redirect admin to admin dashboard
+        if (isAdmin) {
+          router.push('/admin')
+          return
+        }
         toast.success('Demo account logged in!')
         router.push('/dashboard')
         return
@@ -94,7 +110,23 @@ export default function LoginPage() {
           company_name: 'Demo Company',
         })
         // All accounts start without GA4, so they'll see sample data
-        setAuth(response.access_token, demoEmail, false)
+        const tokenParts = response.access_token.split('.')
+        let isAdmin = false
+        if (tokenParts.length === 3) {
+          try {
+            const payload = JSON.parse(atob(tokenParts[1]))
+            isAdmin = payload.is_admin === true
+          } catch {
+            // Ignore
+          }
+        }
+        setAuth(response.access_token, demoEmail, false, isAdmin)
+
+        // Redirect admin to admin dashboard
+        if (isAdmin) {
+          router.push('/admin')
+          return
+        }
         toast.success('Demo account created and logged in!')
         router.push('/dashboard')
       } catch (registerError) {

@@ -33,11 +33,28 @@ export default function RegisterPage() {
 
     try {
       const response = await api.register(formData)
-      setAuth(response.access_token, formData.email, false)
+      // Decode token to check if admin
+      const tokenParts = response.access_token.split('.')
+      let isAdmin = false
+      if (tokenParts.length === 3) {
+        try {
+          const payload = JSON.parse(atob(tokenParts[1]))
+          isAdmin = payload.is_admin === true
+        } catch {
+          // Ignore
+        }
+      }
+      setAuth(response.access_token, formData.email, false, isAdmin)
       toast.success(
         'Account created successfully! You can connect GA4 on the dashboard.'
       )
-      router.push('/dashboard')
+
+      // Redirect admin to admin dashboard
+      if (isAdmin) {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
+      }
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Registration failed'

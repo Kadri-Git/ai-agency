@@ -11,6 +11,19 @@ export default function HomePage() {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token')
       if (token) {
+        // Decode token to check if admin
+        try {
+          const tokenParts = token.split('.')
+          if (tokenParts.length === 3) {
+            const payload = JSON.parse(atob(tokenParts[1]))
+            if (payload.is_admin === true) {
+              router.push('/admin')
+              return
+            }
+          }
+        } catch {
+          // If decode fails, just go to dashboard
+        }
         // Has token, redirect to dashboard
         router.push('/dashboard')
       } else {

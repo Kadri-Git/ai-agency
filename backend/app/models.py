@@ -16,6 +16,7 @@ class Client(Base):
     ga4_property_id = Column(String, nullable=True)  # Nullable for demo mode
     ga4_service_account_json = Column(Text, nullable=True)  # Nullable for demo mode
     is_demo = Column(Boolean, default=False)  # Demo mode flag
+    is_admin = Column(Boolean, default=False)  # Admin flag
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

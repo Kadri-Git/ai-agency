@@ -107,3 +107,18 @@ def get_current_client(
     
     return client
 
+def get_current_admin(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> Client:
+    """Get current admin user - must be authenticated and have is_admin=True"""
+    client = get_current_client(credentials, db)
+    
+    if not client.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    
+    return client
+
