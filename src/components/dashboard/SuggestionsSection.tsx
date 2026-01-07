@@ -9,6 +9,8 @@ import {
   Lightbulb,
   ArrowRight,
   AlertCircle,
+  Search,
+  FileText,
 } from 'lucide-react'
 
 interface SuggestionsSectionProps {
@@ -125,6 +127,109 @@ export function SuggestionsSection({ data }: SuggestionsSectionProps) {
         icon: <Target className="h-5 w-5" />,
       })
     }
+
+    // AI Visibility recommendations based on landing pages
+    const lowTrafficPages = top_landing_pages.filter(
+      (page) => page.sessions < 10 && page.revenue === 0
+    )
+    const highTrafficPages = top_landing_pages.filter(
+      (page) => page.sessions > 50
+    )
+
+    if (lowTrafficPages.length > 0) {
+      suggestions.push({
+        title: 'Increase AI Visibility for Underperforming Pages',
+        description: `${lowTrafficPages.length} landing page${lowTrafficPages.length > 1 ? 's' : ''} are receiving minimal AI traffic. Optimize these pages with clear product descriptions, structured data, and AI-friendly content to improve discoverability.`,
+        priority: 'high',
+        icon: <Lightbulb className="h-5 w-5" />,
+        action: `Review pages: ${lowTrafficPages
+          .slice(0, 3)
+          .map((p) => p.page_path.split('/').pop() || p.page_path)
+          .join(', ')}`,
+      })
+    }
+
+    if (highTrafficPages.length > 0) {
+      const bestPage = highTrafficPages[0]
+      suggestions.push({
+        title: 'Scale AI Visibility from Top Performers',
+        description: `"${bestPage.page_path.split('/').pop() || bestPage.page_path}" is your top AI landing page with ${bestPage.sessions} sessions. Apply similar optimization strategies (clear descriptions, structured data, FAQ sections) to other product pages.`,
+        priority: 'medium',
+        icon: <TrendingUp className="h-5 w-5" />,
+      })
+    }
+
+    // Check for pages with good traffic but low conversion
+    const highTrafficLowConversion = top_landing_pages.filter(
+      (page) => page.sessions > 20 && page.conversion_rate < 1
+    )
+    if (highTrafficLowConversion.length > 0) {
+      suggestions.push({
+        title: 'Improve Conversion on High-Traffic AI Pages',
+        description: `${highTrafficLowConversion.length} page${highTrafficLowConversion.length > 1 ? 's' : ''} receive good AI traffic but convert poorly. Add clear pricing, product benefits, and trust signals to these pages.`,
+        priority: 'high',
+        icon: <Target className="h-5 w-5" />,
+      })
+    }
+  }
+
+  // General AI Visibility recommendations based on landing page analysis
+  const totalPages = top_landing_pages.length
+  const pagesWithRevenue = top_landing_pages.filter((p) => p.revenue > 0).length
+  const avgSessionsPerPage =
+    top_landing_pages.reduce((sum, p) => sum + p.sessions, 0) / totalPages
+
+  if (metrics.ai_sessions < 500 || avgSessionsPerPage < 5) {
+    suggestions.push({
+      title: 'Optimize Content for AI Discovery',
+      description: `Only ${pagesWithRevenue}/${totalPages} landing pages are generating revenue from AI traffic. Ensure all product pages include: clear product names, detailed descriptions, pricing, and FAQ sections. AI assistants need structured, informative content.`,
+      priority: 'high',
+      icon: <Search className="h-5 w-5" />,
+      action: 'Review all product pages and add missing information',
+    })
+
+    suggestions.push({
+      title: 'Add Structured Data (Schema.org)',
+      description:
+        'Implement Product schema markup on your pages. This helps AI assistants understand your products better and increases the likelihood of being recommended. Start with your top landing pages.',
+      priority: 'high',
+      icon: <FileText className="h-5 w-5" />,
+      action: `Add schema to: ${top_landing_pages
+        .slice(0, 3)
+        .map((p) => p.page_path.split('/').pop() || p.page_path)
+        .join(', ')}`,
+    })
+
+    suggestions.push({
+      title: 'Create AI-Friendly Product Descriptions',
+      description:
+        'Write clear, concise product descriptions that answer common questions. Include key features, use cases, benefits, and specifications. AI assistants prefer detailed, factual content over marketing fluff.',
+      priority: 'medium',
+      icon: <Lightbulb className="h-5 w-5" />,
+    })
+
+    // Check if pages have good content structure
+    const pagesNeedingOptimization = top_landing_pages.filter(
+      (page) => page.sessions > 0 && page.conversion_rate === 0
+    )
+    if (pagesNeedingOptimization.length > 0) {
+      suggestions.push({
+        title: 'Improve Content Quality on Non-Converting Pages',
+        description: `${pagesNeedingOptimization.length} page${pagesNeedingOptimization.length > 1 ? 's' : ''} receive AI traffic but don't convert. These pages likely need better product information, clearer pricing, or improved user experience.`,
+        priority: 'high',
+        icon: <Target className="h-5 w-5" />,
+      })
+    }
+  }
+
+  // Recommendations for pages with good performance
+  if (pagesWithRevenue > 0 && pagesWithRevenue < totalPages / 2) {
+    suggestions.push({
+      title: 'Replicate Success from Converting Pages',
+      description: `${pagesWithRevenue} of your ${totalPages} landing pages are generating revenue. Analyze what makes these pages successful and apply the same strategies (content structure, pricing clarity, CTAs) to underperforming pages.`,
+      priority: 'medium',
+      icon: <TrendingUp className="h-5 w-5" />,
+    })
   }
 
   // If no specific suggestions, provide general ones
