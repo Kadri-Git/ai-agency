@@ -30,7 +30,8 @@ async def lifespan(app: FastAPI):
             columns = [col['name'] for col in inspector.get_columns('clients')]
             
             # Determine database type for correct column type
-            is_postgres = DATABASE_URL and DATABASE_URL.startswith("postgresql")
+            db_url = os.getenv("DATABASE_URL", "")
+            is_postgres = db_url.startswith("postgresql")
             text_type = "TEXT" if is_postgres else "TEXT"
             datetime_type = "TIMESTAMP" if is_postgres else "DATETIME"
             
