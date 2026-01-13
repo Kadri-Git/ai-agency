@@ -62,7 +62,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/connect-analytics',
   },
-  secret: nextAuthSecret,
+  secret: nextAuthSecret || 'temporary-secret-for-build', // Use temporary secret for build
   debug: process.env.NODE_ENV === 'development',
 }
 
