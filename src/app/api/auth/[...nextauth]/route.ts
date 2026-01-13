@@ -1,6 +1,40 @@
 import NextAuth from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
+// Clean NEXTAUTH_URL if it has trailing backticks or special characters
+// This fixes the redirect_uri error: visibility-report.vercel.app`/api/auth/callback/google
+if (process.env.NEXTAUTH_URL) {
+  const originalUrl = process.env.NEXTAUTH_URL
+  // Remove trailing backticks, forward slashes, and whitespace
+  const cleanedUrl = originalUrl.replace(/[`\/\s]+$/, '').trim()
+
+  // #region agent log
+  if (originalUrl !== cleanedUrl) {
+    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'auth/[...nextauth]/route.ts:7',
+        message: 'Cleaned NEXTAUTH_URL (removed backtick)',
+        data: {
+          originalUrl,
+          cleanedUrl,
+          hasBacktick: originalUrl.includes('`'),
+          callbackUrl: `${cleanedUrl}/api/auth/callback/google`,
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'A',
+      }),
+    }).catch(() => {})
+  }
+  // #endregion
+
+  // Override the environment variable to use the cleaned version
+  process.env.NEXTAUTH_URL = cleanedUrl
+}
+
 // Validate required environment variables
 if (!process.env.GOOGLE_CLIENT_ID) {
   console.error('Missing GOOGLE_CLIENT_ID environment variable')
