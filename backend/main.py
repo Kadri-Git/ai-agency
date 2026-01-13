@@ -29,41 +29,44 @@ async def lifespan(app: FastAPI):
         if 'clients' in inspector.get_table_names():
             columns = [col['name'] for col in inspector.get_columns('clients')]
             
+            # Determine database type for correct column type
+            is_postgres = DATABASE_URL and DATABASE_URL.startswith("postgresql")
+            text_type = "TEXT" if is_postgres else "TEXT"
+            datetime_type = "TIMESTAMP" if is_postgres else "DATETIME"
+            
             # Add missing columns if they don't exist
-            with engine.connect() as conn:
+            with engine.begin() as conn:  # Use begin() for auto-commit
                 if 'ga4_access_token' not in columns:
                     try:
-                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_access_token TEXT"))
-                        conn.commit()
+                        conn.execute(text(f"ALTER TABLE clients ADD COLUMN ga4_access_token {text_type}"))
                         print("[Migration] Added ga4_access_token column")
                     except Exception as e:
-                        print(f"[Migration] ga4_access_token column may already exist: {e}")
+                        print(f"[Migration] ga4_access_token: {e}")
                 
                 if 'ga4_refresh_token' not in columns:
                     try:
-                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_refresh_token TEXT"))
-                        conn.commit()
+                        conn.execute(text(f"ALTER TABLE clients ADD COLUMN ga4_refresh_token {text_type}"))
                         print("[Migration] Added ga4_refresh_token column")
                     except Exception as e:
-                        print(f"[Migration] ga4_refresh_token column may already exist: {e}")
+                        print(f"[Migration] ga4_refresh_token: {e}")
                 
                 if 'ga4_token_expires_at' not in columns:
                     try:
-                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_token_expires_at DATETIME"))
-                        conn.commit()
+                        conn.execute(text(f"ALTER TABLE clients ADD COLUMN ga4_token_expires_at {datetime_type}"))
                         print("[Migration] Added ga4_token_expires_at column")
                     except Exception as e:
-                        print(f"[Migration] ga4_token_expires_at column may already exist: {e}")
+                        print(f"[Migration] ga4_token_expires_at: {e}")
                 
                 if 'ga4_connected_at' not in columns:
                     try:
-                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_connected_at DATETIME"))
-                        conn.commit()
+                        conn.execute(text(f"ALTER TABLE clients ADD COLUMN ga4_connected_at {datetime_type}"))
                         print("[Migration] Added ga4_connected_at column")
                     except Exception as e:
-                        print(f"[Migration] ga4_connected_at column may already exist: {e}")
+                        print(f"[Migration] ga4_connected_at: {e}")
     except Exception as e:
         print(f"[Migration] Error during migration: {e}")
+        import traceback
+        traceback.print_exc()
         # Don't fail startup if migration fails
     
     yield
