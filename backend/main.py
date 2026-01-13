@@ -19,6 +19,53 @@ async def lifespan(app: FastAPI):
     # This is safe - it only creates missing tables, never deletes data
     # Accounts are preserved across deployments as long as DATABASE_URL is persistent
     Base.metadata.create_all(bind=engine)
+    
+    # Migrate existing database: Add missing GA4 OAuth columns if they don't exist
+    try:
+        from sqlalchemy import text, inspect
+        inspector = inspect(engine)
+        
+        # Check if clients table exists and get its columns
+        if 'clients' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('clients')]
+            
+            # Add missing columns if they don't exist
+            with engine.connect() as conn:
+                if 'ga4_access_token' not in columns:
+                    try:
+                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_access_token TEXT"))
+                        conn.commit()
+                        print("[Migration] Added ga4_access_token column")
+                    except Exception as e:
+                        print(f"[Migration] ga4_access_token column may already exist: {e}")
+                
+                if 'ga4_refresh_token' not in columns:
+                    try:
+                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_refresh_token TEXT"))
+                        conn.commit()
+                        print("[Migration] Added ga4_refresh_token column")
+                    except Exception as e:
+                        print(f"[Migration] ga4_refresh_token column may already exist: {e}")
+                
+                if 'ga4_token_expires_at' not in columns:
+                    try:
+                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_token_expires_at DATETIME"))
+                        conn.commit()
+                        print("[Migration] Added ga4_token_expires_at column")
+                    except Exception as e:
+                        print(f"[Migration] ga4_token_expires_at column may already exist: {e}")
+                
+                if 'ga4_connected_at' not in columns:
+                    try:
+                        conn.execute(text("ALTER TABLE clients ADD COLUMN ga4_connected_at DATETIME"))
+                        conn.commit()
+                        print("[Migration] Added ga4_connected_at column")
+                    except Exception as e:
+                        print(f"[Migration] ga4_connected_at column may already exist: {e}")
+    except Exception as e:
+        print(f"[Migration] Error during migration: {e}")
+        # Don't fail startup if migration fails
+    
     yield
     # Shutdown
 
