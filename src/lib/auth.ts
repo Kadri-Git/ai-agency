@@ -1,38 +1,45 @@
 import { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 
-// Validate required environment variables
-const googleClientId = process.env.GOOGLE_CLIENT_ID
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
-const nextAuthSecret = process.env.NEXTAUTH_SECRET
+// Get environment variables (don't throw during build - validate at runtime)
+const googleClientId = process.env.GOOGLE_CLIENT_ID || ''
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || ''
+const nextAuthSecret =
+  process.env.NEXTAUTH_SECRET || 'temporary-secret-for-build'
 
-if (!googleClientId) {
-  throw new Error('Missing GOOGLE_CLIENT_ID environment variable')
-}
-
-if (!googleClientSecret) {
-  throw new Error('Missing GOOGLE_CLIENT_SECRET environment variable')
-}
-
-if (!nextAuthSecret) {
-  throw new Error('Missing NEXTAUTH_SECRET environment variable')
+// Only validate in production runtime, not during build
+function validateEnvVars() {
+  if (typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      throw new Error('Missing GOOGLE_CLIENT_ID environment variable')
+    }
+    if (!process.env.GOOGLE_CLIENT_SECRET) {
+      throw new Error('Missing GOOGLE_CLIENT_SECRET environment variable')
+    }
+    if (!process.env.NEXTAUTH_SECRET) {
+      throw new Error('Missing NEXTAUTH_SECRET environment variable')
+    }
+  }
 }
 
 export const authOptions: NextAuthOptions = {
-  providers: [
-    GoogleProvider({
-      clientId: googleClientId,
-      clientSecret: googleClientSecret,
-      authorization: {
-        params: {
-          scope:
-            'openid email profile https://www.googleapis.com/auth/analytics.readonly',
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-    }),
-  ],
+  providers:
+    googleClientId && googleClientSecret
+      ? [
+          GoogleProvider({
+            clientId: googleClientId,
+            clientSecret: googleClientSecret,
+            authorization: {
+              params: {
+                scope:
+                  'openid email profile https://www.googleapis.com/auth/analytics.readonly',
+                access_type: 'offline',
+                prompt: 'consent',
+              },
+            },
+          }),
+        ]
+      : [], // Empty providers if credentials not set (allows build to succeed)
   callbacks: {
     async jwt({ token, account, user }) {
       // Initial sign in - store tokens
@@ -62,8 +69,13 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/connect-analytics',
   },
-  secret: nextAuthSecret || 'temporary-secret-for-build', // Use temporary secret for build
+  secret: nextAuthSecret,
   debug: process.env.NODE_ENV === 'development',
+}
+
+// Validate environment variables at runtime (not during build)
+if (typeof window === 'undefined') {
+  validateEnvVars()
 }
 
 async function refreshAccessToken(token: {
@@ -79,8 +91,8 @@ async function refreshAccessToken(token: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: googleClientId!,
-        client_secret: googleClientSecret!,
+        client_id: process.env.GOOGLE_CLIENT_ID || '',
+        client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
         grant_type: 'refresh_token',
         refresh_token: token.refreshToken as string,
       }),
