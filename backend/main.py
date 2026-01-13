@@ -50,10 +50,20 @@ else:
         "http://127.0.0.1:3000",
         "https://visibility-report.vercel.app",
     ]
+    
+    # Also check for custom domain from environment variable
+    custom_domain = os.getenv("FRONTEND_URL")
+    if custom_domain:
+        allowed_origins.append(custom_domain)
+
+# Use regex to allow all Vercel app domains (production and preview)
+# This allows any *.vercel.app domain
+vercel_origin_regex = r"https://.*\.vercel\.app"
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=vercel_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
