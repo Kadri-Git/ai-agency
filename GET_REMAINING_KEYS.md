@@ -11,6 +11,7 @@ Now you just need 2 more keys (both are FREE!):
 **Link**: https://console.anthropic.com/
 
 **Steps**:
+
 1. Click the link above
 2. Sign up or log in (free account works!)
 3. Click "API Keys" in the left sidebar
@@ -29,6 +30,7 @@ Now you just need 2 more keys (both are FREE!):
 **Link**: https://makersuite.google.com/app/apikey
 
 **Steps**:
+
 1. Click the link above
 2. Sign in with your Google account
 3. Click "Create API Key"
@@ -46,6 +48,7 @@ Now you just need 2 more keys (both are FREE!):
 Just paste them here and I'll add them automatically!
 
 Or run:
+
 ```bash
 node scripts/setup-env.js "" "sk-ant-your-anthropic-key" "your-google-key"
 ```
@@ -53,8 +56,3 @@ node scripts/setup-env.js "" "sk-ant-your-anthropic-key" "your-google-key"
 ---
 
 **Tip**: Both of these are free, so you can get them quickly and start using the platform right away!
-
-
-
-
-

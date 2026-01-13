@@ -21,14 +21,20 @@ function getApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     if (
       window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1'
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === ''
     ) {
       return 'http://localhost:8000'
     }
   }
 
-  // Fallback: return empty string (will cause clear error)
-  return ''
+  // Server-side: default to localhost for development
+  if (typeof window === 'undefined') {
+    return 'http://localhost:8000'
+  }
+
+  // Fallback: return localhost for development
+  return 'http://localhost:8000'
 }
 
 const API_BASE_URL = getApiBaseUrl()
@@ -117,6 +123,21 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'api.ts:122',
+        message: 'request() called',
+        data: { endpoint, method: options.method || 'GET' },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'A',
+      }),
+    }).catch(() => {})
+    // #endregion
     const token = this.getToken()
     // Build headers as a plain object to avoid HeadersInit typing issues
     const headers: Record<string, string> = {
@@ -136,16 +157,241 @@ class ApiClient {
 
       const fullUrl = `${API_BASE_URL}${endpoint}`
 
-      // Debug logging in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[API] ${options.method || 'GET'} ${fullUrl}`)
+      // Optional health check - run in background without blocking the request
+      // Only in development and skip for health endpoint itself
+      if (
+        process.env.NODE_ENV === 'development' &&
+        typeof window !== 'undefined' &&
+        endpoint !== '/health'
+      ) {
+        // Run health check in background without awaiting
+        fetch(`${API_BASE_URL}/health`, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit',
+          cache: 'no-cache',
+        })
+          .then((healthCheck) => {
+            if (healthCheck.ok) {
+              healthCheck
+                .json()
+                .then((data) => {
+                  console.log('[API] Backend health check passed:', data)
+                })
+                .catch(() => {})
+            } else {
+              console.warn(
+                '[API] Backend health check returned non-OK status:',
+                healthCheck.status
+              )
+            }
+          })
+          .catch((healthError) => {
+            // Only log if it's a real error, not just browser blocking
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(
+                '[API] Health check failed (non-blocking):',
+                healthError instanceof Error
+                  ? healthError.message
+                  : String(healthError)
+              )
+            }
+          })
       }
 
-      const response = await fetch(fullUrl, {
+      // Build fetch options
+      const fetchOptions: RequestInit = {
         ...options,
         headers,
-      })
+        mode: 'cors',
+      }
 
+      // Only add credentials for authenticated requests (not login/register)
+      // For login/register, omit credentials to avoid CORS issues
+      if (
+        token &&
+        !endpoint.includes('/auth/login') &&
+        !endpoint.includes('/auth/register')
+      ) {
+        fetchOptions.credentials = 'include'
+      } else {
+        fetchOptions.credentials = 'omit'
+      }
+
+      // Debug logging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[API] ${options.method || 'GET'} ${fullUrl}`, {
+          headers: Object.keys(headers),
+          hasToken: !!token,
+          credentials: fetchOptions.credentials,
+        })
+      }
+
+      // Make the fetch request
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'api.ts:219',
+            message: 'About to call fetch',
+            data: {
+              fullUrl,
+              method: fetchOptions.method,
+              hasBody: !!fetchOptions.body,
+              credentials: fetchOptions.credentials,
+              mode: fetchOptions.mode,
+              headersCount: Object.keys(fetchOptions.headers || {}).length,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'F',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+      let response: Response
+      try {
+        // #region agent log
+        const fetchStartTime = Date.now()
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'api.ts:206',
+              message: 'Fetch call starting',
+              data: { fullUrl, method: fetchOptions.method },
+              timestamp: fetchStartTime,
+              sessionId: 'debug-session',
+              runId: 'run1',
+              hypothesisId: 'F',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
+        response = await fetch(fullUrl, fetchOptions)
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'api.ts:224',
+              message: 'Fetch succeeded',
+              data: {
+                status: response.status,
+                ok: response.ok,
+                statusText: response.statusText,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'run1',
+              hypothesisId: 'G',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
+      } catch (fetchError: unknown) {
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'api.ts:227',
+              message: 'Fetch catch',
+              data: {
+                errorName:
+                  fetchError instanceof Error
+                    ? fetchError.name
+                    : typeof fetchError,
+                errorMessage:
+                  fetchError instanceof Error
+                    ? fetchError.message
+                    : String(fetchError),
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'post-fix',
+              hypothesisId: 'A',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
+        // Network error - fetch failed
+        const errorMessage =
+          fetchError instanceof Error ? fetchError.message : String(fetchError)
+        const errorName =
+          fetchError instanceof Error ? fetchError.name : 'Unknown'
+
+        const diagnosticInfo = {
+          apiBaseUrl: API_BASE_URL,
+          endpoint: endpoint,
+          fullUrl: `${API_BASE_URL}${endpoint}`,
+          isBrowser: typeof window !== 'undefined',
+          hostname:
+            typeof window !== 'undefined' ? window.location.hostname : 'server',
+          errorMessage: errorMessage,
+          errorName: errorName,
+          errorType: typeof fetchError,
+          errorString: String(fetchError),
+        }
+
+        // Log with proper serialization
+        console.error(
+          '[API Client] Fetch error:',
+          JSON.stringify(diagnosticInfo, null, 2)
+        )
+        console.error('[API Client] Original error:', fetchError)
+
+        // Provide helpful error message based on error type
+        let helpfulMessage = `Cannot connect to backend server at ${API_BASE_URL}.`
+
+        if (
+          errorMessage.includes('Load failed') ||
+          errorMessage.includes('Failed to fetch')
+        ) {
+          helpfulMessage +=
+            `\n\nThis "Load failed" error is often caused by:\n` +
+            `1. Browser security blocking the request (try Chrome/Firefox instead of Safari)\n` +
+            `2. CORS configuration issue (verify backend CORS allows http://localhost:3000)\n` +
+            `3. Browser extension blocking requests (try incognito/private mode)\n` +
+            `4. Network/firewall blocking localhost connections\n\n` +
+            `To verify backend is running: curl http://localhost:8000/health`
+        } else {
+          helpfulMessage += ` Make sure the backend is running: cd backend && uvicorn main:app --reload.`
+        }
+
+        helpfulMessage += `\nFull URL: ${API_BASE_URL}${endpoint}\nError: ${errorMessage} (${errorName})`
+
+        throw new Error(helpfulMessage)
+      }
+
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'api.ts:265',
+            message: 'Checking response.ok',
+            data: { responseOk: response.ok, responseStatus: response.status },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'post-fix',
+            hypothesisId: 'B',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
       if (!response.ok) {
         // 405 specifically means Method Not Allowed - likely wrong endpoint
         if (response.status === 405) {
@@ -156,9 +402,44 @@ class ApiClient {
           )
         }
 
-        const error = await response.json().catch(() => ({
-          detail: `HTTP error! status: ${response.status}`,
-        }))
+        // Try to get error details from response
+        let error: { detail?: string | unknown[]; message?: string }
+        try {
+          const errorText = await response.text()
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'api.ts:280',
+                message: 'Error response body',
+                data: {
+                  status: response.status,
+                  errorText: errorText.substring(0, 500),
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run1',
+                hypothesisId: 'G',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
+          try {
+            error = JSON.parse(errorText)
+          } catch {
+            error = {
+              detail: errorText || `HTTP error! status: ${response.status}`,
+            }
+          }
+        } catch {
+          error = {
+            detail: `HTTP error! status: ${response.status}`,
+          }
+        }
+
         // Handle validation errors from FastAPI
         if (error.detail && Array.isArray(error.detail)) {
           const firstError = error.detail[0]
@@ -175,12 +456,28 @@ class ApiClient {
 
       return response.json()
     } catch (error) {
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error(
-          `Cannot connect to backend server at ${API_BASE_URL}. ` +
-            `Make sure the backend is running: cd backend && uvicorn main:app --reload`
-        )
-      }
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'api.ts:293',
+            message: 'Outer catch - non-network error',
+            data: {
+              errorName: error instanceof Error ? error.name : typeof error,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'post-fix',
+            hypothesisId: 'A',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+      // Re-throw errors that were already handled (network errors are handled above)
+      // This catch only handles JSON parsing errors and other unexpected errors
       throw error
     }
   }

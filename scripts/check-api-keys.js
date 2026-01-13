@@ -5,36 +5,37 @@
  * Run with: node scripts/check-api-keys.js
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 require('dotenv').config({ path: '.env.local' })
 require('dotenv').config()
 
 const keys = {
-  'OPENAI_API_KEY': process.env.OPENAI_API_KEY,
-  'ANTHROPIC_API_KEY': process.env.ANTHROPIC_API_KEY,
-  'GOOGLE_AI_API_KEY': process.env.GOOGLE_AI_API_KEY,
-  'DATABASE_URL': process.env.DATABASE_URL,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+  GOOGLE_AI_API_KEY: process.env.GOOGLE_AI_API_KEY,
+  DATABASE_URL: process.env.DATABASE_URL,
 }
 
 console.log('\n🔑 API Keys Configuration Check\n')
-console.log('=' .repeat(50))
+console.log('='.repeat(50))
 
 let allConfigured = true
 
 for (const [key, value] of Object.entries(keys)) {
   const isConfigured = value && value.length > 0 && !value.includes('...')
   const status = isConfigured ? '✅' : '❌'
-  const displayValue = isConfigured 
+  const displayValue = isConfigured
     ? `${value.substring(0, 10)}...${value.substring(value.length - 4)}`
     : 'Not configured'
-  
+
   console.log(`${status} ${key}: ${displayValue}`)
-  
+
   if (!isConfigured && key !== 'DATABASE_URL') {
     allConfigured = false
   }
 }
 
-console.log('=' .repeat(50))
+console.log('='.repeat(50))
 
 if (allConfigured) {
   console.log('\n✅ All API keys are configured!')
@@ -48,8 +49,3 @@ if (allConfigured) {
   console.log('3. See SETUP.md for detailed instructions\n')
   process.exit(1)
 }
-
-
-
-
-

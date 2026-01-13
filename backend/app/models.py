@@ -14,7 +14,12 @@ class Client(Base):
     password_hash = Column(String, nullable=False)
     company_name = Column(String, nullable=False)
     ga4_property_id = Column(String, nullable=True)  # Nullable for demo mode
-    ga4_service_account_json = Column(Text, nullable=True)  # Nullable for demo mode
+    ga4_service_account_json = Column(Text, nullable=True)  # Nullable for demo mode (legacy)
+    # OAuth2 tokens for GA4
+    ga4_access_token = Column(Text, nullable=True)
+    ga4_refresh_token = Column(Text, nullable=True)
+    ga4_token_expires_at = Column(DateTime(timezone=True), nullable=True)
+    ga4_connected_at = Column(DateTime(timezone=True), nullable=True)
     is_demo = Column(Boolean, default=False)  # Demo mode flag
     is_admin = Column(Boolean, default=False)  # Admin flag
     is_active = Column(Boolean, default=True)

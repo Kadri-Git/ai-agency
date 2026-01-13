@@ -40,6 +40,7 @@ I'll guide you through getting each API key. Follow these steps:
 ## What to Do Next
 
 Once you have your keys, tell me:
+
 - "I have my OpenAI key: sk-..."
 - "I have my Anthropic key: sk-ant-..."
 - "I have my Google AI key: AIza..."
@@ -49,8 +50,3 @@ Or just paste them all at once, and I'll add them to your .env file automaticall
 ---
 
 **Quick Tip**: You can get all three keys in about 10 minutes. Start with Anthropic (easiest, free) or Google AI (also free), then do OpenAI (requires payment setup).
-
-
-
-
-

@@ -25,8 +25,18 @@ async def get_dashboard_metrics(
     Client data is automatically isolated based on JWT token.
     """
     try:
+        # Check if GA4 credentials are available (OAuth or service account)
+        has_oauth = bool(
+            current_client.ga4_property_id 
+            and current_client.ga4_access_token 
+            and current_client.ga4_refresh_token
+        )
+        has_service_account = bool(
+            current_client.ga4_property_id and current_client.ga4_service_account_json
+        )
+        
         # If GA4 credentials are missing, return mock data
-        if not current_client.ga4_property_id or not current_client.ga4_service_account_json:
+        if not has_oauth and not has_service_account:
             mock_data = generate_mock_dashboard_data(days)
             return DashboardData(
                 metrics=AITrafficMetrics(**mock_data["metrics"]),
@@ -44,10 +54,12 @@ async def get_dashboard_metrics(
         start_date_str = start_date.strftime("%Y-%m-%d")
         end_date_str = end_date.strftime("%Y-%m-%d")
         
-        # Get AI traffic metrics
+        # Get AI traffic metrics (use OAuth if available, otherwise service account)
         metrics_data = get_ai_traffic_metrics(
             property_id=current_client.ga4_property_id,
-            service_account_json=current_client.ga4_service_account_json,
+            service_account_json=current_client.ga4_service_account_json if has_service_account else None,
+            access_token=current_client.ga4_access_token if has_oauth else None,
+            refresh_token=current_client.ga4_refresh_token if has_oauth else None,
             start_date=start_date_str,
             end_date=end_date_str
         )
@@ -86,10 +98,12 @@ async def get_dashboard_metrics(
             ai_vs_site_conversion_rate=round(ai_vs_site_conversion_rate, 2)
         )
         
-        # Get revenue trend
+        # Get revenue trend (use OAuth if available, otherwise service account)
         trend_data = get_revenue_trend(
             property_id=current_client.ga4_property_id,
-            service_account_json=current_client.ga4_service_account_json,
+            service_account_json=current_client.ga4_service_account_json if has_service_account else None,
+            access_token=current_client.ga4_access_token if has_oauth else None,
+            refresh_token=current_client.ga4_refresh_token if has_oauth else None,
             days=days
         )
         
@@ -97,10 +111,12 @@ async def get_dashboard_metrics(
             data=[RevenueTrendPoint(date=d["date"], revenue=d["revenue"]) for d in trend_data]
         )
         
-        # Get top landing pages
+        # Get top landing pages (use OAuth if available, otherwise service account)
         landing_pages_data = get_top_landing_pages(
             property_id=current_client.ga4_property_id,
-            service_account_json=current_client.ga4_service_account_json,
+            service_account_json=current_client.ga4_service_account_json if has_service_account else None,
+            access_token=current_client.ga4_access_token if has_oauth else None,
+            refresh_token=current_client.ga4_refresh_token if has_oauth else None,
             start_date=start_date_str,
             end_date=end_date_str,
             limit=10

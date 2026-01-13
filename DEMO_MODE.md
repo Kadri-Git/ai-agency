@@ -12,6 +12,7 @@ Demo mode allows you to test the application without setting up Google Analytics
 4. The dashboard will show mock data
 
 **Demo Credentials:**
+
 - Email: `demo@example.com`
 - Password: `demo123`
 
@@ -29,6 +30,7 @@ Demo mode allows you to test the application without setting up Google Analytics
 ### What You'll See
 
 In demo mode, the dashboard shows:
+
 - **AI Sessions**: Random between 50-300
 - **AI Revenue**: Random between $500-$3,000
 - **AI Conversion Rate**: Calculated from sessions and conversions
@@ -42,6 +44,7 @@ In demo mode, the dashboard shows:
 ### Switching to Real Data
 
 To use real GA4 data:
+
 1. Logout
 2. Register a new account **without** checking "Demo Mode"
 3. Provide your real GA4 Property ID and Service Account JSON
@@ -53,4 +56,3 @@ To use real GA4 data:
 - Demo accounts are stored in the database but don't require GA4 credentials
 - You can have multiple demo accounts with different emails
 - Demo mode is indicated by a banner at the top of the dashboard
-

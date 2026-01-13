@@ -74,7 +74,11 @@ export default function RegisterPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            suppressHydrationWarning
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -87,6 +91,7 @@ export default function RegisterPage() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
+                  suppressHydrationWarning
                 />
               </div>
               <div className="space-y-2">
@@ -99,6 +104,7 @@ export default function RegisterPage() {
                     setFormData({ ...formData, password: e.target.value })
                   }
                   required
+                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -111,6 +117,7 @@ export default function RegisterPage() {
                   setFormData({ ...formData, company_name: e.target.value })
                 }
                 required
+                suppressHydrationWarning
               />
             </div>
             <div className="p-4 bg-muted rounded-lg">
@@ -120,7 +127,12 @@ export default function RegisterPage() {
                 connect GA4.
               </p>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading}
+              suppressHydrationWarning
+            >
               {isLoading ? 'Creating account...' : 'Register'}
             </Button>
           </form>

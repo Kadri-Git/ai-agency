@@ -5,6 +5,7 @@
  * Usage: node scripts/setup-database.js "postgresql://..."
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs')
 const path = require('path')
 
@@ -12,10 +13,14 @@ const envPath = path.join(process.cwd(), '.env')
 const dbUrl = process.argv[2]
 
 if (!dbUrl) {
-  console.log('Usage: node scripts/setup-database.js "postgresql://user:pass@host:port/db"')
+  console.log(
+    'Usage: node scripts/setup-database.js "postgresql://user:pass@host:port/db"'
+  )
   console.log('')
   console.log('Example:')
-  console.log('  node scripts/setup-database.js "postgresql://postgres:password@db.xxx.supabase.co:5432/postgres"')
+  console.log(
+    '  node scripts/setup-database.js "postgresql://postgres:password@db.xxx.supabase.co:5432/postgres"'
+  )
   process.exit(1)
 }
 
@@ -28,10 +33,7 @@ let envContent = fs.readFileSync(envPath, 'utf8')
 
 // Update or add DATABASE_URL
 if (envContent.includes('DATABASE_URL=')) {
-  envContent = envContent.replace(
-    /DATABASE_URL=.*/,
-    `DATABASE_URL="${dbUrl}"`
-  )
+  envContent = envContent.replace(/DATABASE_URL=.*/, `DATABASE_URL="${dbUrl}"`)
 } else {
   envContent += `\nDATABASE_URL="${dbUrl}"\n`
 }
@@ -43,8 +45,3 @@ console.log('Next steps:')
 console.log('  1. Run: npx prisma generate')
 console.log('  2. Run: npx prisma migrate dev')
 console.log('  3. Start the app: npm run dev')
-
-
-
-
-

@@ -5,12 +5,14 @@
 ### Step 1: Install Dependencies
 
 **Backend:**
+
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
 **Frontend:**
+
 ```bash
 npm install
 ```
@@ -18,6 +20,7 @@ npm install
 ### Step 2: Set Up Environment
 
 Create `.env` file in the root:
+
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/ai_visibility
 JWT_SECRET_KEY=your-secret-key-min-32-chars
@@ -27,12 +30,14 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ### Step 3: Start the Application
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd backend
 uvicorn main:app --reload
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 npm run dev
 ```
@@ -51,6 +56,7 @@ npm run dev
 ## ✅ That's It!
 
 The dashboard will show:
+
 - AI Sessions
 - AI Revenue
 - AI Conversion Rate
@@ -64,7 +70,7 @@ The dashboard will show:
 ## 📚 Full Documentation
 
 See `README_GA4_DASHBOARD.md` for:
+
 - Detailed GA4 setup instructions
 - Troubleshooting
 - Production deployment guide
-

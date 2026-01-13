@@ -1,6 +1,7 @@
 # How to Fix Gemini API Issues - Exact Steps
 
 ## Problem
+
 All Gemini models are returning 404 errors: "models/[model-name] is not found for API version v1beta"
 
 ## Solution Steps
@@ -26,6 +27,7 @@ All Gemini models are returning 404 errors: "models/[model-name] is not found fo
 1. **Open your terminal** in the project root directory
 
 2. **Run the checker script:**
+
    ```bash
    npm run check:gemini
    ```
@@ -51,10 +53,11 @@ All Gemini models are returning 404 errors: "models/[model-name] is not found fo
 2. **Find the `queryGemini` function** (around line 212)
 
 3. **Update the `geminiModels` array** with the exact model names from Step 2:
+
    ```typescript
    const geminiModels = [
-     'gemini-1.5-flash',        // Use the exact name from the checker
-     'gemini-1.5-pro',          // Use the exact name from the checker
+     'gemini-1.5-flash', // Use the exact name from the checker
+     'gemini-1.5-pro', // Use the exact name from the checker
      // Add other working models here
    ]
    ```
@@ -64,11 +67,13 @@ All Gemini models are returning 404 errors: "models/[model-name] is not found fo
 ### Step 4: Verify Your API Key
 
 1. **Check your `.env.local` file:**
+
    ```bash
    cat .env.local | grep GOOGLE_AI_API_KEY
    ```
 
 2. **Make sure it's set correctly:**
+
    ```
    GOOGLE_AI_API_KEY=your_actual_api_key_here
    ```
@@ -83,6 +88,7 @@ All Gemini models are returning 404 errors: "models/[model-name] is not found fo
 ### Step 5: Test the Fix
 
 1. **Restart your dev server:**
+
    ```bash
    # Stop the current server (Ctrl+C)
    npm run dev
@@ -115,17 +121,21 @@ If the above doesn't work, you might need to:
 ## Common Issues
 
 ### Issue: "API key not valid"
+
 - **Fix:** Get a fresh API key from https://aistudio.google.com/
 - Make sure there are no extra spaces in `.env.local`
 
 ### Issue: "API not enabled"
+
 - **Fix:** Enable the Generative Language API in Google Cloud Console
 
 ### Issue: "Quota exceeded"
+
 - **Fix:** Check your usage limits in Google Cloud Console
 - You might need to upgrade your plan
 
 ### Issue: "No models found"
+
 - **Fix:** Your API key might not have access to Gemini models
 - Try creating a new API key in Google AI Studio
 
@@ -137,6 +147,3 @@ If none of the above works:
 2. **Share the output** from `npm run check:gemini`
 3. **Verify your API key** is from Google AI Studio (not Vertex AI)
 4. **Try a different API key** - create a new one in Google AI Studio
-
-
-

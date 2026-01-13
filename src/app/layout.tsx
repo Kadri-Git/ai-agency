@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { Toaster } from '@/components/ui/sonner'
+import { SessionProvider } from '@/components/providers/SessionProvider'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -13,7 +14,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'AI Visibility Analysis Platform',
-  description: 'Enterprise-grade AI search visibility analysis with actionable recommendations',
+  description:
+    'Enterprise-grade AI search visibility analysis with actionable recommendations',
 }
 
 export default function RootLayout({
@@ -23,19 +25,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} font-sans antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          forcedTheme="light"
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster />
-        </ThemeProvider>
+      <body className={`${inter.variable} font-sans antialiased`}>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            forcedTheme="light"
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   )

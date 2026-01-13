@@ -7,6 +7,8 @@ from google.analytics.data_v1beta.types import (
     FilterExpression,
     Filter,
 )
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 from datetime import datetime, timedelta
 import json
 import re
@@ -14,15 +16,63 @@ import re
 # AI traffic source regex pattern
 AI_SOURCE_REGEX = r"chat\.openai|perplexity|gemini|claude"
 
-def get_ga4_client(service_account_json: str):
-    """Create GA4 client from service account JSON"""
-    credentials_dict = json.loads(service_account_json)
-    client = BetaAnalyticsDataClient.from_service_account_info(credentials_dict)
-    return client
+def get_ga4_client(service_account_json: str = None, access_token: str = None, refresh_token: str = None):
+    """
+    Create GA4 client from either service account JSON or OAuth2 tokens.
+    
+    Args:
+        service_account_json: Service account JSON string (legacy)
+        access_token: OAuth2 access token
+        refresh_token: OAuth2 refresh token (for token refresh)
+    
+    Returns:
+        BetaAnalyticsDataClient instance
+    """
+    if service_account_json:
+        # Legacy: Use service account JSON
+        credentials_dict = json.loads(service_account_json)
+        client = BetaAnalyticsDataClient.from_service_account_info(credentials_dict)
+        return client
+    elif access_token:
+        # OAuth2: Use access token
+        credentials = Credentials(
+            token=access_token,
+            refresh_token=refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=None,  # Not needed for token refresh if refresh_token is provided
+            client_secret=None,
+        )
+        client = BetaAnalyticsDataClient(credentials=credentials)
+        return client
+    else:
+        raise ValueError("Either service_account_json or access_token must be provided")
+
+def refresh_oauth_token(refresh_token: str, client_id: str, client_secret: str) -> dict:
+    """
+    Refresh OAuth2 access token using refresh token.
+    
+    Returns:
+        dict with access_token, expires_in, and optionally refresh_token
+    """
+    import requests
+    
+    url = "https://oauth2.googleapis.com/token"
+    data = {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "refresh_token": refresh_token,
+        "grant_type": "refresh_token",
+    }
+    
+    response = requests.post(url, data=data)
+    response.raise_for_status()
+    return response.json()
 
 def get_ai_traffic_metrics(
     property_id: str,
-    service_account_json: str,
+    service_account_json: str = None,
+    access_token: str = None,
+    refresh_token: str = None,
     start_date: str = None,
     end_date: str = None
 ) -> dict:
@@ -44,7 +94,11 @@ def get_ai_traffic_metrics(
     if not end_date:
         end_date = datetime.now().strftime("%Y-%m-%d")
     
-    client = get_ga4_client(service_account_json)
+    client = get_ga4_client(
+        service_account_json=service_account_json,
+        access_token=access_token,
+        refresh_token=refresh_token
+    )
     
     # AI traffic filter
     ai_source_filter = FilterExpression(
@@ -131,14 +185,20 @@ def get_ai_traffic_metrics(
 
 def get_revenue_trend(
     property_id: str,
-    service_account_json: str,
+    service_account_json: str = None,
+    access_token: str = None,
+    refresh_token: str = None,
     days: int = 30
 ) -> list:
     """Get daily revenue trend for AI traffic"""
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days)
     
-    client = get_ga4_client(service_account_json)
+    client = get_ga4_client(
+        service_account_json=service_account_json,
+        access_token=access_token,
+        refresh_token=refresh_token
+    )
     
     # AI traffic filter - using sessionSource dimension
     ai_source_filter = FilterExpression(
@@ -184,7 +244,9 @@ def get_revenue_trend(
 
 def get_top_landing_pages(
     property_id: str,
-    service_account_json: str,
+    service_account_json: str = None,
+    access_token: str = None,
+    refresh_token: str = None,
     start_date: str = None,
     end_date: str = None,
     limit: int = 10
@@ -195,7 +257,11 @@ def get_top_landing_pages(
     if not end_date:
         end_date = datetime.now().strftime("%Y-%m-%d")
     
-    client = get_ga4_client(service_account_json)
+    client = get_ga4_client(
+        service_account_json=service_account_json,
+        access_token=access_token,
+        refresh_token=refresh_token
+    )
     
     # AI traffic filter - using sessionSource dimension
     ai_source_filter = FilterExpression(

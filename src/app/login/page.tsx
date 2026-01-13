@@ -32,17 +32,115 @@ export default function LoginPage() {
 
     try {
       const response = await api.login(formData)
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'login/page.tsx:34',
+            message: 'Login response received',
+            data: {
+              hasToken: !!response.access_token,
+              tokenLength: response.access_token?.length,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'D',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
       // Decode JWT to check if demo mode (simple check - in production use proper JWT decode)
       // For now, we'll check the email or decode the token
       const tokenParts = response.access_token.split('.')
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'login/page.tsx:38',
+            message: 'JWT split result',
+            data: { tokenPartsLength: tokenParts.length },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'D',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
       let isDemo = false
       let isAdmin = false
       if (tokenParts.length === 3) {
         try {
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'login/page.tsx:42',
+                message: 'Attempting JWT decode',
+                data: { payloadLength: tokenParts[1]?.length },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run1',
+                hypothesisId: 'D',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
           const payload = JSON.parse(atob(tokenParts[1]))
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'login/page.tsx:44',
+                message: 'JWT decode succeeded',
+                data: { isDemo: payload.is_demo, isAdmin: payload.is_admin },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run1',
+                hypothesisId: 'D',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
           isDemo = payload.is_demo === true
           isAdmin = payload.is_admin === true
-        } catch {
+        } catch (decodeError) {
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'login/page.tsx:48',
+                message: 'JWT decode failed',
+                data: {
+                  errorName:
+                    decodeError instanceof Error
+                      ? decodeError.name
+                      : typeof decodeError,
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run1',
+                hypothesisId: 'D',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
           // Fallback: check email
           isDemo = formData.email.toLowerCase().includes('demo')
         }
@@ -166,7 +264,11 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            suppressHydrationWarning
+          >
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -178,6 +280,7 @@ export default function LoginPage() {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
+                suppressHydrationWarning
               />
             </div>
             <div className="space-y-2">
@@ -190,9 +293,15 @@ export default function LoginPage() {
                   setFormData({ ...formData, password: e.target.value })
                 }
                 required
+                suppressHydrationWarning
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading}
+              suppressHydrationWarning
+            >
               {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>

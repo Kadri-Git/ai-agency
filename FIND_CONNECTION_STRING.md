@@ -61,6 +61,7 @@ If you see "Connection pooling" instead:
 ## Still Can't Find It?
 
 Try this:
+
 1. In your Supabase project, look for **"Project Settings"** or **"API Settings"**
 2. Or check the **"Database"** section in the main dashboard
 3. Look for any section that says **"Connection"**, **"Database URL"**, or **"PostgreSQL connection"**
@@ -80,6 +81,7 @@ If you still can't find it, you can construct it manually:
    ```
 
 Replace:
+
 - `[YOUR-PASSWORD]` with your database password
 - `[PROJECT-REF]` with your project reference ID
 
@@ -88,12 +90,9 @@ Replace:
 ## Need More Help?
 
 Tell me:
+
 1. What do you see when you click Settings → Database?
 2. What tabs or sections are visible?
 3. Are you on the Supabase dashboard for your project?
 
 I can guide you through the exact steps based on what you're seeing!
-
-
-
-

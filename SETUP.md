@@ -67,6 +67,7 @@ cp .env.example .env
 You need a PostgreSQL database. Options:
 
 #### Option A: Supabase (Recommended - Free tier available)
+
 1. Go to [Supabase](https://supabase.com)
 2. Create a new project
 3. Go to Settings > Database
@@ -77,6 +78,7 @@ You need a PostgreSQL database. Options:
    ```
 
 #### Option B: Neon (Serverless PostgreSQL - Free tier)
+
 1. Go to [Neon](https://neon.tech)
 2. Sign up and create a project
 3. Copy the connection string
@@ -86,6 +88,7 @@ You need a PostgreSQL database. Options:
    ```
 
 #### Option C: Local PostgreSQL
+
 1. Install PostgreSQL locally
 2. Create a database:
    ```bash
@@ -121,7 +124,7 @@ The application should start without errors. If you see API key errors, double-c
 Approximate costs per analysis (200 prompts across 3 platforms):
 
 - **OpenAI GPT-4**: ~$2-5 per analysis
-- **Anthropic Claude**: ~$1-3 per analysis  
+- **Anthropic Claude**: ~$1-3 per analysis
 - **Google Gemini**: Free tier usually covers this
 
 **Total per analysis**: ~$3-8 depending on usage
@@ -129,16 +132,19 @@ Approximate costs per analysis (200 prompts across 3 platforms):
 ## Troubleshooting
 
 ### "API key not found" errors
+
 - Ensure `.env` file exists in the root directory
 - Check that keys don't have quotes around them
 - Restart the dev server after adding keys
 
 ### Database connection errors
+
 - Verify DATABASE_URL is correct
 - Check if database is accessible
 - Ensure Prisma migrations have run
 
 ### Rate limit errors
+
 - Each platform has rate limits
 - Free tiers have lower limits
 - Consider upgrading to paid tiers for production
@@ -152,8 +158,3 @@ The `.env` file is already in `.gitignore`. Always keep your API keys secret.
 ## Testing Without API Keys
 
 You can test the UI without API keys, but the analysis will fail. The form will still work and show error messages, allowing you to test the user experience.
-
-
-
-
-

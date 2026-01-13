@@ -69,3 +69,4 @@ else
     echo "  - Try visiting: ${RAILWAY_URL}/health"
 fi
 
+

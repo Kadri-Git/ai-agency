@@ -68,6 +68,7 @@ You should see all green checkmarks ✅
 If you need a database, here are free options:
 
 ### Option A: Supabase (Recommended)
+
 1. Go to https://supabase.com
 2. Create a new project
 3. Go to Settings > Database
@@ -75,6 +76,7 @@ If you need a database, here are free options:
 5. Update `DATABASE_URL` in `.env`
 
 ### Option B: Neon
+
 1. Go to https://neon.tech
 2. Sign up and create a project
 3. Copy the connection string
@@ -102,21 +104,19 @@ Visit http://localhost:3000 to see your dashboard!
 ## Troubleshooting
 
 ### "API key not found" errors
+
 - Make sure `.env` file exists in the root directory
 - Check that keys don't have quotes around them (unless the value itself needs quotes)
 - Restart the dev server after adding keys
 
 ### Database connection errors
+
 - Verify `DATABASE_URL` is correct
 - Check if database is accessible
 - Ensure Prisma migrations have run
 
 ### Rate limit errors
+
 - Each platform has rate limits
 - Free tiers have lower limits
 - Consider upgrading to paid tiers for production
-
-
-
-
-

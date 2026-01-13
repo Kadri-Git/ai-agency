@@ -90,3 +90,4 @@ def generate_mock_dashboard_data(days: int = 30) -> dict:
         "top_landing_pages": landing_pages
     }
 
+

@@ -13,6 +13,7 @@ A fully working, local, runnable multi-tenant web application for tracking AI sh
 ## Tech Stack
 
 ### Backend
+
 - Python 3.9+
 - FastAPI
 - SQLAlchemy (PostgreSQL)
@@ -20,6 +21,7 @@ A fully working, local, runnable multi-tenant web application for tracking AI sh
 - Google Analytics Data API (GA4)
 
 ### Frontend
+
 - Next.js 16 (App Router)
 - React 19
 - Recharts
@@ -31,12 +33,14 @@ A fully working, local, runnable multi-tenant web application for tracking AI sh
 ### 1. Install Dependencies
 
 **Backend:**
+
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
 **Frontend:**
+
 ```bash
 npm install
 ```
@@ -68,6 +72,7 @@ npx prisma migrate dev
 ### 4. Run the Application
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd backend
 uvicorn main:app --reload
@@ -76,6 +81,7 @@ uvicorn main:app --reload
 The backend will run on `http://localhost:8000`
 
 **Terminal 2 - Frontend:**
+
 ```bash
 npm run dev
 ```
@@ -153,11 +159,13 @@ The dashboard shows 8 key metrics:
 ## AI Traffic Detection
 
 The system automatically identifies AI traffic using this regex pattern:
+
 ```
 chat\.openai|perplexity|gemini|claude
 ```
 
 This matches traffic sources containing:
+
 - `chat.openai` (ChatGPT)
 - `perplexity` (Perplexity AI)
 - `gemini` (Google Gemini)
@@ -166,6 +174,7 @@ This matches traffic sources containing:
 ## Multi-Tenancy
 
 Each client:
+
 - Has a unique `client_id` in the JWT token
 - Can only access their own GA4 data
 - Has isolated credentials stored securely in the database
@@ -174,15 +183,18 @@ Each client:
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - Register a new client
 - `POST /api/auth/login` - Login and get JWT token
 
 ### Dashboard
+
 - `GET /api/dashboard/metrics?days=30` - Get dashboard metrics (requires authentication)
 
 ## Development
 
 ### Backend Structure
+
 ```
 backend/
   main.py                 # FastAPI app entry point
@@ -199,6 +211,7 @@ backend/
 ```
 
 ### Frontend Structure
+
 ```
 src/
   app/
@@ -215,17 +228,20 @@ src/
 ## Troubleshooting
 
 ### "Could not validate credentials"
+
 - Check that your JWT token is valid
 - Try logging out and logging back in
 - Check that `JWT_SECRET_KEY` is set in `.env`
 
 ### "Error fetching dashboard data"
+
 - Verify your GA4 Property ID is correct
 - Check that the service account has access to the GA4 property
 - Ensure the Google Analytics Data API is enabled
 - Check that your service account JSON is valid
 
 ### No AI traffic showing
+
 - Verify that you have traffic from AI sources in GA4
 - Check that the source names match the regex pattern
 - Ensure you have data for the selected date range
@@ -244,4 +260,3 @@ Before deploying to production:
 ## License
 
 MIT
-

@@ -5,6 +5,7 @@
  * Usage: node scripts/setup-env.js
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs')
 const path = require('path')
 
@@ -17,7 +18,7 @@ const googleKey = process.argv[4] || process.env.GOOGLE_KEY
 
 function updateEnvFile() {
   let envContent = ''
-  
+
   // Read existing .env if it exists
   if (fs.existsSync(envPath)) {
     envContent = fs.readFileSync(envPath, 'utf8')
@@ -92,12 +93,9 @@ GOOGLE_AI_API_KEY="${googleKey}"
 if (openaiKey || anthropicKey || googleKey) {
   updateEnvFile()
 } else {
-  console.log('Usage: node scripts/setup-env.js [OPENAI_KEY] [ANTHROPIC_KEY] [GOOGLE_KEY]')
+  console.log(
+    'Usage: node scripts/setup-env.js [OPENAI_KEY] [ANTHROPIC_KEY] [GOOGLE_KEY]'
+  )
   console.log('Example: node scripts/setup-env.js sk-xxx sk-ant-xxx AIza-xxx')
   process.exit(1)
 }
-
-
-
-
-

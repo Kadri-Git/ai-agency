@@ -5,7 +5,7 @@ This guide will help you get everything set up in the right order.
 ## 📋 Setup Checklist
 
 - [ ] Get OpenAI API Key
-- [ ] Get Anthropic API Key  
+- [ ] Get Anthropic API Key
 - [ ] Get Google AI API Key
 - [ ] Set up Database (if needed)
 - [ ] Add all keys to .env file
@@ -146,16 +146,19 @@ Visit http://localhost:3000 🎉
 ## 🆘 Troubleshooting
 
 ### "API key not found"
+
 - Make sure `.env` file is in the root directory
 - Check that keys don't have extra spaces
 - Restart the dev server after adding keys
 
 ### Database connection errors
+
 - Verify `DATABASE_URL` is correct
 - Check if database is accessible
 - Make sure migrations have run
 
 ### Rate limit errors
+
 - Free tiers have lower limits
 - Consider upgrading for production use
 
@@ -173,13 +176,9 @@ Visit http://localhost:3000 🎉
 ## ✅ You're Done!
 
 Once all steps are complete, you can:
+
 - Run analyses on the dashboard
 - Track AI visibility metrics
 - Get actionable recommendations
 
 Happy analyzing! 🚀
-
-
-
-
-

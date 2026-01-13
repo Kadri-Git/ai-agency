@@ -71,11 +71,13 @@ Follow these steps to get all three API keys. This should take about 10-15 minut
 ## ✅ After Adding All Keys
 
 1. **Verify your setup**:
+
    ```bash
    npm run check:keys
    ```
 
 2. **You should see**:
+
    ```
    ✅ OPENAI_API_KEY: sk-proj...xxxx
    ✅ ANTHROPIC_API_KEY: sk-ant...xxxx
@@ -113,8 +115,3 @@ This will guide you through adding each key step by step.
 - Check `SETUP.md` for detailed instructions
 - Check `API_KEYS_SETUP.md` for troubleshooting
 - Run `npm run check:keys` to see what's missing
-
-
-
-
-

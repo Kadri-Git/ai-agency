@@ -5,16 +5,19 @@
 ### 1. Get Your Keys (Open these links in new tabs)
 
 **Anthropic (Claude) - FREE** ⭐ Start here!
+
 - Link: https://console.anthropic.com/
 - Time: 2 minutes
 - Cost: FREE (free credits included)
 
 **Google AI (Gemini) - FREE** ⭐ Also free!
-- Link: https://makersuite.google.com/app/apikey  
+
+- Link: https://makersuite.google.com/app/apikey
 - Time: 2 minutes
 - Cost: FREE (generous free tier)
 
 **OpenAI (ChatGPT) - PAID**
+
 - Link: https://platform.openai.com/api-keys
 - Time: 3 minutes
 - Cost: Requires payment (~$5-10 minimum)
@@ -30,6 +33,7 @@ node scripts/setup-env.js "sk-your-openai-key" "sk-ant-your-anthropic-key" "your
 ```
 
 **Or** manually edit `.env` and add:
+
 ```env
 OPENAI_API_KEY="sk-your-key"
 ANTHROPIC_API_KEY="sk-ant-your-key"
@@ -60,6 +64,7 @@ You should see all ✅ green!
 6. Update `DATABASE_URL` in `.env`
 
 Then run:
+
 ```bash
 npx prisma generate
 npx prisma migrate dev
@@ -90,8 +95,3 @@ Visit http://localhost:3000 🎉
 - See `COMPLETE_SETUP.md` for detailed instructions
 - See `SETUP.md` for troubleshooting
 - Run `npm run check:keys` anytime to see what's missing
-
-
-
-
-

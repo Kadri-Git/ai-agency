@@ -22,6 +22,7 @@ Your database URL is currently a placeholder. Let's set up a free cloud database
 10. **Update `.env` file** with the connection string
 
 **Example**:
+
 ```env
 DATABASE_URL="postgresql://postgres:yourpassword123@db.abcdefgh.supabase.co:5432/postgres"
 ```
@@ -43,6 +44,7 @@ DATABASE_URL="postgresql://postgres:yourpassword123@db.abcdefgh.supabase.co:5432
 ## After Setting Up Database
 
 Once you have your database connection string, I'll:
+
 1. Update the `.env` file
 2. Run database migrations
 3. Verify everything works
@@ -59,8 +61,3 @@ Once you have your connection string, you can update it by running:
 ```
 
 Or just paste the connection string here and I'll add it for you!
-
-
-
-
-

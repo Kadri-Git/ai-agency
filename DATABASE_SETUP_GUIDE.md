@@ -98,11 +98,13 @@ Once you have your database connection string, I'll:
 ## Quick Reference
 
 **Supabase Connection String Format:**
+
 ```
 postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
 **Neon Connection String Format:**
+
 ```
 postgresql://[user]:[password]@[host].neon.tech/[database]
 ```
@@ -112,7 +114,3 @@ postgresql://[user]:[password]@[host].neon.tech/[database]
 ## Need Help?
 
 If you get stuck at any step, just let me know what step you're on and I'll help you through it!
-
-
-
-

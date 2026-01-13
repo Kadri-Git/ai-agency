@@ -74,3 +74,4 @@ if __name__ == "__main__":
     print("Creating admin account...")
     create_admin(args.email, args.password, args.company)
 
+

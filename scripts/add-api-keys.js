@@ -5,6 +5,7 @@
  * Usage: node scripts/add-api-keys.js
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs')
 const path = require('path')
 const readline = require('readline')
@@ -31,17 +32,24 @@ async function main() {
   }
 
   // Check what's already configured
-  const hasOpenAI = envContent.includes('OPENAI_API_KEY=') && 
-                    !envContent.match(/OPENAI_API_KEY=["']?\s*["']?$/m)
-  const hasAnthropic = envContent.includes('ANTHROPIC_API_KEY=') && 
-                       !envContent.match(/ANTHROPIC_API_KEY=["']?\s*["']?$/m)
-  const hasGoogle = envContent.includes('GOOGLE_AI_API_KEY=') && 
-                    !envContent.match(/GOOGLE_AI_API_KEY=["']?\s*["']?$/m)
+  const hasOpenAI =
+    envContent.includes('OPENAI_API_KEY=') &&
+    !envContent.match(/OPENAI_API_KEY=["']?\s*["']?$/m)
+  const hasAnthropic =
+    envContent.includes('ANTHROPIC_API_KEY=') &&
+    !envContent.match(/ANTHROPIC_API_KEY=["']?\s*["']?$/m)
+  const hasGoogle =
+    envContent.includes('GOOGLE_AI_API_KEY=') &&
+    !envContent.match(/GOOGLE_AI_API_KEY=["']?\s*["']?$/m)
 
   console.log('Current status:')
   console.log(`  OpenAI: ${hasOpenAI ? '✅ Configured' : '❌ Not configured'}`)
-  console.log(`  Anthropic: ${hasAnthropic ? '✅ Configured' : '❌ Not configured'}`)
-  console.log(`  Google AI: ${hasGoogle ? '✅ Configured' : '❌ Not configured'}\n`)
+  console.log(
+    `  Anthropic: ${hasAnthropic ? '✅ Configured' : '❌ Not configured'}`
+  )
+  console.log(
+    `  Google AI: ${hasGoogle ? '✅ Configured' : '❌ Not configured'}\n`
+  )
 
   let updatedContent = envContent
 
@@ -51,12 +59,15 @@ async function main() {
     console.log('  1. Visit: https://platform.openai.com/api-keys')
     console.log('  2. Create a new secret key')
     console.log('  3. Copy the key (starts with sk-)\n')
-    
-    const openaiKey = await question('Enter your OpenAI API key (or press Enter to skip): ')
+
+    const openaiKey = await question(
+      'Enter your OpenAI API key (or press Enter to skip): '
+    )
     if (openaiKey.trim()) {
       if (!updatedContent.includes('OPENAI_API_KEY=')) {
         updatedContent += '\n# OpenAI API Key (for ChatGPT)\n'
-        updatedContent += '# Get your key at: https://platform.openai.com/api-keys\n'
+        updatedContent +=
+          '# Get your key at: https://platform.openai.com/api-keys\n'
         updatedContent += `OPENAI_API_KEY="${openaiKey.trim()}"\n`
       } else {
         updatedContent = updatedContent.replace(
@@ -74,8 +85,10 @@ async function main() {
     console.log('  1. Visit: https://console.anthropic.com/')
     console.log('  2. Navigate to API Keys section')
     console.log('  3. Create a new key (starts with sk-ant-)\n')
-    
-    const anthropicKey = await question('Enter your Anthropic API key (or press Enter to skip): ')
+
+    const anthropicKey = await question(
+      'Enter your Anthropic API key (or press Enter to skip): '
+    )
     if (anthropicKey.trim()) {
       if (!updatedContent.includes('ANTHROPIC_API_KEY=')) {
         updatedContent += '\n# Anthropic API Key (for Claude)\n'
@@ -97,12 +110,15 @@ async function main() {
     console.log('  1. Visit: https://makersuite.google.com/app/apikey')
     console.log('  2. Sign in with Google')
     console.log('  3. Create API key\n')
-    
-    const googleKey = await question('Enter your Google AI API key (or press Enter to skip): ')
+
+    const googleKey = await question(
+      'Enter your Google AI API key (or press Enter to skip): '
+    )
     if (googleKey.trim()) {
       if (!updatedContent.includes('GOOGLE_AI_API_KEY=')) {
         updatedContent += '\n# Google AI API Key (for Gemini)\n'
-        updatedContent += '# Get your key at: https://makersuite.google.com/app/apikey\n'
+        updatedContent +=
+          '# Get your key at: https://makersuite.google.com/app/apikey\n'
         updatedContent += `GOOGLE_AI_API_KEY="${googleKey.trim()}"\n`
       } else {
         updatedContent = updatedContent.replace(
@@ -131,8 +147,3 @@ main().catch((error) => {
   rl.close()
   process.exit(1)
 })
-
-
-
-
-
