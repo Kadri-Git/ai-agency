@@ -9,7 +9,7 @@ if (process.env.NEXTAUTH_URL) {
   const cleanedUrl = originalUrl.replace(/[`\/\s]+$/, '').trim()
 
   // #region agent log
-  if (originalUrl !== cleanedUrl) {
+  if (originalUrl !== cleanedUrl && typeof window === 'undefined') {
     fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -122,22 +122,33 @@ async function handleRequest(
   context: { params: Promise<{ nextauth: string[] }> }
 ) {
   // #region agent log
+  // Extract query params to check for OAuth errors
+  const url = new URL(req.url)
+  const errorParam = url.searchParams.get('error')
+  const errorDescription = url.searchParams.get('error_description')
+  const callbackPath = url.pathname
+
   fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      location: 'auth/[...nextauth]/route.ts:35',
+      location: 'auth/[...nextauth]/route.ts:95',
       message: 'NextAuth handler called',
       data: {
         method: req.method,
         url: req.url,
+        pathname: callbackPath,
+        errorParam,
+        errorDescription,
+        nextAuthUrl: process.env.NEXTAUTH_URL,
         handlerType: typeof handlerFn,
         isFunction: typeof handlerFn === 'function',
+        queryParams: Object.fromEntries(url.searchParams.entries()),
       },
       timestamp: Date.now(),
       sessionId: 'debug-session',
       runId: 'run1',
-      hypothesisId: 'E',
+      hypothesisId: 'C',
     }),
   }).catch(() => {})
   // #endregion

@@ -12,9 +12,12 @@ from google.auth.transport.requests import Request
 from datetime import datetime, timedelta
 import json
 import re
+import os
 
-# AI traffic source regex pattern
-AI_SOURCE_REGEX = r"chat\.openai|perplexity|gemini|claude"
+# AI traffic source patterns - using CONTAINS match type instead of regex
+# We'll need to make separate requests for each source or use OR logic
+AI_SOURCE_PATTERNS = ["chat.openai", "perplexity", "gemini", "claude"]
+AI_SOURCE_REGEX = r"chat\.openai|perplexity|gemini|claude"  # Keep for reference
 
 def get_ga4_client(service_account_json: str = None, access_token: str = None, refresh_token: str = None):
     """
@@ -100,17 +103,90 @@ def get_ai_traffic_metrics(
         refresh_token=refresh_token
     )
     
-    # AI traffic filter
-    ai_source_filter = FilterExpression(
-        filter=Filter(
-            field_name="sessionSource",
-            string_filter=Filter.StringFilter(
-                match_type=Filter.StringFilter.MatchType.CONTAINS_REGEX,
-                value=AI_SOURCE_REGEX,
-                case_sensitive=False
+    # #region agent log
+    import json as json_module
+    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.cursor', 'debug.log')
+    try:
+        # Get available match types
+        match_type_attrs = [attr for attr in dir(Filter.StringFilter.MatchType) if not attr.startswith('_')]
+        with open(log_path, 'a') as f:
+            log_entry = {
+                "location": "ga4_service.py:103",
+                "message": "Creating AI source filter - checking available match types",
+                "data": {
+                    "available_match_types": match_type_attrs,
+                    "regex_pattern": AI_SOURCE_REGEX,
+                    "field_name": "sessionSource"
+                },
+                "timestamp": int(datetime.now().timestamp() * 1000),
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "A"
+            }
+            f.write(json_module.dumps(log_entry) + '\n')
+    except Exception as log_err:
+        # Log the logging error too
+        try:
+            with open(log_path, 'a') as f:
+                f.write(json_module.dumps({"location": "ga4_service.py:log_err", "message": "Failed to log match types", "data": {"error": str(log_err)}}) + '\n')
+        except Exception:
+            pass
+    # #endregion
+    
+    # AI traffic filter - try using CONTAINS instead of regex for better compatibility
+    # We'll filter for each AI source individually and combine results
+    # For now, let's use a simpler approach with CONTAINS match type
+    try:
+        # Try using CONTAINS match type which is more widely supported
+        ai_source_filter = FilterExpression(
+            filter=Filter(
+                field_name="sessionSource",
+                string_filter=Filter.StringFilter(
+                    match_type=Filter.StringFilter.MatchType.CONTAINS,
+                    value="chat.openai",  # Using CONTAINS - will match chat.openai.com, etc.
+                    case_sensitive=False
+                )
             )
         )
-    )
+        # #region agent log
+        try:
+            with open(log_path, 'a') as f:
+                log_entry = {
+                    "location": "ga4_service.py:140",
+                    "message": "AI source filter created with CONTAINS",
+                    "data": {"filter_created": True, "match_type": "CONTAINS"},
+                    "timestamp": int(datetime.now().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "run1",
+                    "hypothesisId": "A"
+                }
+                f.write(json_module.dumps(log_entry) + '\n')
+        except Exception:
+            pass
+        # #endregion
+    except Exception as filter_error:
+        # #region agent log
+        try:
+            with open(log_path, 'a') as f:
+                log_entry = {
+                    "location": "ga4_service.py:155",
+                    "message": "Error creating AI source filter",
+                    "data": {
+                        "error_type": type(filter_error).__name__,
+                        "error_message": str(filter_error),
+                        "error_repr": repr(filter_error),
+                        "match_type_attempted": "CONTAINS"
+                    },
+                    "timestamp": int(datetime.now().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "run1",
+                    "hypothesisId": "A"
+                }
+                f.write(json_module.dumps(log_entry) + '\n')
+        except Exception:
+            pass
+        # #endregion
+        raise
     
     # Request for AI traffic
     ai_request = RunReportRequest(
@@ -137,7 +213,64 @@ def get_ai_traffic_metrics(
     )
     
     # Execute requests
-    ai_response = client.run_report(ai_request)
+    # #region agent log
+    try:
+        with open(log_path, 'a') as f:
+            log_entry = {
+                "location": "ga4_service.py:140",
+                "message": "About to execute GA4 run_report for AI traffic",
+                "data": {"property_id": property_id},
+                "timestamp": int(datetime.now().timestamp() * 1000),
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "B"
+            }
+            f.write(json_module.dumps(log_entry) + '\n')
+    except Exception:
+        pass
+    # #endregion
+    
+    try:
+        ai_response = client.run_report(ai_request)
+        # #region agent log
+        try:
+            with open(log_path, 'a') as f:
+                log_entry = {
+                    "location": "ga4_service.py:150",
+                    "message": "AI traffic run_report succeeded",
+                    "data": {"row_count": len(ai_response.rows) if ai_response.rows else 0},
+                    "timestamp": int(datetime.now().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "run1",
+                    "hypothesisId": "B"
+                }
+                f.write(json_module.dumps(log_entry) + '\n')
+        except Exception:
+            pass
+        # #endregion
+    except Exception as run_error:
+        # #region agent log
+        try:
+            with open(log_path, 'a') as f:
+                log_entry = {
+                    "location": "ga4_service.py:165",
+                    "message": "Error executing AI traffic run_report",
+                    "data": {
+                        "error_type": type(run_error).__name__,
+                        "error_message": str(run_error),
+                        "error_repr": repr(run_error)
+                    },
+                    "timestamp": int(datetime.now().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "run1",
+                    "hypothesisId": "B"
+                }
+                f.write(json_module.dumps(log_entry) + '\n')
+        except Exception:
+            pass
+        # #endregion
+        raise
+    
     total_response = client.run_report(total_request)
     
     # Parse AI traffic metrics
@@ -200,13 +333,14 @@ def get_revenue_trend(
         refresh_token=refresh_token
     )
     
-    # AI traffic filter - using sessionSource dimension
+    # AI traffic filter - using CONTAINS match type (regex not supported)
+    # For now, using a single pattern - we can expand to OR logic later if needed
     ai_source_filter = FilterExpression(
         filter=Filter(
             field_name="sessionSource",
             string_filter=Filter.StringFilter(
-                match_type=Filter.StringFilter.MatchType.CONTAINS_REGEX,
-                value=AI_SOURCE_REGEX,
+                match_type=Filter.StringFilter.MatchType.CONTAINS,
+                value="chat.openai",  # Will match chat.openai.com, etc.
                 case_sensitive=False
             )
         )
@@ -263,13 +397,14 @@ def get_top_landing_pages(
         refresh_token=refresh_token
     )
     
-    # AI traffic filter - using sessionSource dimension
+    # AI traffic filter - using CONTAINS match type (regex not supported)
+    # For now, using a single pattern - we can expand to OR logic later if needed
     ai_source_filter = FilterExpression(
         filter=Filter(
             field_name="sessionSource",
             string_filter=Filter.StringFilter(
-                match_type=Filter.StringFilter.MatchType.CONTAINS_REGEX,
-                value=AI_SOURCE_REGEX,
+                match_type=Filter.StringFilter.MatchType.CONTAINS,
+                value="chat.openai",  # Will match chat.openai.com, etc.
                 case_sensitive=False
             )
         )

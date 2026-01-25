@@ -37,6 +37,10 @@ export default function ConnectAnalyticsPage() {
   const [isConnecting, setIsConnecting] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
 
+  const [currentPropertyId, setCurrentPropertyId] = useState<string | null>(
+    null
+  )
+
   // Check if already connected
   useEffect(() => {
     const checkConnection = async () => {
@@ -44,6 +48,7 @@ export default function ConnectAnalyticsPage() {
         const status = await api.getGA4Status()
         if (status.has_credentials) {
           setIsConnected(true)
+          setCurrentPropertyId(status.ga4_property_id)
         }
       } catch {
         // Not connected yet
@@ -53,7 +58,9 @@ export default function ConnectAnalyticsPage() {
   }, [])
 
   const fetchProperties = useCallback(async () => {
-    if (!session?.accessToken) return
+    if (!session?.accessToken) {
+      return
+    }
 
     setIsLoadingProperties(true)
     try {
@@ -64,7 +71,23 @@ export default function ConnectAnalyticsPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch properties')
+        const errorText = await response.text()
+        let errorData
+        try {
+          errorData = JSON.parse(errorText)
+        } catch {
+          errorData = { error: errorText }
+        }
+
+        // If re-authentication is required, sign out and redirect to sign in
+        if (response.status === 401 && errorData.requiresReauth) {
+          await signOut({ redirect: false })
+          toast.error('Your session has expired. Please sign in again.')
+          router.push('/connect-analytics')
+          return
+        }
+
+        throw new Error(errorData.error || 'Failed to fetch properties')
       }
 
       const data = await response.json()
@@ -76,7 +99,7 @@ export default function ConnectAnalyticsPage() {
     } finally {
       setIsLoadingProperties(false)
     }
-  }, [session])
+  }, [session, router])
 
   // Fetch properties when authenticated
   useEffect(() => {
@@ -112,7 +135,11 @@ export default function ConnectAnalyticsPage() {
       }
 
       toast.success('GA4 property connected successfully!')
+
+      // Refresh status to get the new property ID
+      const status = await api.getGA4Status()
       setIsConnected(true)
+      setCurrentPropertyId(status.ga4_property_id)
 
       // Redirect to dashboard after a short delay
       setTimeout(() => {
@@ -144,18 +171,38 @@ export default function ConnectAnalyticsPage() {
 
   if (isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <CardTitle>Already Connected</CardTitle>
+              <CardTitle>GA4 Already Connected</CardTitle>
             </div>
-            <CardDescription>
-              Your Google Analytics account is already connected.
+            <CardDescription className="mt-2">
+              {currentPropertyId ? (
+                <>
+                  Current Property ID:{' '}
+                  <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
+                    {currentPropertyId}
+                  </span>
+                </>
+              ) : (
+                'Your Google Analytics account is already connected.'
+              )}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
+            <Button
+              onClick={() => {
+                setIsConnected(false)
+                setCurrentPropertyId(null)
+                fetchProperties()
+              }}
+              className="w-full"
+              variant="outline"
+            >
+              Change Property
+            </Button>
             <Button
               onClick={() => router.push('/dashboard')}
               className="w-full"

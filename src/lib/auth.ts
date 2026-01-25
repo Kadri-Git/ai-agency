@@ -7,41 +7,9 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || ''
 const nextAuthSecret =
   process.env.NEXTAUTH_SECRET || 'temporary-secret-for-build'
 
-// Clean NEXTAUTH_URL - remove trailing backticks, slashes, and whitespace
-// The error shows redirect_uri has a backtick: visibility-report.vercel.app`/api/auth/callback/google
-function cleanNextAuthUrl(url: string | undefined): string {
-  if (!url) return 'http://localhost:3000'
-  // Remove trailing backticks, forward slashes, and whitespace
-  return url.replace(/[`\/\s]+$/, '').trim()
-}
-
-const nextAuthUrlRaw = process.env.NEXTAUTH_URL
-const nextAuthUrl = cleanNextAuthUrl(nextAuthUrlRaw)
-
-// #region agent log
-// Log NEXTAUTH_URL to debug redirect URI issue
-if (typeof window === 'undefined') {
-  fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      location: 'auth.ts:14',
-      message: 'NEXTAUTH_URL configuration check',
-      data: {
-        rawNextAuthUrl: nextAuthUrlRaw,
-        cleanedNextAuthUrl: nextAuthUrl,
-        hasBacktick: nextAuthUrlRaw?.includes('`') || false,
-        callbackUrl: `${nextAuthUrl}/api/auth/callback/google`,
-        nodeEnv: process.env.NODE_ENV,
-      },
-      timestamp: Date.now(),
-      sessionId: 'debug-session',
-      runId: 'run1',
-      hypothesisId: 'A',
-    }),
-  }).catch(() => {})
-}
-// #endregion
+// Note: NEXTAUTH_URL should be set in environment variables
+// If you see redirect_uri errors with backticks, ensure NEXTAUTH_URL
+// in your environment doesn't have trailing backticks, slashes, or whitespace
 
 // Only validate in production runtime, not during build
 function validateEnvVars() {
@@ -72,7 +40,7 @@ export const authOptions: NextAuthOptions = {
             authorization: {
               params: {
                 scope:
-                  'openid email profile https://www.googleapis.com/auth/analytics.readonly',
+                  'openid email profile https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.manage.users.readonly',
                 access_type: 'offline',
                 prompt: 'consent',
               },
@@ -82,6 +50,11 @@ export const authOptions: NextAuthOptions = {
       : [], // Empty providers if credentials not set (allows build to succeed)
   callbacks: {
     async jwt({ token, account, user }) {
+      // Check for OAuth errors
+      if ((token as { error?: string }).error) {
+        return token
+      }
+
       // Initial sign in - store tokens
       if (account && user) {
         token.accessToken = account.access_token
@@ -105,43 +78,15 @@ export const authOptions: NextAuthOptions = {
       session.expiresAt = token.expiresAt as number
       return session
     },
+    async signIn() {
+      return true
+    },
   },
   pages: {
     signIn: '/connect-analytics',
   },
   secret: nextAuthSecret,
   debug: process.env.NODE_ENV === 'development',
-  // #region agent log
-  // Log final authOptions configuration
-  ...(typeof window === 'undefined'
-    ? {
-        // This will be evaluated server-side
-        _finalConfig: (() => {
-          fetch(
-            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                location: 'auth.ts:75',
-                message: 'Final NextAuth configuration',
-                data: {
-                  nextAuthUrl,
-                  expectedCallbackUrl: `${nextAuthUrl}/api/auth/callback/google`,
-                  hasProviders: googleClientId && googleClientSecret,
-                },
-                timestamp: Date.now(),
-                sessionId: 'debug-session',
-                runId: 'run1',
-                hypothesisId: 'A',
-              }),
-            }
-          ).catch(() => {})
-          return {}
-        })(),
-      }
-    : {}),
-  // #endregion
 }
 
 // Validate environment variables at runtime (not during build)

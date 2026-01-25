@@ -139,6 +139,32 @@ async def get_dashboard_metrics(
         )
         
     except Exception as e:
+        # #region agent log
+        import os
+        import json as json_module
+        from datetime import datetime as dt
+        log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.cursor', 'debug.log')
+        try:
+            with open(log_path, 'a') as f:
+                log_entry = {
+                    "location": "dashboard.py:141",
+                    "message": "Dashboard metrics error caught",
+                    "data": {
+                        "error_type": type(e).__name__,
+                        "error_message": str(e),
+                        "error_repr": repr(e),
+                        "has_oauth": has_oauth,
+                        "has_service_account": has_service_account
+                    },
+                    "timestamp": int(dt.now().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "run1",
+                    "hypothesisId": "C"
+                }
+                f.write(json_module.dumps(log_entry) + '\n')
+        except Exception:
+            pass
+        # #endregion
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching dashboard data: {str(e)}"

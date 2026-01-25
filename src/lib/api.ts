@@ -2,6 +2,27 @@
 // In production, set NEXT_PUBLIC_API_URL environment variable in Vercel
 // For local development, defaults to localhost:8000
 function getApiBaseUrl(): string {
+  // #region agent log
+  if (typeof window === 'undefined') {
+    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'api.ts:getApiBaseUrl',
+        message: 'getApiBaseUrl called (server-side)',
+        data: {
+          hasEnvVar: !!process.env.NEXT_PUBLIC_API_URL,
+          nodeEnv: process.env.NODE_ENV,
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'A',
+      }),
+    }).catch(() => {})
+  }
+  // #endregion
+
   // Check environment variable first
   if (process.env.NEXT_PUBLIC_API_URL) {
     let url = process.env.NEXT_PUBLIC_API_URL.trim()
@@ -17,27 +38,56 @@ function getApiBaseUrl(): string {
     return url
   }
 
-  // In browser, check if we're on localhost
-  if (typeof window !== 'undefined') {
+  // Server-side: always return localhost for development
+  // Never access window.location during SSR/build
+  if (typeof window === 'undefined') {
+    return 'http://localhost:8000'
+  }
+
+  // Browser-side: check if we're on localhost
+  // Use try-catch as extra safety in case window.location is not available
+  try {
     if (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.hostname === ''
+      window.location &&
+      (window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === '')
     ) {
       return 'http://localhost:8000'
     }
-  }
-
-  // Server-side: default to localhost for development
-  if (typeof window === 'undefined') {
-    return 'http://localhost:8000'
+  } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'api.ts:getApiBaseUrl',
+        message: 'Error accessing window.location',
+        data: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'B',
+      }),
+    }).catch(() => {})
+    // #endregion
   }
 
   // Fallback: return localhost for development
   return 'http://localhost:8000'
 }
 
-const API_BASE_URL = getApiBaseUrl()
+// Lazy initialization to avoid SSR issues
+let API_BASE_URL: string | null = null
+
+function getApiBaseUrlLazy(): string {
+  if (API_BASE_URL === null) {
+    API_BASE_URL = getApiBaseUrl()
+  }
+  return API_BASE_URL
+}
 
 export interface LoginRequest {
   email: string
@@ -147,15 +197,18 @@ class ApiClient {
     }
 
     try {
+      // Get API URL lazily to avoid SSR issues
+      const apiBaseUrl = getApiBaseUrlLazy()
+
       // Validate API URL is set
-      if (!API_BASE_URL) {
+      if (!apiBaseUrl) {
         throw new Error(
           'API URL not configured. Please set NEXT_PUBLIC_API_URL environment variable in Vercel. ' +
             'Go to Vercel Dashboard → Settings → Environment Variables → Add NEXT_PUBLIC_API_URL with your Railway backend URL.'
         )
       }
 
-      const fullUrl = `${API_BASE_URL}${endpoint}`
+      const fullUrl = `${apiBaseUrl}${endpoint}`
 
       // Optional health check - run in background without blocking the request
       // Only in development and skip for health endpoint itself
@@ -165,7 +218,8 @@ class ApiClient {
         endpoint !== '/health'
       ) {
         // Run health check in background without awaiting
-        fetch(`${API_BASE_URL}/health`, {
+        const apiBaseUrl = getApiBaseUrlLazy()
+        fetch(`${apiBaseUrl}/health`, {
           method: 'GET',
           mode: 'cors',
           credentials: 'omit',
@@ -331,13 +385,16 @@ class ApiClient {
         const errorName =
           fetchError instanceof Error ? fetchError.name : 'Unknown'
 
+        const apiBaseUrl = getApiBaseUrlLazy()
         const diagnosticInfo = {
-          apiBaseUrl: API_BASE_URL,
+          apiBaseUrl: apiBaseUrl,
           endpoint: endpoint,
-          fullUrl: `${API_BASE_URL}${endpoint}`,
+          fullUrl: `${apiBaseUrl}${endpoint}`,
           isBrowser: typeof window !== 'undefined',
           hostname:
-            typeof window !== 'undefined' ? window.location.hostname : 'server',
+            typeof window !== 'undefined' && window.location
+              ? window.location.hostname
+              : 'server',
           errorMessage: errorMessage,
           errorName: errorName,
           errorType: typeof fetchError,
@@ -352,7 +409,8 @@ class ApiClient {
         console.error('[API Client] Original error:', fetchError)
 
         // Provide helpful error message based on error type
-        let helpfulMessage = `Cannot connect to backend server at ${API_BASE_URL}.`
+        // apiBaseUrl already declared above
+        let helpfulMessage = `Cannot connect to backend server at ${apiBaseUrl}.`
 
         if (
           errorMessage.includes('Load failed') ||
@@ -369,7 +427,7 @@ class ApiClient {
           helpfulMessage += ` Make sure the backend is running: cd backend && uvicorn main:app --reload.`
         }
 
-        helpfulMessage += `\nFull URL: ${API_BASE_URL}${endpoint}\nError: ${errorMessage} (${errorName})`
+        helpfulMessage += `\nFull URL: ${apiBaseUrl}${endpoint}\nError: ${errorMessage} (${errorName})`
 
         throw new Error(helpfulMessage)
       }
@@ -395,10 +453,11 @@ class ApiClient {
       if (!response.ok) {
         // 405 specifically means Method Not Allowed - likely wrong endpoint
         if (response.status === 405) {
+          const apiBaseUrl = getApiBaseUrlLazy()
           throw new Error(
             `Method not allowed (405). The request went to: ${fullUrl}. ` +
               `Make sure NEXT_PUBLIC_API_URL is set to your Railway backend URL in Vercel environment variables. ` +
-              `Current API URL: ${API_BASE_URL || 'NOT SET'}`
+              `Current API URL: ${apiBaseUrl || 'NOT SET'}`
           )
         }
 
