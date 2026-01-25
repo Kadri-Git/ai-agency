@@ -105,11 +105,6 @@ export default function DashboardPage() {
     }
   }
 
-  const handleGA4Connected = () => {
-    checkGA4Status()
-    fetchDashboardData()
-  }
-
   const handleLogout = () => {
     clearAuth()
     router.push('/login')
@@ -213,10 +208,7 @@ export default function DashboardPage() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Connect GA4 Section - Compact and collapsible */}
-        <ConnectGA4
-          hasCredentials={hasGA4Credentials}
-          onConnected={handleGA4Connected}
-        />
+        <ConnectGA4 hasCredentials={hasGA4Credentials} />
 
         {/* Sample Data Banner - Only show when GA4 not connected */}
         {!hasGA4Credentials && (
