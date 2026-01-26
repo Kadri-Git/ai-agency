@@ -138,21 +138,6 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'api.ts:122',
-        message: 'request() called',
-        data: { endpoint, method: options.method || 'GET' },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'run1',
-        hypothesisId: 'A',
-      }),
-    }).catch(() => {})
-    // #endregion
     const token = this.getToken()
     // Build headers as a plain object to avoid HeadersInit typing issues
     const headers: Record<string, string> = {
@@ -252,103 +237,10 @@ class ApiClient {
       }
 
       // Make the fetch request
-      // #region agent log
-      fetch(
-        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            location: 'api.ts:219',
-            message: 'About to call fetch',
-            data: {
-              fullUrl,
-              method: fetchOptions.method,
-              hasBody: !!fetchOptions.body,
-              credentials: fetchOptions.credentials,
-              mode: fetchOptions.mode,
-              headersCount: Object.keys(fetchOptions.headers || {}).length,
-            },
-            timestamp: Date.now(),
-            sessionId: 'debug-session',
-            runId: 'run1',
-            hypothesisId: 'F',
-          }),
-        }
-      ).catch(() => {})
-      // #endregion
       let response: Response
       try {
-        // #region agent log
-        const fetchStartTime = Date.now()
-        fetch(
-          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: 'api.ts:206',
-              message: 'Fetch call starting',
-              data: { fullUrl, method: fetchOptions.method },
-              timestamp: fetchStartTime,
-              sessionId: 'debug-session',
-              runId: 'run1',
-              hypothesisId: 'F',
-            }),
-          }
-        ).catch(() => {})
-        // #endregion
         response = await fetch(fullUrl, fetchOptions)
-        // #region agent log
-        fetch(
-          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: 'api.ts:224',
-              message: 'Fetch succeeded',
-              data: {
-                status: response.status,
-                ok: response.ok,
-                statusText: response.statusText,
-              },
-              timestamp: Date.now(),
-              sessionId: 'debug-session',
-              runId: 'run1',
-              hypothesisId: 'G',
-            }),
-          }
-        ).catch(() => {})
-        // #endregion
       } catch (fetchError: unknown) {
-        // #region agent log
-        fetch(
-          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: 'api.ts:227',
-              message: 'Fetch catch',
-              data: {
-                errorName:
-                  fetchError instanceof Error
-                    ? fetchError.name
-                    : typeof fetchError,
-                errorMessage:
-                  fetchError instanceof Error
-                    ? fetchError.message
-                    : String(fetchError),
-              },
-              timestamp: Date.now(),
-              sessionId: 'debug-session',
-              runId: 'post-fix',
-              hypothesisId: 'A',
-            }),
-          }
-        ).catch(() => {})
-        // #endregion
         // Network error - fetch failed
         const errorMessage =
           fetchError instanceof Error ? fetchError.message : String(fetchError)
@@ -412,24 +304,6 @@ class ApiClient {
         throw new Error(helpfulMessage)
       }
 
-      // #region agent log
-      fetch(
-        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            location: 'api.ts:265',
-            message: 'Checking response.ok',
-            data: { responseOk: response.ok, responseStatus: response.status },
-            timestamp: Date.now(),
-            sessionId: 'debug-session',
-            runId: 'post-fix',
-            hypothesisId: 'B',
-          }),
-        }
-      ).catch(() => {})
-      // #endregion
       if (!response.ok) {
         // 405 specifically means Method Not Allowed - likely wrong endpoint
         if (response.status === 405) {
@@ -445,27 +319,6 @@ class ApiClient {
         let error: { detail?: string | unknown[]; message?: string }
         try {
           const errorText = await response.text()
-          // #region agent log
-          fetch(
-            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                location: 'api.ts:280',
-                message: 'Error response body',
-                data: {
-                  status: response.status,
-                  errorText: errorText.substring(0, 500),
-                },
-                timestamp: Date.now(),
-                sessionId: 'debug-session',
-                runId: 'run1',
-                hypothesisId: 'G',
-              }),
-            }
-          ).catch(() => {})
-          // #endregion
           try {
             error = JSON.parse(errorText)
           } catch {
@@ -495,26 +348,6 @@ class ApiClient {
 
       return response.json()
     } catch (error) {
-      // #region agent log
-      fetch(
-        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            location: 'api.ts:293',
-            message: 'Outer catch - non-network error',
-            data: {
-              errorName: error instanceof Error ? error.name : typeof error,
-            },
-            timestamp: Date.now(),
-            sessionId: 'debug-session',
-            runId: 'post-fix',
-            hypothesisId: 'A',
-          }),
-        }
-      ).catch(() => {})
-      // #endregion
       // Re-throw errors that were already handled (network errors are handled above)
       // This catch only handles JSON parsing errors and other unexpected errors
       throw error

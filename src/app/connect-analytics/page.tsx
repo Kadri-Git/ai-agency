@@ -126,31 +126,6 @@ export default function ConnectAnalyticsPage() {
 
     setIsConnecting(true)
     try {
-      // #region agent log
-      fetch(
-        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            location: 'connect-analytics/page.tsx:handleConnect',
-            message: 'About to save property',
-            data: {
-              hasSelectedProperty: !!selectedProperty,
-              hasAccessToken: !!session.accessToken,
-              hasRefreshToken: !!session.refreshToken,
-              hasEmail: !!session.user?.email,
-              hasAuthToken: !!authToken,
-            },
-            timestamp: Date.now(),
-            sessionId: 'debug-session',
-            runId: 'run1',
-            hypothesisId: 'C',
-          }),
-        }
-      ).catch(() => {})
-      // #endregion
-
       const response = await fetch('/api/client/save-property', {
         method: 'POST',
         headers: {
@@ -167,29 +142,6 @@ export default function ConnectAnalyticsPage() {
         }),
       })
 
-      // #region agent log
-      fetch(
-        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            location: 'connect-analytics/page.tsx:afterFetch',
-            message: 'Save property response received',
-            data: {
-              status: response.status,
-              statusText: response.statusText,
-              ok: response.ok,
-            },
-            timestamp: Date.now(),
-            sessionId: 'debug-session',
-            runId: 'run1',
-            hypothesisId: 'C',
-          }),
-        }
-      ).catch(() => {})
-      // #endregion
-
       if (!response.ok) {
         const errorText = await response.text()
         let error
@@ -198,29 +150,6 @@ export default function ConnectAnalyticsPage() {
         } catch {
           error = { message: errorText || `HTTP ${response.status}` }
         }
-
-        // #region agent log
-        fetch(
-          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: 'connect-analytics/page.tsx:errorResponse',
-              message: 'Error response from save-property',
-              data: {
-                status: response.status,
-                error: error,
-                errorText: errorText,
-              },
-              timestamp: Date.now(),
-              sessionId: 'debug-session',
-              runId: 'run1',
-              hypothesisId: 'C',
-            }),
-          }
-        ).catch(() => {})
-        // #endregion
 
         throw new Error(
           error.message || error.error || 'Failed to connect property'
