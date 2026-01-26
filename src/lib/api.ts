@@ -2,28 +2,7 @@
 // In production, set NEXT_PUBLIC_API_URL environment variable in Vercel
 // For local development, defaults to localhost:8000
 function getApiBaseUrl(): string {
-  // #region agent log
-  if (typeof window === 'undefined') {
-    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'api.ts:getApiBaseUrl',
-        message: 'getApiBaseUrl called (server-side)',
-        data: {
-          hasEnvVar: !!process.env.NEXT_PUBLIC_API_URL,
-          nodeEnv: process.env.NODE_ENV,
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'run1',
-        hypothesisId: 'A',
-      }),
-    }).catch(() => {})
-  }
-  // #endregion
-
-  // Check environment variable first
+  // Check environment variable first (works in both server and client)
   if (process.env.NEXT_PUBLIC_API_URL) {
     let url = process.env.NEXT_PUBLIC_API_URL.trim()
 
@@ -38,16 +17,17 @@ function getApiBaseUrl(): string {
     return url
   }
 
-  // Server-side: always return localhost for development
-  // Never access window.location during SSR/build
+  // Server-side (SSR/build): always return localhost for development
+  // Never access window or location during SSR/build
   if (typeof window === 'undefined') {
     return 'http://localhost:8000'
   }
 
-  // Browser-side: check if we're on localhost
-  // Use try-catch as extra safety in case window.location is not available
+  // Client-side only: check if we're on localhost
+  // Use try-catch as extra safety
   try {
     if (
+      typeof window !== 'undefined' &&
       window.location &&
       (window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1' ||
@@ -55,27 +35,12 @@ function getApiBaseUrl(): string {
     ) {
       return 'http://localhost:8000'
     }
-  } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'api.ts:getApiBaseUrl',
-        message: 'Error accessing window.location',
-        data: {
-          error: error instanceof Error ? error.message : String(error),
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'run1',
-        hypothesisId: 'B',
-      }),
-    }).catch(() => {})
-    // #endregion
+  } catch {
+    // Fallback to localhost if window.location access fails
+    return 'http://localhost:8000'
   }
 
-  // Fallback: return localhost for development
+  // Default fallback
   return 'http://localhost:8000'
 }
 
@@ -392,7 +357,8 @@ class ApiClient {
           fullUrl: `${apiBaseUrl}${endpoint}`,
           isBrowser: typeof window !== 'undefined',
           hostname:
-            typeof window !== 'undefined' && window.location
+            typeof window !== 'undefined' &&
+            typeof window.location !== 'undefined'
               ? window.location.hostname
               : 'server',
           errorMessage: errorMessage,
