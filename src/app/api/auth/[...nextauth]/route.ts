@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { appendFileSync } from 'fs'
 
 // Clean NEXTAUTH_URL if it has trailing backticks or special characters
 // This fixes the redirect_uri error: visibility-report.vercel.app`/api/auth/callback/google
@@ -102,11 +103,55 @@ async function handleRequest(
   req: Request,
   context: { params: Promise<{ nextauth: string[] }> }
 ) {
+  // #region agent log
+  const logPath =
+    '/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log'
+  try {
+    const url = new URL(req.url)
+    const params = await context.params
+    const logEntry = {
+      location: 'auth/[...nextauth]/route.ts:handleRequest',
+      message: 'NextAuth request received',
+      data: {
+        method: req.method,
+        pathname: url.pathname,
+        searchParams: Object.fromEntries(url.searchParams.entries()),
+        nextauthParams: params.nextauth,
+        hasAuthHeader: req.headers.get('authorization') ? true : false,
+      },
+      timestamp: Date.now(),
+      sessionId: 'debug-session',
+      runId: 'run1',
+      hypothesisId: 'A',
+    }
+    appendFileSync(logPath, JSON.stringify(logEntry) + '\n')
+  } catch {}
+  // #endregion
+
   try {
     if (typeof handlerFn !== 'function') {
       throw new Error(`Handler is not a function, got: ${typeof handlerFn}`)
     }
     const response = await handlerFn(req, context)
+
+    // #region agent log
+    try {
+      const logEntry = {
+        location: 'auth/[...nextauth]/route.ts:afterHandler',
+        message: 'NextAuth handler response',
+        data: {
+          status: response?.status,
+          statusText: response?.statusText,
+          headers: Object.fromEntries(response?.headers.entries() || []),
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'A',
+      }
+      appendFileSync(logPath, JSON.stringify(logEntry) + '\n')
+    } catch {}
+    // #endregion
 
     // Ensure response is valid
     if (!response) {
