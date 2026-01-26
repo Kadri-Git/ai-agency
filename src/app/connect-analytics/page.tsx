@@ -21,6 +21,7 @@ import {
 import { toast } from 'sonner'
 import { Loader2, CheckCircle2, AlertCircle, LogOut } from 'lucide-react'
 import { api } from '@/lib/api'
+import { useAuthStore } from '@/store/useAuthStore'
 
 interface GA4Property {
   propertyId: string
@@ -111,6 +112,18 @@ export default function ConnectAnalyticsPage() {
   const handleConnect = async () => {
     if (!selectedProperty || !session?.accessToken) return
 
+    // Check if user is logged into the app
+    const authToken =
+      useAuthStore.getState().token ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('auth_token')
+        : null)
+    if (!authToken) {
+      toast.error('Please log in to the app first before connecting GA4')
+      router.push('/login')
+      return
+    }
+
     setIsConnecting(true)
     try {
       // #region agent log
@@ -127,7 +140,7 @@ export default function ConnectAnalyticsPage() {
               hasAccessToken: !!session.accessToken,
               hasRefreshToken: !!session.refreshToken,
               hasEmail: !!session.user?.email,
-              hasAuthToken: !!localStorage.getItem('auth_token'),
+              hasAuthToken: !!authToken,
             },
             timestamp: Date.now(),
             sessionId: 'debug-session',
@@ -150,7 +163,7 @@ export default function ConnectAnalyticsPage() {
           accessToken: session.accessToken,
           refreshToken: session.refreshToken,
           expiresAt: session.expiresAt,
-          authToken: localStorage.getItem('auth_token'), // Our app's JWT token
+          authToken: authToken, // Our app's JWT token
         }),
       })
 
