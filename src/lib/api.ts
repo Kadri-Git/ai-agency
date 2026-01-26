@@ -165,11 +165,16 @@ class ApiClient {
       // Get API URL lazily to avoid SSR issues
       const apiBaseUrl = getApiBaseUrlLazy()
 
-      // Validate API URL is set
-      if (!apiBaseUrl) {
+      // Validate API URL is set and not a placeholder
+      if (!apiBaseUrl || apiBaseUrl.includes('your-backend-url')) {
         throw new Error(
-          'API URL not configured. Please set NEXT_PUBLIC_API_URL environment variable in Vercel. ' +
-            'Go to Vercel Dashboard → Settings → Environment Variables → Add NEXT_PUBLIC_API_URL with your Railway backend URL.'
+          'API URL not configured. Please set NEXT_PUBLIC_API_URL environment variable in Vercel.\n\n' +
+            'Steps:\n' +
+            '1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables\n' +
+            '2. Add or update NEXT_PUBLIC_API_URL with your backend URL (e.g., https://your-backend.railway.app)\n' +
+            '3. Make sure to select "Production", "Preview", and "Development" environments\n' +
+            '4. Redeploy your application\n\n' +
+            `Current value: ${apiBaseUrl || 'not set'}`
         )
       }
 
@@ -378,22 +383,31 @@ class ApiClient {
         // apiBaseUrl already declared above
         let helpfulMessage = `Cannot connect to backend server at ${apiBaseUrl}.`
 
-        if (
+        // Check if API URL is a placeholder
+        if (apiBaseUrl.includes('your-backend-url')) {
+          helpfulMessage =
+            `Backend URL is not configured. The API URL is set to a placeholder value.\n\n` +
+            `Please set NEXT_PUBLIC_API_URL in Vercel:\n` +
+            `1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables\n` +
+            `2. Add or update NEXT_PUBLIC_API_URL with your actual backend URL\n` +
+            `3. Make sure to select "Production", "Preview", and "Development"\n` +
+            `4. Redeploy your application\n\n` +
+            `Example: NEXT_PUBLIC_API_URL=https://your-backend.railway.app`
+        } else if (
           errorMessage.includes('Load failed') ||
           errorMessage.includes('Failed to fetch')
         ) {
           helpfulMessage +=
             `\n\nThis "Load failed" error is often caused by:\n` +
-            `1. Browser security blocking the request (try Chrome/Firefox instead of Safari)\n` +
-            `2. CORS configuration issue (verify backend CORS allows http://localhost:3000)\n` +
-            `3. Browser extension blocking requests (try incognito/private mode)\n` +
-            `4. Network/firewall blocking localhost connections\n\n` +
-            `To verify backend is running: curl http://localhost:8000/health`
+            `1. Backend server is not running or not accessible\n` +
+            `2. CORS configuration issue (verify backend CORS allows your Vercel domain)\n` +
+            `3. Network/firewall blocking the connection\n` +
+            `4. Backend URL is incorrect\n\n` +
+            `Full URL attempted: ${apiBaseUrl}${endpoint}\n` +
+            `Error: ${errorMessage} (${errorName})`
         } else {
-          helpfulMessage += ` Make sure the backend is running: cd backend && uvicorn main:app --reload.`
+          helpfulMessage += ` Make sure the backend is running and accessible.\nFull URL: ${apiBaseUrl}${endpoint}\nError: ${errorMessage} (${errorName})`
         }
-
-        helpfulMessage += `\nFull URL: ${apiBaseUrl}${endpoint}\nError: ${errorMessage} (${errorName})`
 
         throw new Error(helpfulMessage)
       }
