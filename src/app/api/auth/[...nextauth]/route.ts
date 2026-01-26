@@ -12,17 +12,28 @@ if (process.env.NEXTAUTH_URL) {
   process.env.NEXTAUTH_URL = cleanedUrl
 }
 
-// Validate required environment variables
-if (!process.env.GOOGLE_CLIENT_ID) {
-  console.error('Missing GOOGLE_CLIENT_ID environment variable')
-}
+// Validate required environment variables (only log, don't throw during build)
+if (process.env.NODE_ENV === 'production') {
+  const missingVars: string[] = []
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    missingVars.push('GOOGLE_CLIENT_ID')
+  }
+  if (!process.env.GOOGLE_CLIENT_SECRET) {
+    missingVars.push('GOOGLE_CLIENT_SECRET')
+  }
+  if (!process.env.NEXTAUTH_SECRET) {
+    missingVars.push('NEXTAUTH_SECRET')
+  }
+  if (!process.env.NEXTAUTH_URL) {
+    missingVars.push('NEXTAUTH_URL')
+  }
 
-if (!process.env.GOOGLE_CLIENT_SECRET) {
-  console.error('Missing GOOGLE_CLIENT_SECRET environment variable')
-}
-
-if (!process.env.NEXTAUTH_SECRET) {
-  console.error('Missing NEXTAUTH_SECRET environment variable')
+  if (missingVars.length > 0) {
+    console.error(
+      `Missing required environment variables in production: ${missingVars.join(', ')}. ` +
+        `Please set these in Vercel Dashboard → Settings → Environment Variables`
+    )
+  }
 }
 
 // NextAuth v5 beta - create the auth instance
@@ -71,7 +82,18 @@ if (typeof auth === 'function') {
     handlerFn = auth as NextAuthHandler
   }
 } else {
-  throw new Error(`NextAuth returned unexpected type: ${typeof auth}`)
+  // Log what we got for debugging
+  console.error('NextAuth initialization failed:', {
+    authType: typeof auth,
+    authValue: auth,
+    hasHandlers: auth && typeof auth === 'object' && 'handlers' in auth,
+    authKeys: auth && typeof auth === 'object' ? Object.keys(auth) : [],
+  })
+  throw new Error(
+    `NextAuth returned unexpected type: ${typeof auth}. ` +
+      `This may indicate a NextAuth configuration issue. ` +
+      `Please check that GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and NEXTAUTH_SECRET are set in Vercel environment variables.`
+  )
 }
 
 // Wrap handlers to catch errors and ensure valid responses
@@ -118,10 +140,34 @@ async function handleRequest(
     return response
   } catch (error) {
     console.error('NextAuth handler error:', error)
+
+    // Provide more detailed error information
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorStack = error instanceof Error ? error.stack : undefined
+
+    // Check for common configuration issues
+    let helpfulMessage = 'Authentication error'
+    if (
+      errorMessage.includes('NEXTAUTH_URL') ||
+      errorMessage.includes('redirect_uri')
+    ) {
+      helpfulMessage =
+        'NEXTAUTH_URL configuration error. Please check your Vercel environment variables.'
+    } else if (errorMessage.includes('GOOGLE_CLIENT')) {
+      helpfulMessage =
+        'Google OAuth credentials missing. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Vercel.'
+    } else if (errorMessage.includes('NEXTAUTH_SECRET')) {
+      helpfulMessage =
+        'NEXTAUTH_SECRET missing. Please set it in Vercel environment variables.'
+    }
+
     return new Response(
       JSON.stringify({
-        error: 'Authentication error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: helpfulMessage,
+        message: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && errorStack
+          ? { stack: errorStack }
+          : {}),
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     )

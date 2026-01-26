@@ -12,16 +12,28 @@ const nextAuthSecret =
 // in your environment doesn't have trailing backticks, slashes, or whitespace
 
 // Only validate in production runtime, not during build
+// Don't throw - just log warnings to allow better error messages
 function validateEnvVars() {
   if (typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+    const missing: string[] = []
     if (!process.env.GOOGLE_CLIENT_ID) {
-      throw new Error('Missing GOOGLE_CLIENT_ID environment variable')
+      missing.push('GOOGLE_CLIENT_ID')
     }
     if (!process.env.GOOGLE_CLIENT_SECRET) {
-      throw new Error('Missing GOOGLE_CLIENT_SECRET environment variable')
+      missing.push('GOOGLE_CLIENT_SECRET')
     }
     if (!process.env.NEXTAUTH_SECRET) {
-      throw new Error('Missing NEXTAUTH_SECRET environment variable')
+      missing.push('NEXTAUTH_SECRET')
+    }
+    if (!process.env.NEXTAUTH_URL) {
+      missing.push('NEXTAUTH_URL')
+    }
+
+    if (missing.length > 0) {
+      console.error(
+        `Missing required environment variables: ${missing.join(', ')}. ` +
+          `Please set these in Vercel Dashboard → Settings → Environment Variables`
+      )
     }
   }
 }
@@ -90,9 +102,8 @@ export const authOptions: NextAuthOptions = {
 }
 
 // Validate environment variables at runtime (not during build)
-if (typeof window === 'undefined') {
-  validateEnvVars()
-}
+// Only log warnings, don't throw to prevent server errors
+validateEnvVars()
 
 async function refreshAccessToken(token: {
   refreshToken?: string
