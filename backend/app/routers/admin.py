@@ -43,7 +43,16 @@ async def list_all_clients(
     client_summaries = []
     for client in clients:
         # Get recent metrics for each client
-        has_ga4 = bool(client.ga4_property_id and client.ga4_service_account_json)
+        # Consider both OAuth and legacy service-account connections
+        has_ga4_oauth = bool(
+            client.ga4_property_id
+            and client.ga4_access_token
+            and client.ga4_refresh_token
+        )
+        has_ga4_service_account = bool(
+            client.ga4_property_id and client.ga4_service_account_json
+        )
+        has_ga4 = has_ga4_oauth or has_ga4_service_account
         
         # Try to get metrics (use mock if no GA4)
         try:

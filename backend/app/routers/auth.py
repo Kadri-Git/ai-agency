@@ -43,13 +43,17 @@ async def register(client_data: ClientRegister, db: Session = Depends(get_db)):
             detail=f"Error hashing password: {str(e)}"
         )
     
+    # Mark demo accounts explicitly so backend can treat them differently
+    is_demo_account = client_data.email.lower().startswith("demo@")
+    
     new_client = Client(
         email=client_data.email,
         password_hash=hashed_password,
         company_name=client_data.company_name,
         ga4_property_id=client_data.ga4_property_id,
         ga4_service_account_json=client_data.ga4_service_account_json,
-        is_demo=False  # All accounts start with mock data, not demo mode
+        # Regular accounts are not demo, but we explicitly flag demo@example.com
+        is_demo=is_demo_account
     )
     
     try:
@@ -69,7 +73,7 @@ async def register(client_data: ClientRegister, db: Session = Depends(get_db)):
         data={
             "client_id": new_client.id,
             "email": new_client.email,
-            "is_demo": False,  # Always False now - mock data shown if GA4 not connected
+            "is_demo": new_client.is_demo,
             "is_admin": new_client.is_admin
         },
         expires_delta=access_token_expires
@@ -120,6 +124,12 @@ async def login(client_data: ClientLogin, db: Session = Depends(get_db)):
             detail=f"Password verification failed: {str(e)}. Please try again or contact support."
         )
     
+    # Ensure demo accounts are flagged correctly in the database
+    if client.email.lower().startswith("demo@") and not client.is_demo:
+        client.is_demo = True
+        db.commit()
+        db.refresh(client)
+
     # Create access token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

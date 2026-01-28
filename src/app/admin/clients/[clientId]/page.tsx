@@ -153,6 +153,21 @@ export default function AdminClientViewPage() {
               <option value={30}>Last 30 days</option>
               <option value={90}>Last 90 days</option>
             </select>
+            {/* Admin shortcut to connect GA4 for this client */}
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() =>
+                router.push(
+                  `/connect-analytics?fromAdmin=1&clientId=${encodeURIComponent(
+                    clientId
+                  )}`
+                )
+              }
+            >
+              <Settings className="h-4 w-4" />
+              Connect GA4
+            </Button>
             <Link href="/settings">
               <Button variant="outline" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />

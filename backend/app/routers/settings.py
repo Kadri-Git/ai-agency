@@ -70,6 +70,35 @@ async def update_ga4_oauth(
     """
     Update GA4 OAuth2 credentials for the current client.
     """
+    # #region agent log
+    try:
+        log_entry = {
+            "location": "settings.py:update_ga4_oauth:start",
+            "message": "Updating GA4 OAuth credentials",
+            "data": {
+                "client_id": current_client.id,
+                "email": current_client.email,
+                "has_property_id": bool(oauth_data.ga4_property_id),
+                "has_access_token": bool(oauth_data.ga4_access_token),
+                "has_refresh_token": bool(oauth_data.ga4_refresh_token),
+            },
+            "timestamp": int(datetime.now().timestamp() * 1000),
+            "sessionId": "debug-session",
+            "runId": "ga-persist1",
+            "hypothesisId": "G1",
+        }
+        from pathlib import Path
+        log_path = (
+            Path(__file__).resolve().parents[2]
+            / ".cursor"
+            / "debug.log"
+        )
+        with open(log_path, "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+    except Exception:
+        pass
+    # #endregion
+
     try:
         current_client.ga4_property_id = oauth_data.ga4_property_id
         current_client.ga4_access_token = oauth_data.ga4_access_token
@@ -90,6 +119,35 @@ async def update_ga4_oauth(
         db.commit()
         db.refresh(current_client)
         
+        # #region agent log
+        try:
+            log_entry = {
+                "location": "settings.py:update_ga4_oauth:success",
+                "message": "GA4 OAuth credentials updated",
+                "data": {
+                    "client_id": current_client.id,
+                    "email": current_client.email,
+                    "ga4_property_id": current_client.ga4_property_id,
+                    "has_access_token": bool(current_client.ga4_access_token),
+                    "has_refresh_token": bool(current_client.ga4_refresh_token),
+                },
+                "timestamp": int(datetime.now().timestamp() * 1000),
+                "sessionId": "debug-session",
+                "runId": "ga-persist1",
+                "hypothesisId": "G1",
+            }
+            from pathlib import Path
+            log_path = (
+                Path(__file__).resolve().parents[2]
+                / ".cursor"
+                / "debug.log"
+            )
+            with open(log_path, "a") as f:
+                f.write(json.dumps(log_entry) + "\n")
+        except Exception:
+            pass
+        # #endregion
+
         return {
             "message": "GA4 OAuth credentials updated successfully",
             "ga4_property_id": current_client.ga4_property_id
@@ -122,6 +180,36 @@ async def get_ga4_status(
     )
     
     has_credentials = has_oauth or has_service_account
+
+    # #region agent log
+    try:
+        log_entry = {
+            "location": "settings.py:get_ga4_status",
+            "message": "GA4 status checked",
+            "data": {
+                "client_id": current_client.id,
+                "email": current_client.email,
+                "ga4_property_id": current_client.ga4_property_id,
+                "has_oauth": has_oauth,
+                "has_service_account": has_service_account,
+                "has_credentials": has_credentials,
+            },
+            "timestamp": int(datetime.now().timestamp() * 1000),
+            "sessionId": "debug-session",
+            "runId": "ga-persist1",
+            "hypothesisId": "G2",
+        }
+        from pathlib import Path
+        log_path = (
+            Path(__file__).resolve().parents[2]
+            / ".cursor"
+            / "debug.log"
+        )
+        with open(log_path, "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+    except Exception:
+        pass
+    # #endregion
     
     return {
         "has_credentials": has_credentials,

@@ -69,6 +69,30 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
+    // #region agent log
+    fetch(
+      'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'google-analytics/properties/route.ts:GET:start',
+          message: 'GA4 properties request',
+          data: {
+            hasSession: !!session,
+            hasAccessToken: !!session?.accessToken,
+            hasRefreshToken: !!session?.refreshToken,
+            expiresAt: (session as { expiresAt?: number })?.expiresAt ?? null,
+          },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'ga-run',
+          hypothesisId: 'GA1',
+        }),
+      }
+    ).catch(() => {})
+    // #endregion
+
     // Refresh token if expired
     const accessToken = await refreshTokenIfNeeded(
       session as {
@@ -182,6 +206,29 @@ export async function GET(_request: NextRequest) {
 
     // Check if re-authentication is required
     const errorMessage = error instanceof Error ? error.message : String(error)
+
+    // #region agent log
+    fetch(
+      'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'google-analytics/properties/route.ts:GET:catch',
+          message: 'GA4 properties error',
+          data: {
+            errorName: error instanceof Error ? error.name : typeof error,
+            errorMessage,
+          },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'ga-run',
+          hypothesisId: 'GA1',
+        }),
+      }
+    ).catch(() => {})
+    // #endregion
+
     if (errorMessage.includes('REAUTH_REQUIRED')) {
       return NextResponse.json(
         {

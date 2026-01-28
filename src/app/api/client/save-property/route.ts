@@ -27,6 +27,33 @@ export async function POST(request: NextRequest) {
     // The client should include their JWT token from localStorage
     const authToken = body.authToken
 
+    // #region agent log
+    try {
+      const logEntry = {
+        location: 'save-property/route.ts:beforeBackend',
+        message: 'Saving GA4 OAuth for client',
+        data: {
+          hasAuthToken: !!authToken,
+          email,
+          propertyId,
+          apiBaseUrl,
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'ga-persist1',
+        hypothesisId: 'G1',
+      }
+      const fs = require('fs')
+      const path = require('path')
+      const logPath = path.join(
+        process.cwd(),
+        '.cursor',
+        'debug.log'
+      )
+      fs.appendFileSync(logPath, JSON.stringify(logEntry) + '\n')
+    } catch {}
+    // #endregion
+
     if (!authToken) {
       return NextResponse.json(
         { error: 'App authentication token required' },

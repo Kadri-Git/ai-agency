@@ -2,15 +2,22 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Client
-from app.schemas import DashboardData, AITrafficMetrics, RevenueTrend, RevenueTrendPoint, TopLandingPage
+from app.schemas import (
+    DashboardData,
+    AITrafficMetrics,
+    RevenueTrend,
+    RevenueTrendPoint,
+    TopLandingPage,
+)
 from app.auth import get_current_client
 from app.ga4_service import (
     get_ai_traffic_metrics,
     get_revenue_trend,
-    get_top_landing_pages
+    get_top_landing_pages,
 )
 from app.mock_data import generate_mock_dashboard_data
 from datetime import datetime, timedelta
+import json as json_module
 
 router = APIRouter()
 
@@ -25,6 +32,77 @@ async def get_dashboard_metrics(
     Client data is automatically isolated based on JWT token.
     """
     try:
+        # #region agent log
+        try:
+            log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+            with open(log_path, "a") as f:
+                f.write(
+                    json_module.dumps(
+                        {
+                            "location": "dashboard.py:get_dashboard_metrics:start",
+                            "message": "Dashboard metrics called",
+                            "data": {
+                                "client_email": getattr(current_client, "email", None),
+                                "is_demo": getattr(current_client, "is_demo", None),
+                                "has_property_id": bool(
+                                    getattr(current_client, "ga4_property_id", None)
+                                ),
+                            },
+                            "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                            "sessionId": "debug-session",
+                            "runId": "demo-run",
+                            "hypothesisId": "DL4",
+                        }
+                    )
+                    + "\n"
+                )
+        except Exception:
+            pass
+        # #endregion
+
+        # For demo accounts, always return mock data and avoid real GA4 calls
+        if getattr(current_client, "is_demo", False):
+            # #region agent log
+            try:
+                log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+                with open(log_path, "a") as f:
+                    f.write(
+                        json_module.dumps(
+                            {
+                                "location": "dashboard.py:get_dashboard_metrics:demo_mock",
+                                "message": "Using mock dashboard data for demo client",
+                                "data": {
+                                    "client_email": getattr(
+                                        current_client, "email", None
+                                    ),
+                                },
+                                "timestamp": int(
+                                    datetime.utcnow().timestamp() * 1000
+                                ),
+                                "sessionId": "debug-session",
+                                "runId": "demo-run",
+                                "hypothesisId": "DL4",
+                            }
+                        )
+                        + "\n"
+                    )
+            except Exception:
+                pass
+            # #endregion
+            mock_data = generate_mock_dashboard_data(days)
+            return DashboardData(
+                metrics=AITrafficMetrics(**mock_data["metrics"]),
+                revenue_trend=RevenueTrend(
+                    data=[
+                        RevenueTrendPoint(**d)
+                        for d in mock_data["revenue_trend"]["data"]
+                    ]
+                ),
+                top_landing_pages=[
+                    TopLandingPage(**lp) for lp in mock_data["top_landing_pages"]
+                ],
+            )
+
         # Check if GA4 credentials are available (OAuth or service account)
         has_oauth = bool(
             current_client.ga4_property_id 

@@ -9,6 +9,7 @@ from app.database import get_db
 from app.models import Client
 from app.schemas import TokenData
 import os
+import json as json_module
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
@@ -108,9 +109,32 @@ def get_current_client(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    # #region agent log
+    log_base_dir = os.path.dirname(os.path.dirname(__file__))
+    log_path = os.path.join(log_base_dir, ".cursor", "debug.log")
+    # #endregion
     
     try:
         token = credentials.credentials
+        # #region agent log
+        try:
+            with open(log_path, "a") as f:
+                log_entry = {
+                    "location": "auth.py:get_current_client:before_decode",
+                    "message": "About to decode JWT for current client",
+                    "data": {
+                        "token_prefix": token[:16] if isinstance(token, str) else None,
+                    },
+                    "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "demo-run",
+                    "hypothesisId": "DL2",
+                }
+                f.write(json_module.dumps(log_entry) + "\n")
+        except Exception:
+            pass
+        # #endregion
+
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         client_id: str = payload.get("client_id")
         email: str = payload.get("email")
@@ -119,7 +143,42 @@ def get_current_client(
             raise credentials_exception
             
         token_data = TokenData(client_id=client_id, email=email)
+        # #region agent log
+        try:
+            with open(log_path, "a") as f:
+                log_entry = {
+                    "location": "auth.py:get_current_client:after_decode",
+                    "message": "JWT decoded for current client",
+                    "data": {
+                        "client_id": str(client_id),
+                        "email": email,
+                    },
+                    "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "demo-run",
+                    "hypothesisId": "DL2",
+                }
+                f.write(json_module.dumps(log_entry) + "\n")
+        except Exception:
+            pass
+        # #endregion
     except JWTError:
+        # #region agent log
+        try:
+            with open(log_path, "a") as f:
+                log_entry = {
+                    "location": "auth.py:get_current_client:jwt_error",
+                    "message": "JWT decode failed for current client",
+                    "data": {},
+                    "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                    "sessionId": "debug-session",
+                    "runId": "demo-run",
+                    "hypothesisId": "DL2",
+                }
+                f.write(json_module.dumps(log_entry) + "\n")
+        except Exception:
+            pass
+        # #endregion
         raise credentials_exception
     
     client = db.query(Client).filter(Client.id == token_data.client_id).first()

@@ -168,6 +168,29 @@ export default function ConnectAnalyticsPage() {
         router.push('/dashboard')
       }, 1500)
     } catch (error) {
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'connect-analytics/page.tsx:handleConnect:catch',
+            message: 'GA4 connect failed',
+            data: {
+              errorName: error instanceof Error ? error.name : typeof error,
+              errorMessage:
+                error instanceof Error ? error.message : String(error),
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'ga-run',
+            hypothesisId: 'GA1',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+
       toast.error(
         error instanceof Error ? error.message : 'Failed to connect property'
       )

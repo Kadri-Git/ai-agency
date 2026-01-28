@@ -173,6 +173,27 @@ export default function LoginPage() {
           email: demoEmail,
           password: demoPassword,
         })
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'login/page.tsx:handleDemoLogin:loginSuccess',
+              message: 'Demo login via /api/auth/login succeeded',
+              data: {
+                email: demoEmail,
+                hasToken: !!response.access_token,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'demo-run',
+              hypothesisId: 'DL1',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
         const tokenParts = response.access_token.split('.')
         let isDemo = false
         let isAdmin = false
@@ -185,19 +206,72 @@ export default function LoginPage() {
             isDemo = true // Assume demo if we can't decode
           }
         }
+        // For demo mode we always want a non-admin demo experience
+        isDemo = true
+        isAdmin = false
         setAuth(response.access_token, demoEmail, isDemo, isAdmin)
 
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'login/page.tsx:handleDemoLogin:afterSetAuth',
+              message: 'Demo auth state after setAuth',
+              data: {
+                storeState: {
+                  isAuthenticated: useAuthStore.getState().isAuthenticated,
+                  hasToken: !!useAuthStore.getState().token,
+                },
+                hasLocalStorageToken:
+                  typeof window !== 'undefined'
+                    ? !!localStorage.getItem('auth_token')
+                    : null,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'demo-run',
+              hypothesisId: 'DL6',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
+
         // Redirect admin to admin dashboard
-        if (isAdmin) {
-          router.push('/admin')
-          return
-        }
         toast.success('Demo account logged in!')
         router.push('/dashboard')
         return
       } catch (loginError) {
         // If login fails, try to register
-        console.log('Login failed, trying to register:', loginError)
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'login/page.tsx:handleDemoLogin:loginError',
+              message: 'Demo login via /api/auth/login failed',
+              data: {
+                errorName:
+                  loginError instanceof Error
+                    ? loginError.name
+                    : typeof loginError,
+                errorMessage:
+                  loginError instanceof Error
+                    ? loginError.message
+                    : String(loginError),
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'demo-run',
+              hypothesisId: 'DL1',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
       }
 
       // Try to register
@@ -207,6 +281,27 @@ export default function LoginPage() {
           password: demoPassword,
           company_name: 'Demo Company',
         })
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'login/page.tsx:handleDemoLogin:registerSuccess',
+              message: 'Demo register via /api/auth/register succeeded',
+              data: {
+                email: demoEmail,
+                hasToken: !!response.access_token,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'demo-run',
+              hypothesisId: 'DL1',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
         // All accounts start without GA4, so they'll see sample data
         const tokenParts = response.access_token.split('.')
         let isAdmin = false
@@ -218,13 +313,37 @@ export default function LoginPage() {
             // Ignore
           }
         }
-        setAuth(response.access_token, demoEmail, false, isAdmin)
+        // For demo mode we always want a non-admin demo experience
+        setAuth(response.access_token, demoEmail, true, false)
 
-        // Redirect admin to admin dashboard
-        if (isAdmin) {
-          router.push('/admin')
-          return
-        }
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'login/page.tsx:handleDemoLogin:afterSetAuth:register',
+              message: 'Demo auth state after setAuth (register path)',
+              data: {
+                storeState: {
+                  isAuthenticated: useAuthStore.getState().isAuthenticated,
+                  hasToken: !!useAuthStore.getState().token,
+                },
+                hasLocalStorageToken:
+                  typeof window !== 'undefined'
+                    ? !!localStorage.getItem('auth_token')
+                    : null,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'demo-run',
+              hypothesisId: 'DL6',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
+
         toast.success('Demo account created and logged in!')
         router.push('/dashboard')
       } catch (registerError) {
@@ -234,6 +353,31 @@ export default function LoginPage() {
           registerError instanceof Error
             ? registerError.message
             : 'Failed to setup demo account'
+
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'login/page.tsx:handleDemoLogin:registerError',
+              message: 'Demo register via /api/auth/register failed',
+              data: {
+                errorName:
+                  registerError instanceof Error
+                    ? registerError.name
+                    : typeof registerError,
+                errorMessage,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'demo-run',
+              hypothesisId: 'DL1',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
 
         if (errorMessage.includes('already registered')) {
           toast.error(
@@ -247,6 +391,29 @@ export default function LoginPage() {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to setup demo account'
+
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'login/page.tsx:handleDemoLogin:catch',
+            message: 'Demo login failed',
+            data: {
+              errorName: error instanceof Error ? error.name : typeof error,
+              errorMessage: errorMessage,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'demo-run',
+            hypothesisId: 'DL1',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+
       toast.error(`Failed to setup demo account: ${errorMessage}`)
       console.error('Demo login error:', error)
     } finally {
