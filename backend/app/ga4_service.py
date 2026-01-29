@@ -678,6 +678,7 @@ def get_ai_traffic_metrics(
             "total_row_count": len(total_response.rows) if total_response.rows else 0,
             "debug_sources_row_count": debug_sources_row_count,
             "debug_sources_sample": debug_sources_sample,
+            "all_sources": all_sources_list,  # Include ALL sources for debugging
         }
     }
     
