@@ -177,7 +177,7 @@ def get_ai_traffic_metrics(
                 "data": {
                     "available_match_types": match_type_attrs,
                     "regex_pattern": AI_SOURCE_REGEX,
-                    "field_name": "source"
+                    "field_name": "sessionSource"
                 },
                 "timestamp": int(datetime.now().timestamp() * 1000),
                 "sessionId": "debug-session",
