@@ -114,8 +114,63 @@ async def get_dashboard_metrics(
             current_client.ga4_property_id and current_client.ga4_service_account_json
         )
         
+        # #region agent log
+        try:
+            log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+            with open(log_path, "a") as f:
+                f.write(
+                    json_module.dumps(
+                        {
+                            "location": "dashboard.py:check_ga4_credentials",
+                            "message": "Checking GA4 credentials",
+                            "data": {
+                                "client_email": getattr(current_client, "email", None),
+                                "has_property_id": bool(getattr(current_client, "ga4_property_id", None)),
+                                "has_access_token": bool(getattr(current_client, "ga4_access_token", None)),
+                                "has_refresh_token": bool(getattr(current_client, "ga4_refresh_token", None)),
+                                "has_service_account_json": bool(getattr(current_client, "ga4_service_account_json", None)),
+                                "has_oauth": has_oauth,
+                                "has_service_account": has_service_account,
+                                "will_use_mock": not has_oauth and not has_service_account,
+                            },
+                            "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                            "sessionId": "debug-session",
+                            "runId": "ga-verify",
+                            "hypothesisId": "GA_CREDS",
+                        }
+                    )
+                    + "\n"
+                )
+        except Exception:
+            pass
+        # #endregion
+        
         # If GA4 credentials are missing, return mock data
         if not has_oauth and not has_service_account:
+            # #region agent log
+            try:
+                log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+                with open(log_path, "a") as f:
+                    f.write(
+                        json_module.dumps(
+                            {
+                                "location": "dashboard.py:returning_mock_data",
+                                "message": "Returning mock data - no GA4 credentials",
+                                "data": {
+                                    "client_email": getattr(current_client, "email", None),
+                                    "days": days,
+                                },
+                                "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                                "sessionId": "debug-session",
+                                "runId": "ga-verify",
+                                "hypothesisId": "GA_CREDS",
+                            }
+                        )
+                        + "\n"
+                    )
+            except Exception:
+                pass
+            # #endregion
             mock_data = generate_mock_dashboard_data(days)
             return DashboardData(
                 metrics=AITrafficMetrics(**mock_data["metrics"]),
@@ -221,6 +276,35 @@ async def get_dashboard_metrics(
         start_date_str = start_date.strftime("%Y-%m-%d")
         end_date_str = end_date.strftime("%Y-%m-%d")
         
+        # #region agent log
+        try:
+            log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+            with open(log_path, "a") as f:
+                f.write(
+                    json_module.dumps(
+                        {
+                            "location": "dashboard.py:before_ga4_call",
+                            "message": "About to call GA4 get_ai_traffic_metrics",
+                            "data": {
+                                "client_email": getattr(current_client, "email", None),
+                                "property_id": current_client.ga4_property_id,
+                                "start_date": start_date_str,
+                                "end_date": end_date_str,
+                                "has_oauth": has_oauth,
+                                "has_service_account": has_service_account,
+                            },
+                            "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                            "sessionId": "debug-session",
+                            "runId": "ga-verify",
+                            "hypothesisId": "GA_CALL",
+                        }
+                    )
+                    + "\n"
+                )
+        except Exception:
+            pass
+        # #endregion
+        
         # Get AI traffic metrics (use OAuth if available, otherwise service account)
         metrics_data = get_ai_traffic_metrics(
             property_id=current_client.ga4_property_id,
@@ -230,6 +314,31 @@ async def get_dashboard_metrics(
             start_date=start_date_str,
             end_date=end_date_str
         )
+        
+        # #region agent log
+        try:
+            log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+            with open(log_path, "a") as f:
+                f.write(
+                    json_module.dumps(
+                        {
+                            "location": "dashboard.py:after_ga4_call",
+                            "message": "GA4 get_ai_traffic_metrics returned",
+                            "data": {
+                                "client_email": getattr(current_client, "email", None),
+                                "metrics_data": metrics_data,
+                            },
+                            "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                            "sessionId": "debug-session",
+                            "runId": "ga-verify",
+                            "hypothesisId": "GA_CALL",
+                        }
+                    )
+                    + "\n"
+                )
+        except Exception:
+            pass
+        # #endregion
         
         # Calculate derived metrics
         ai_sessions = metrics_data["ai_sessions"]
