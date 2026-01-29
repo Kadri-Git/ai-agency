@@ -336,7 +336,32 @@ def get_ai_traffic_metrics(
             pass
 
         # Then: actual AI-filtered request
-        ai_response = client.run_report(ai_request)
+        try:
+            ai_response = client.run_report(ai_request)
+        except Exception as ai_error:
+            # #region agent log
+            try:
+                with open(log_path, 'a') as f:
+                    log_entry = {
+                        "location": "ga4_service.py:ai_request_error",
+                        "message": "AI-filtered GA4 request failed",
+                        "data": {
+                            "error_type": type(ai_error).__name__,
+                            "error_message": str(ai_error),
+                            "error_repr": repr(ai_error),
+                            "dimension_used": "source",
+                            "filter_patterns": AI_SOURCE_PATTERNS,
+                        },
+                        "timestamp": int(datetime.now().timestamp() * 1000),
+                        "sessionId": "debug-session",
+                        "runId": "run1",
+                        "hypothesisId": "GA_ERROR",
+                    }
+                    f.write(json_module.dumps(log_entry) + '\n')
+            except Exception:
+                pass
+            # #endregion
+            raise
         # #region agent log
         try:
             row_count = len(ai_response.rows) if ai_response.rows else 0
