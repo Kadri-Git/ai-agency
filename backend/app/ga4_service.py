@@ -20,10 +20,12 @@ import os
 AI_SOURCE_PATTERNS = [
     "chat.openai",  # Matches "chat.openai.com", "chat.openai", etc.
     "chatgpt",  # Matches "chatgpt.com" - ChatGPT appears as this in GA4!
+    "openai",  # Also match just "openai" in case it appears that way
     "perplexity",
     "gemini",
     "claude",
-    "openai",  # Also match just "openai" in case it appears that way
+    "anthropic",  # Claude's company name - might appear as source
+    "claude.ai",  # Claude's domain
 ]
 AI_SOURCE_REGEX = r"chat\.openai|chatgpt|perplexity|gemini|claude|openai"  # Keep for reference
 
@@ -295,13 +297,18 @@ def get_ai_traffic_metrics(
     try:
         with open(log_path, 'a') as f:
             log_entry = {
-                "location": "ga4_service.py:140",
+                "location": "ga4_service.py:execute_requests",
                 "message": "About to execute GA4 run_report for AI traffic",
-                "data": {"property_id": property_id},
+                "data": {
+                    "property_id": property_id,
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "ai_patterns": AI_SOURCE_PATTERNS,
+                },
                 "timestamp": int(datetime.now().timestamp() * 1000),
                 "sessionId": "debug-session",
                 "runId": "run1",
-                "hypothesisId": "B"
+                "hypothesisId": "DATE_RANGE"
             }
             f.write(json_module.dumps(log_entry) + '\n')
     except Exception:
@@ -310,6 +317,7 @@ def get_ai_traffic_metrics(
     
     debug_sources_response = None
     debug_source_dimension_response = None
+    all_sources = []  # Function-level variable to track ALL sources
     try:
         # First: diagnostic unfiltered sources to see actual source values
         debug_sources_response = client.run_report(debug_sources_request)
@@ -345,11 +353,18 @@ def get_ai_traffic_metrics(
             log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.cursor', 'debug.log')
             
             debug_rows = []
-            all_sources = []  # Track all sources for AI pattern matching
+            all_sources = []  # Track ALL sources (not just matching ones) for debugging
+            ai_matching_sources = []  # Track sources that match AI patterns
             if debug_sources_response.rows:
                 for i, row in enumerate(debug_sources_response.rows):
                     source_value = row.dimension_values[0].value if row.dimension_values else ""
                     sessions_value = row.metric_values[0].value if row.metric_values else "0"
+                    
+                    # Log ALL sources (not just first 10)
+                    all_sources.append({
+                        "source": source_value,
+                        "sessions": sessions_value,
+                    })
                     
                     # Log first 10 for sample
                     if i < 10:
@@ -365,7 +380,7 @@ def get_ai_traffic_metrics(
                     source_lower = source_value.lower()
                     matches_ai = any(pattern.lower() in source_lower for pattern in AI_SOURCE_PATTERNS)
                     if matches_ai:
-                        all_sources.append({
+                        ai_matching_sources.append({
                             "source": source_value,
                             "sessions": sessions_value,
                             "matches_patterns": [p for p in AI_SOURCE_PATTERNS if p.lower() in source_lower]
@@ -404,11 +419,14 @@ def get_ai_traffic_metrics(
                                     else []
                                 ),
                                 "sample_rows": debug_rows,
-                                "ai_matching_sources_in_sessionSource": all_sources,
+                                "all_sources_complete": all_sources,  # ALL sources, not just matching
+                                "ai_matching_sources_in_sessionSource": ai_matching_sources,
                                 "ai_matching_sources_in_source_dim": source_dim_ai_matches,
                                 "ai_patterns_used": AI_SOURCE_PATTERNS,
-                                "total_ai_sources_found_in_sessionSource": len(all_sources),
+                                "total_sources_count": len(all_sources),
+                                "total_ai_sources_found_in_sessionSource": len(ai_matching_sources),
                                 "total_ai_sources_found_in_source_dim": len(source_dim_ai_matches),
+                                "date_range": {"start_date": start_date, "end_date": end_date},
                             },
                             "timestamp": int(
                                 datetime.now().timestamp() * 1000
