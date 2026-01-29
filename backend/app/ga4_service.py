@@ -289,8 +289,9 @@ def get_ai_traffic_metrics(
         pass
     # #endregion
     
+    debug_sources_response = None
     try:
-        # First: diagnostic unfiltered sources to see actual sessionSource values
+        # First: diagnostic unfiltered sources to see actual source values
         debug_sources_response = client.run_report(debug_sources_request)
         try:
             debug_rows = []
