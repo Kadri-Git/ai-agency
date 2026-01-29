@@ -86,6 +86,38 @@ function createSampleDashboardData(days: number): DashboardData {
   }
 }
 
+// Dashboard data with all zeros – used when GA is not connected or GA errors
+// for real (non-demo) accounts, so they can still see the UI without fake data.
+function createZeroDashboardData(days: number): DashboardData {
+  const now = new Date()
+  const revenue_trend = {
+    data: Array.from({ length: days }, (_, i) => {
+      const d = new Date(now)
+      d.setDate(now.getDate() - (days - 1 - i))
+      return {
+        date: d.toISOString().slice(0, 10),
+        revenue: 0,
+      }
+    }),
+  }
+
+  const metrics = {
+    ai_sessions: 0,
+    ai_revenue: 0,
+    ai_conversion_rate: 0,
+    ai_average_order_value: 0,
+    ai_revenue_per_session: 0,
+    site_avg_conversion_rate: 0,
+    ai_vs_site_conversion_rate: 0,
+  }
+
+  return {
+    metrics,
+    revenue_trend,
+    top_landing_pages: [],
+  }
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const { isAuthenticated, clearAuth, isDemo } = useAuthStore()
@@ -147,6 +179,24 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true)
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'dashboard/page.tsx:fetchDashboardData:entry',
+            message: 'Starting dashboard data fetch',
+            data: { days, isAuthenticated, isDemo },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'H4',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
       const data = await api.getDashboardMetrics(days)
       // #region agent log
       fetch(
@@ -236,37 +286,100 @@ export default function DashboardPage() {
       }
 
       if (isGoogleGAError) {
-        // For demo users or when GA fails, silently fall back to sample data
-        // so the user can still explore the dashboard.
-        const sample = createSampleDashboardData(days)
-        setDashboardData(sample)
+        if (isDemo) {
+          // For demo users, silently fall back to sample data so the experience
+          // is always interactive even if GA is misconfigured.
+          const sample = createSampleDashboardData(days)
+          setDashboardData(sample)
 
-        // #region agent log
-        fetch(
-          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: 'dashboard/page.tsx:186',
-              message: 'Using sample data after GA auth error',
-              data: {
-                isDemo,
-                days,
-              },
-              timestamp: Date.now(),
-              sessionId: 'debug-session',
-              runId: 'demo-run',
-              hypothesisId: 'DL7',
-            }),
-          }
-        ).catch(() => {})
-        // #endregion
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'dashboard/page.tsx:186',
+                message: 'Using sample data after GA auth error (demo user)',
+                data: {
+                  isDemo,
+                  days,
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'demo-run',
+                hypothesisId: 'DL7',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
+        } else {
+          // For real (non-demo) users, keep the dashboard visible with zeros
+          // instead of random sample data, so they can still use the app even
+          // if GA is not connected or has an auth issue.
+          const zeroData = createZeroDashboardData(days)
+          setDashboardData(zeroData)
+
+          toast.message(
+            'Google Analytics is not available yet. Metrics are shown as 0 until GA is connected.',
+            {
+              description:
+                'You can connect or fix GA4 from Connect Analytics or Settings at any time.',
+            }
+          )
+
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'dashboard/page.tsx:198',
+                message:
+                  'GA auth error for non-demo user, using zero dashboard data',
+                data: {
+                  isDemo,
+                  days,
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'demo-run',
+                hypothesisId: 'DL7',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
+        }
         return
       }
 
       // For other errors, show error but keep trying
       console.error('Failed to load dashboard data:', error)
+      // #region agent log
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'dashboard/page.tsx:fetchDashboardData:otherError',
+            message: 'Other error (not GA or auth)',
+            data: {
+              errorMessage: errorMsg,
+              isGoogleGAError,
+              isBackendAuthError,
+              isDemo,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'H5',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
       toast.error('Failed to load dashboard data. Please try again.')
 
       // Set empty data to prevent "No data available" screen

@@ -37,14 +37,49 @@ def get_ga4_client(service_account_json: str = None, access_token: str = None, r
         client = BetaAnalyticsDataClient.from_service_account_info(credentials_dict)
         return client
     elif access_token:
-        # OAuth2: Use access token
+        # OAuth2: Use access token. To allow automatic refresh, we must provide
+        # client_id and client_secret from environment when available.
+        client_id = os.getenv("GOOGLE_CLIENT_ID") or None
+        client_secret = os.getenv("GOOGLE_CLIENT_SECRET") or None
+
         credentials = Credentials(
             token=access_token,
             refresh_token=refresh_token,
             token_uri="https://oauth2.googleapis.com/token",
-            client_id=None,  # Not needed for token refresh if refresh_token is provided
-            client_secret=None,
+            client_id=client_id,
+            client_secret=client_secret,
+            scopes=["https://www.googleapis.com/auth/analytics.readonly"],
         )
+
+        # #region agent log
+        try:
+            log_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), ".cursor", "debug.log"
+            )
+            with open(log_path, "a") as f:
+                f.write(
+                    json.dumps(
+                        {
+                            "location": "ga4_service.py:get_ga4_client",
+                            "message": "Created OAuth2 GA4 client",
+                            "data": {
+                                "has_access_token": bool(access_token),
+                                "has_refresh_token": bool(refresh_token),
+                                "has_client_id": bool(client_id),
+                                "has_client_secret": bool(client_secret),
+                            },
+                            "timestamp": int(datetime.now().timestamp() * 1000),
+                            "sessionId": "debug-session",
+                            "runId": "ga-oauth-client1",
+                            "hypothesisId": "G4",
+                        }
+                    )
+                    + "\n"
+                )
+        except Exception:
+            pass
+        # #endregion
+
         client = BetaAnalyticsDataClient(credentials=credentials)
         return client
     else:
@@ -278,9 +313,19 @@ def get_ai_traffic_metrics(
     ai_revenue = 0.0
     ai_conversions = 0
     
+    # Get metric names from response headers (metric_values don't have .name attribute)
+    # Metric headers contain the names in the same order as metric_values
+    metric_names = [header.name for header in ai_response.metric_headers] if ai_response.metric_headers else []
+    
+    if not metric_names:
+        # Fallback: use expected order if headers are missing
+        metric_names = ["sessions", "totalRevenue", "conversions"]
+    
     for row in ai_response.rows:
-        for metric_value in row.metric_values:
-            metric_name = metric_value.name
+        for idx, metric_value in enumerate(row.metric_values):
+            if idx >= len(metric_names):
+                continue  # Skip if index is out of range
+            metric_name = metric_names[idx]
             value = float(metric_value.value) if metric_value.value else 0
             
             if metric_name == "sessions":
@@ -295,9 +340,19 @@ def get_ai_traffic_metrics(
     total_revenue = 0.0
     total_conversions = 0
     
+    # Get metric names from response headers (metric_values don't have .name attribute)
+    # Metric headers contain the names in the same order as metric_values
+    total_metric_names = [header.name for header in total_response.metric_headers] if total_response.metric_headers else []
+    
+    if not total_metric_names:
+        # Fallback: use expected order if headers are missing
+        total_metric_names = ["sessions", "totalRevenue", "conversions"]
+    
     for row in total_response.rows:
-        for metric_value in row.metric_values:
-            metric_name = metric_value.name
+        for idx, metric_value in enumerate(row.metric_values):
+            if idx >= len(total_metric_names):
+                continue  # Skip if index is out of range
+            metric_name = total_metric_names[idx]
             value = float(metric_value.value) if metric_value.value else 0
             
             if metric_name == "sessions":

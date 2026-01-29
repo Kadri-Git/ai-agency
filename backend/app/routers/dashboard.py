@@ -14,6 +14,7 @@ from app.ga4_service import (
     get_ai_traffic_metrics,
     get_revenue_trend,
     get_top_landing_pages,
+    refresh_oauth_token,
 )
 from app.mock_data import generate_mock_dashboard_data
 from datetime import datetime, timedelta
@@ -125,6 +126,94 @@ async def get_dashboard_metrics(
                     TopLandingPage(**lp) for lp in mock_data["top_landing_pages"]
                 ]
             )
+        
+        # If we are using OAuth tokens, proactively refresh the GA4 access token
+        # to avoid "invalid authentication credentials" errors when tokens expire.
+        if has_oauth and current_client.ga4_refresh_token:
+            try:
+                import os
+                from datetime import datetime as dt
+
+                client_id = os.getenv("GOOGLE_CLIENT_ID", "")
+                client_secret = os.getenv("GOOGLE_CLIENT_SECRET", "")
+
+                # Only attempt refresh if we have client credentials configured
+                if client_id and client_secret:
+                    token_response = refresh_oauth_token(
+                        refresh_token=current_client.ga4_refresh_token,
+                        client_id=client_id,
+                        client_secret=client_secret,
+                    )
+
+                    new_access_token = token_response.get("access_token")
+                    new_expires_in = token_response.get("expires_in")
+                    new_refresh_token = token_response.get("refresh_token")
+
+                    if new_access_token:
+                        current_client.ga4_access_token = new_access_token
+                    if new_refresh_token:
+                        current_client.ga4_refresh_token = new_refresh_token
+                    if new_expires_in:
+                        current_client.ga4_token_expires_at = dt.utcnow() + timedelta(
+                            seconds=int(new_expires_in)
+                        )
+
+                    current_client.ga4_connected_at = current_client.ga4_connected_at or dt.utcnow()
+                    db.commit()
+                    db.refresh(current_client)
+
+                    # #region agent log
+                    try:
+                        log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+                        with open(log_path, "a") as f:
+                            f.write(
+                                json_module.dumps(
+                                    {
+                                        "location": "dashboard.py:get_dashboard_metrics:ga4_token_refreshed",
+                                        "message": "Refreshed GA4 OAuth access token",
+                                        "data": {
+                                            "client_email": getattr(current_client, "email", None),
+                                            "ga4_property_id": current_client.ga4_property_id,
+                                            "has_new_refresh_token": bool(new_refresh_token),
+                                            "has_expires_in": bool(new_expires_in),
+                                        },
+                                        "timestamp": int(dt.utcnow().timestamp() * 1000),
+                                        "sessionId": "debug-session",
+                                        "runId": "ga-refresh1",
+                                        "hypothesisId": "G3",
+                                    }
+                                )
+                                + "\n"
+                            )
+                    except Exception:
+                        pass
+                    # #endregion
+            except Exception as refresh_error:
+                # #region agent log
+                try:
+                    log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+                    with open(log_path, "a") as f:
+                        f.write(
+                            json_module.dumps(
+                                {
+                                    "location": "dashboard.py:get_dashboard_metrics:ga4_token_refresh_error",
+                                    "message": "Failed to refresh GA4 OAuth access token",
+                                    "data": {
+                                        "client_email": getattr(current_client, "email", None),
+                                        "error_type": type(refresh_error).__name__,
+                                        "error_message": str(refresh_error),
+                                    },
+                                    "timestamp": int(dt.utcnow().timestamp() * 1000),
+                                    "sessionId": "debug-session",
+                                    "runId": "ga-refresh1",
+                                    "hypothesisId": "G3",
+                                }
+                            )
+                            + "\n"
+                        )
+                except Exception:
+                    pass
+                # #endregion
         
         # Calculate date range
         end_date = datetime.now()

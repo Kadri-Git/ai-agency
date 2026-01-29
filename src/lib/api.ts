@@ -238,8 +238,55 @@ class ApiClient {
 
       // Make the fetch request
       let response: Response
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'api.ts:request:beforeFetch',
+            message: 'About to make fetch request',
+            data: {
+              fullUrl,
+              endpoint,
+              hasToken: !!token,
+              method: options.method || 'GET',
+              credentials: fetchOptions.credentials,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'H2',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
       try {
         response = await fetch(fullUrl, fetchOptions)
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'api.ts:request:afterFetch',
+              message: 'Fetch request completed',
+              data: {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok,
+                fullUrl,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'run1',
+              hypothesisId: 'H2',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
       } catch (fetchError: unknown) {
         // Network error - fetch failed
         const errorMessage =
@@ -305,6 +352,29 @@ class ApiClient {
       }
 
       if (!response.ok) {
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'api.ts:request:responseNotOk',
+              message: 'Response not OK',
+              data: {
+                status: response.status,
+                statusText: response.statusText,
+                fullUrl,
+                endpoint,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'run1',
+              hypothesisId: 'H3',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
         // 405 specifically means Method Not Allowed - likely wrong endpoint
         if (response.status === 405) {
           const apiBaseUrl = getApiBaseUrlLazy()
@@ -319,6 +389,28 @@ class ApiClient {
         let error: { detail?: string | unknown[]; message?: string }
         try {
           const errorText = await response.text()
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'api.ts:request:errorResponse',
+                message: 'Error response body',
+                data: {
+                  status: response.status,
+                  errorText: errorText.substring(0, 500),
+                  fullUrl,
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run1',
+                hypothesisId: 'H3',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
           try {
             error = JSON.parse(errorText)
           } catch {
@@ -369,7 +461,98 @@ class ApiClient {
   }
 
   async getDashboardMetrics(days: number = 30): Promise<DashboardData> {
-    return this.request<DashboardData>(`/api/dashboard/metrics?days=${days}`)
+    // #region agent log
+    const apiBaseUrl = getApiBaseUrlLazy()
+    const token = this.getToken()
+    const endpoint = `/api/dashboard/metrics?days=${days}`
+    const fullUrl = `${apiBaseUrl}${endpoint}`
+    fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'api.ts:getDashboardMetrics:entry',
+        message: 'Starting dashboard metrics request',
+        data: {
+          days,
+          apiBaseUrl,
+          endpoint,
+          fullUrl,
+          hasToken: !!token,
+          tokenLength: token?.length || 0,
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'H1',
+      }),
+    }).catch(() => {})
+    // #endregion
+    try {
+      const result = await this.request<DashboardData>(endpoint)
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'api.ts:getDashboardMetrics:success',
+            message: 'Dashboard metrics loaded successfully',
+            data: {
+              hasMetrics: !!result?.metrics,
+              hasRevenueTrend: !!result?.revenue_trend,
+              hasTopPages: !!result?.top_landing_pages,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'H1',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+      return result
+    } catch (error) {
+      // #region agent log
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      const errorName = error instanceof Error ? error.name : typeof error
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'api.ts:getDashboardMetrics:error',
+            message: 'Dashboard metrics request failed',
+            data: {
+              errorMessage: errorMsg,
+              errorName,
+              apiBaseUrl,
+              endpoint,
+              fullUrl,
+              hasToken: !!token,
+              isNetworkError:
+                errorMsg.includes('fetch') || errorMsg.includes('network'),
+              isCorsError:
+                errorMsg.includes('CORS') || errorMsg.includes('cors'),
+              isAuthError:
+                errorMsg.includes('401') ||
+                errorMsg.includes('credentials') ||
+                errorMsg.includes('token'),
+              isBackendDown:
+                errorMsg.includes('connect') ||
+                errorMsg.includes('ECONNREFUSED'),
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'H1',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+      throw error
+    }
   }
 
   async updateGA4Credentials(
