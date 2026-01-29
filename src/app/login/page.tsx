@@ -147,13 +147,53 @@ export default function LoginPage() {
       }
       setAuth(response.access_token, formData.email, isDemo, isAdmin)
 
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'login/page.tsx:afterSetAuth',
+            message: 'Auth state after setAuth',
+            data: {
+              storeState: {
+                isAuthenticated: useAuthStore.getState().isAuthenticated,
+                hasToken: !!useAuthStore.getState().token,
+                email: useAuthStore.getState().email,
+              },
+              hasLocalStorageToken:
+                typeof window !== 'undefined'
+                  ? !!localStorage.getItem('auth_token')
+                  : null,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'LOGIN_REDIRECT',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+
       // Redirect admin to admin dashboard
       if (isAdmin) {
-        router.push('/admin')
+        toast.success('Logged in successfully!')
+        if (typeof window !== 'undefined') {
+          window.location.href = '/admin'
+        } else {
+          router.replace('/admin')
+        }
         return
       }
       toast.success('Logged in successfully!')
-      router.push('/dashboard')
+      // Use window.location for a hard redirect to ensure auth state is recognized
+      // This avoids race conditions with Zustand store updates
+      if (typeof window !== 'undefined') {
+        window.location.href = '/dashboard'
+      } else {
+        router.replace('/dashboard')
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Login failed')
     } finally {
@@ -303,16 +343,6 @@ export default function LoginPage() {
         ).catch(() => {})
         // #endregion
         // All accounts start without GA4, so they'll see sample data
-        const tokenParts = response.access_token.split('.')
-        let isAdmin = false
-        if (tokenParts.length === 3) {
-          try {
-            const payload = JSON.parse(atob(tokenParts[1]))
-            isAdmin = payload.is_admin === true
-          } catch {
-            // Ignore
-          }
-        }
         // For demo mode we always want a non-admin demo experience
         setAuth(response.access_token, demoEmail, true, false)
 
@@ -345,7 +375,11 @@ export default function LoginPage() {
         // #endregion
 
         toast.success('Demo account created and logged in!')
-        router.push('/dashboard')
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard'
+        } else {
+          router.replace('/dashboard')
+        }
       } catch (registerError) {
         // If registration fails, it might be because account exists with wrong password
         // Try to show a more helpful error
