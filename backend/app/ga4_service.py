@@ -25,13 +25,14 @@ def build_ai_source_filter() -> FilterExpression:
     """
     Build a GA4 FilterExpression that matches AI traffic from multiple sources.
     Uses OR logic over CONTAINS string filters for each pattern in AI_SOURCE_PATTERNS.
+    GA4 uses "sessionSource" as the dimension and filter field name.
     """
     return FilterExpression(
         or_group=FilterExpressionList(
             expressions=[
                 FilterExpression(
                     filter=Filter(
-                        field_name="source",
+                        field_name="sessionSource",
                         string_filter=Filter.StringFilter(
                             match_type=Filter.StringFilter.MatchType.CONTAINS,
                             value=pattern,
