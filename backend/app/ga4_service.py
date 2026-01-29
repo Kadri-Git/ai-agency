@@ -237,10 +237,12 @@ def get_ai_traffic_metrics(
         raise
     
     # Request for AI traffic
+    # GA4 uses "source" dimension (not "sessionSource")
+    # ChatGPT traffic appears as "chat.openai.com" in the source dimension
     ai_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
-        dimensions=[Dimension(name="sessionSource")],
+        dimensions=[Dimension(name="source")],
         metrics=[
             Metric(name="sessions"),
             Metric(name="totalRevenue"),
@@ -249,11 +251,11 @@ def get_ai_traffic_metrics(
         dimension_filter=ai_source_filter,
     )
 
-    # Additional diagnostic request: unfiltered sessionSource breakdown to see actual sources
+    # Additional diagnostic request: unfiltered source breakdown to see actual sources
     debug_sources_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
-        dimensions=[Dimension(name="sessionSource")],
+        dimensions=[Dimension(name="source")],
         metrics=[Metric(name="sessions")],
         limit=50,
     )
@@ -297,7 +299,7 @@ def get_ai_traffic_metrics(
                     debug_rows.append(
                         {
                             "row_index": i,
-                            "sessionSource": row.dimension_values[0].value
+                            "source": row.dimension_values[0].value
                             if row.dimension_values
                             else "",
                             "sessions": row.metric_values[0].value
@@ -310,7 +312,7 @@ def get_ai_traffic_metrics(
                     json_module.dumps(
                         {
                             "location": "ga4_service.py:debug_sources",
-                            "message": "Unfiltered sessionSource breakdown",
+                            "message": "Unfiltered source breakdown",
                             "data": {
                                 "row_count": len(
                                     debug_sources_response.rows
