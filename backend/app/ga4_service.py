@@ -641,17 +641,27 @@ def get_ai_traffic_metrics(
             elif metric_name == "conversions":
                 total_conversions += int(value)
     
-    # Build debug info with sources breakdown
+    # Build debug info with sources breakdown - include ALL sources, not just top 5
     debug_sources_sample = []
     debug_sources_row_count = 0
+    all_sources_list = []  # Track ALL sources for debugging
     try:
         if 'debug_sources_response' in locals() and debug_sources_response:
             debug_sources_row_count = len(debug_sources_response.rows) if debug_sources_response.rows else 0
             if debug_sources_response.rows:
-                for row in debug_sources_response.rows[:5]:
+                # Log first 10 for sample (frontend display)
+                for row in debug_sources_response.rows[:10]:
                     debug_sources_sample.append({
                         "source": row.dimension_values[0].value if row.dimension_values else "",
                         "sessions": row.metric_values[0].value if row.metric_values else "0"
+                    })
+                # Log ALL sources for backend debugging
+                for row in debug_sources_response.rows:
+                    source_val = row.dimension_values[0].value if row.dimension_values else ""
+                    sessions_val = row.metric_values[0].value if row.metric_values else "0"
+                    all_sources_list.append({
+                        "source": source_val,
+                        "sessions": sessions_val
                     })
     except Exception:
         pass
