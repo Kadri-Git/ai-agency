@@ -31,7 +31,7 @@ def build_ai_source_filter() -> FilterExpression:
             expressions=[
                 FilterExpression(
                     filter=Filter(
-                        field_name="sessionSource",
+                        field_name="source",
                         string_filter=Filter.StringFilter(
                             match_type=Filter.StringFilter.MatchType.CONTAINS,
                             value=pattern,
