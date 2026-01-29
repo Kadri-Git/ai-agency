@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, Union
+from typing import Optional, Union, Dict, Any
 from datetime import datetime
 
 # Auth schemas
@@ -58,5 +58,9 @@ class DashboardData(BaseModel):
     revenue_trend: RevenueTrend
     top_landing_pages: list[TopLandingPage]
     users_per_page_trend: UsersPerPageTrend
-    debug_info: dict = None  # Optional debug info for troubleshooting
+    debug_info: Optional[Dict[str, Any]] = None  # Optional debug info for troubleshooting
+    
+    class Config:
+        # Include None values in JSON output so debug_info appears even if empty
+        exclude_none = False
 
