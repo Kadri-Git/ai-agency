@@ -321,14 +321,42 @@ async def get_dashboard_metrics(
         # #endregion
         
         # Get AI traffic metrics (use OAuth if available, otherwise service account)
-        metrics_data = get_ai_traffic_metrics(
-            property_id=current_client.ga4_property_id,
-            service_account_json=current_client.ga4_service_account_json if has_service_account else None,
-            access_token=current_client.ga4_access_token if has_oauth else None,
-            refresh_token=current_client.ga4_refresh_token if has_oauth else None,
-            start_date=start_date_str,
-            end_date=end_date_str
-        )
+        try:
+            metrics_data = get_ai_traffic_metrics(
+                property_id=current_client.ga4_property_id,
+                service_account_json=current_client.ga4_service_account_json if has_service_account else None,
+                access_token=current_client.ga4_access_token if has_oauth else None,
+                refresh_token=current_client.ga4_refresh_token if has_oauth else None,
+                start_date=start_date_str,
+                end_date=end_date_str
+            )
+        except Exception as ga4_error:
+            # #region agent log
+            try:
+                log_path = "/Users/kadri/Desktop/Vibe-coding/ai-visibility report/.cursor/debug.log"
+                with open(log_path, "a") as f:
+                    f.write(
+                        json_module.dumps(
+                            {
+                                "location": "dashboard.py:ga4_error",
+                                "message": "GA4 get_ai_traffic_metrics raised exception",
+                                "data": {
+                                    "error_type": type(ga4_error).__name__,
+                                    "error_message": str(ga4_error),
+                                    "error_repr": repr(ga4_error),
+                                },
+                                "timestamp": int(datetime.utcnow().timestamp() * 1000),
+                                "sessionId": "debug-session",
+                                "runId": "ga-verify",
+                                "hypothesisId": "GA_ERROR",
+                            }
+                        )
+                        + "\n"
+                    )
+            except Exception:
+                pass
+            # #endregion
+            raise
         
         # #region agent log
         try:

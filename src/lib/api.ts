@@ -134,6 +134,12 @@ export interface DashboardData {
   users_per_page_trend: {
     data: UsersPerPagePoint[]
   }
+  debug_info?: {
+    ai_row_count?: number
+    total_row_count?: number
+    debug_sources_row_count?: number
+    debug_sources_sample?: Array<{ source: string; sessions: string }>
+  }
 }
 
 class ApiClient {
@@ -522,6 +528,10 @@ class ApiClient {
               firstRevenueValue: result?.revenue_trend?.data?.[0]?.revenue,
               firstUsersValue: result?.users_per_page_trend?.data?.[0]?.users,
               fullResultKeys: result ? Object.keys(result) : [],
+              debugInfo: result?.debug_info,
+              debugSourcesSample: result?.debug_info?.debug_sources_sample,
+              aiRowCount: result?.debug_info?.ai_row_count,
+              debugSourcesRowCount: result?.debug_info?.debug_sources_row_count,
             },
             timestamp: Date.now(),
             sessionId: 'debug-session',

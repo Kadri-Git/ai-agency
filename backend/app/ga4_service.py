@@ -535,6 +535,18 @@ def get_ai_traffic_metrics(
         "total_sessions": total_sessions,
         "total_revenue": total_revenue,
         "total_conversions": total_conversions,
+        "_debug": {
+            "ai_row_count": len(ai_response.rows) if ai_response.rows else 0,
+            "total_row_count": len(total_response.rows) if total_response.rows else 0,
+            "debug_sources_row_count": len(debug_sources_response.rows) if debug_sources_response.rows else 0,
+            "debug_sources_sample": [
+                {
+                    "source": row.dimension_values[0].value if row.dimension_values else "",
+                    "sessions": row.metric_values[0].value if row.metric_values else "0"
+                }
+                for row in (debug_sources_response.rows[:5] if debug_sources_response.rows else [])
+            ] if 'debug_sources_response' in locals() else [],
+        }
     }
     
     # #region agent log

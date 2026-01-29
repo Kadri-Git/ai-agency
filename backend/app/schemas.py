@@ -58,4 +58,5 @@ class DashboardData(BaseModel):
     revenue_trend: RevenueTrend
     top_landing_pages: list[TopLandingPage]
     users_per_page_trend: UsersPerPageTrend
+    debug_info: dict = None  # Optional debug info for troubleshooting
 
