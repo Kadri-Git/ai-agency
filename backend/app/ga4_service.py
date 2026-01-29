@@ -319,6 +319,7 @@ def get_ai_traffic_metrics(
         except Exception as source_dim_error:
             # #region agent log
             try:
+                import json as json_module
                 with open(log_path, 'a') as f:
                     log_entry = {
                         "location": "ga4_service.py:debug_source_dimension",
