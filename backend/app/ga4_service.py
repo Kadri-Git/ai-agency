@@ -6,6 +6,7 @@ from google.analytics.data_v1beta.types import (
     Metric,
     FilterExpression,
     Filter,
+    FilterExpressionList,
 )
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -18,6 +19,30 @@ import os
 # We'll need to make separate requests for each source or use OR logic
 AI_SOURCE_PATTERNS = ["chat.openai", "perplexity", "gemini", "claude"]
 AI_SOURCE_REGEX = r"chat\.openai|perplexity|gemini|claude"  # Keep for reference
+
+
+def build_ai_source_filter() -> FilterExpression:
+    """
+    Build a GA4 FilterExpression that matches AI traffic from multiple sources.
+    Uses OR logic over CONTAINS string filters for each pattern in AI_SOURCE_PATTERNS.
+    """
+    return FilterExpression(
+        or_group=FilterExpressionList(
+            expressions=[
+                FilterExpression(
+                    filter=Filter(
+                        field_name="sessionSource",
+                        string_filter=Filter.StringFilter(
+                            match_type=Filter.StringFilter.MatchType.CONTAINS,
+                            value=pattern,
+                            case_sensitive=False,
+                        ),
+                    )
+                )
+                for pattern in AI_SOURCE_PATTERNS
+            ]
+        )
+    )
 
 def get_ga4_client(service_account_json: str = None, access_token: str = None, refresh_token: str = None):
     """
@@ -168,21 +193,9 @@ def get_ai_traffic_metrics(
             pass
     # #endregion
     
-    # AI traffic filter - try using CONTAINS instead of regex for better compatibility
-    # We'll filter for each AI source individually and combine results
-    # For now, let's use a simpler approach with CONTAINS match type
+    # AI traffic filter - use OR over multiple AI source patterns
     try:
-        # Try using CONTAINS match type which is more widely supported
-        ai_source_filter = FilterExpression(
-            filter=Filter(
-                field_name="sessionSource",
-                string_filter=Filter.StringFilter(
-                    match_type=Filter.StringFilter.MatchType.CONTAINS,
-                    value="chat.openai",  # Using CONTAINS - will match chat.openai.com, etc.
-                    case_sensitive=False
-                )
-            )
-        )
+        ai_source_filter = build_ai_source_filter()
         # #region agent log
         try:
             with open(log_path, 'a') as f:
@@ -497,18 +510,8 @@ def get_revenue_trend(
         refresh_token=refresh_token
     )
     
-    # AI traffic filter - using CONTAINS match type (regex not supported)
-    # For now, using a single pattern - we can expand to OR logic later if needed
-    ai_source_filter = FilterExpression(
-        filter=Filter(
-            field_name="sessionSource",
-            string_filter=Filter.StringFilter(
-                match_type=Filter.StringFilter.MatchType.CONTAINS,
-                value="chat.openai",  # Will match chat.openai.com, etc.
-                case_sensitive=False
-            )
-        )
-    )
+    # AI traffic filter - OR over multiple AI source patterns
+    ai_source_filter = build_ai_source_filter()
     
     request = RunReportRequest(
         property=f"properties/{property_id}",
@@ -571,18 +574,8 @@ def get_top_landing_pages(
         refresh_token=refresh_token
     )
     
-    # AI traffic filter - using CONTAINS match type (regex not supported)
-    # For now, using a single pattern - we can expand to OR logic later if needed
-    ai_source_filter = FilterExpression(
-        filter=Filter(
-            field_name="sessionSource",
-            string_filter=Filter.StringFilter(
-                match_type=Filter.StringFilter.MatchType.CONTAINS,
-                value="chat.openai",  # Will match chat.openai.com, etc.
-                case_sensitive=False
-            )
-        )
-    )
+    # AI traffic filter - OR over multiple AI source patterns
+    ai_source_filter = build_ai_source_filter()
     
     request = RunReportRequest(
         property=f"properties/{property_id}",
