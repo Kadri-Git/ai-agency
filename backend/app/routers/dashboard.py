@@ -464,11 +464,15 @@ async def get_dashboard_metrics(
             data=[UsersPerPagePoint(date=d["date"], users=d["users"]) for d in users_trend_data]
         )
         
+        # Extract debug info from metrics_data if present
+        debug_info = metrics_data.get("_debug", {}) if isinstance(metrics_data, dict) else {}
+        
         return DashboardData(
             metrics=metrics,
             revenue_trend=revenue_trend,
             top_landing_pages=top_landing_pages,
-            users_per_page_trend=users_per_page_trend
+            users_per_page_trend=users_per_page_trend,
+            debug_info=debug_info
         )
         
     except Exception as e:
