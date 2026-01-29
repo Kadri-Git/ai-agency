@@ -128,10 +128,36 @@ export default function DashboardPage() {
   const [isCheckingGA4, setIsCheckingGA4] = useState(true)
 
   useEffect(() => {
-    // Check if we have a token in localStorage (for initial load)
+    // Check localStorage directly first (source of truth after hard redirect)
+    // After window.location.assign(), Zustand store rehydrates from localStorage
+    // but we check localStorage directly to avoid race conditions
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token')
-      if (!token && !isAuthenticated) {
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'dashboard/page.tsx:authCheck',
+            message: 'Dashboard auth check',
+            data: {
+              hasTokenInLocalStorage: !!token,
+              isAuthenticatedFromStore: isAuthenticated,
+              tokenLength: token?.length,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'LOGIN_REDIRECT',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+
+      // If no token in localStorage, redirect immediately
+      if (!token) {
         // #region agent log
         fetch(
           'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
@@ -139,8 +165,9 @@ export default function DashboardPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              location: 'dashboard/page.tsx:49',
-              message: 'No auth token found, redirecting to login',
+              location: 'dashboard/page.tsx:redirectToLogin',
+              message:
+                'No auth token found in localStorage, redirecting to login',
               data: { isAuthenticated },
               timestamp: Date.now(),
               sessionId: 'debug-session',
@@ -153,10 +180,20 @@ export default function DashboardPage() {
         router.push('/login')
         return
       }
+
+      // Token exists in localStorage - proceed even if store hasn't rehydrated yet
+      // The store will sync on next render, and API calls use token from localStorage
     }
 
-    if (!isAuthenticated) {
-      router.push('/login')
+    // Only check store state if we're sure localStorage has no token
+    // This prevents redirect loops after hard page reloads
+    if (!isAuthenticated && typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token')
+      if (!token) {
+        router.push('/login')
+        return
+      }
+      // Token exists, store will sync - don't redirect yet
       return
     }
 
@@ -541,7 +578,16 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-bold">
               AI Shopping Visibility Dashboard
             </h1>
-            {!hasGA4Credentials && (
+            {hasGA4Credentials ? (
+              <p className="text-sm text-muted-foreground mt-1">
+                GA4 is connected for property{' '}
+                <span className="font-mono text-xs">
+                  {users_per_page_trend?.data?.length
+                    ? 'live data from GA4'
+                    : 'waiting for GA4 data'}
+                </span>
+              </p>
+            ) : (
               <p className="text-sm text-muted-foreground mt-1">
                 Showing sample data - Connect GA4 to see real analytics
               </p>
