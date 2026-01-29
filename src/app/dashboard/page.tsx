@@ -457,6 +457,32 @@ export default function DashboardPage() {
   // Fallback for users_per_page_trend if not present (for backwards compatibility)
   const usersTrendData = users_per_page_trend?.data || []
 
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      location: 'dashboard/page.tsx:dataCheck',
+      message: 'Dashboard data structure check',
+      data: {
+        hasMetrics: !!metrics,
+        hasRevenueTrend: !!revenue_trend,
+        hasTopPages: !!top_landing_pages,
+        hasUsersTrend: !!users_per_page_trend,
+        revenueDataPoints: revenue_trend?.data?.length,
+        usersDataPoints: usersTrendData.length,
+        aiSessions: metrics?.ai_sessions,
+        firstRevenue: revenue_trend?.data?.[0]?.revenue,
+        firstUsers: usersTrendData[0]?.users,
+      },
+      timestamp: Date.now(),
+      sessionId: 'debug-session',
+      runId: 'run1',
+      hypothesisId: 'DATA_CHECK',
+    }),
+  }).catch(() => {})
+  // #endregion
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
