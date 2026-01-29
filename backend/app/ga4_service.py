@@ -353,7 +353,7 @@ def get_ai_traffic_metrics(
             log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.cursor', 'debug.log')
             
             debug_rows = []
-            all_sources = []  # Track ALL sources (not just matching ones) for debugging
+            # all_sources is already defined at function level
             ai_matching_sources = []  # Track sources that match AI patterns
             if debug_sources_response.rows:
                 for i, row in enumerate(debug_sources_response.rows):
