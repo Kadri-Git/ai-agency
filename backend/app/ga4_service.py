@@ -320,6 +320,7 @@ def get_ai_traffic_metrics(
             # #region agent log
             try:
                 import json as json_module
+                log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.cursor', 'debug.log')
                 with open(log_path, 'a') as f:
                     log_entry = {
                         "location": "ga4_service.py:debug_source_dimension",
