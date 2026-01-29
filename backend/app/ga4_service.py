@@ -19,12 +19,13 @@ import os
 # We'll need to make separate requests for each source or use OR logic
 AI_SOURCE_PATTERNS = [
     "chat.openai",  # Matches "chat.openai.com", "chat.openai", etc.
+    "chatgpt",  # Matches "chatgpt.com" - ChatGPT appears as this in GA4!
     "perplexity",
     "gemini",
     "claude",
     "openai",  # Also match just "openai" in case it appears that way
 ]
-AI_SOURCE_REGEX = r"chat\.openai|perplexity|gemini|claude|openai"  # Keep for reference
+AI_SOURCE_REGEX = r"chat\.openai|chatgpt|perplexity|gemini|claude|openai"  # Keep for reference
 
 
 def build_ai_source_filter() -> FilterExpression:
