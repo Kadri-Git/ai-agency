@@ -18,14 +18,23 @@ import os
 # AI traffic source patterns - using CONTAINS match type instead of regex
 # We'll need to make separate requests for each source or use OR logic
 AI_SOURCE_PATTERNS = [
+    "chat.openai.com",  # ChatGPT web - primary domain for ChatGPT traffic
     "chat.openai",  # Matches "chat.openai.com", "chat.openai", etc.
+    "chatgpt.com",  # ChatGPT domain
     "chatgpt",  # Matches "chatgpt.com" - ChatGPT appears as this in GA4!
     "openai",  # Also match just "openai" in case it appears that way
-    "perplexity",
-    "gemini",
-    "claude",
+    "claude.ai",  # Claude's domain - primary domain for Claude traffic
+    "claude",  # Claude name
     "anthropic",  # Claude's company name - might appear as source
-    "claude.ai",  # Claude's domain
+    "perplexity.ai",  # Perplexity AI
+    "perplexity",  # Perplexity name
+    "gemini.google.com",  # Google Gemini
+    "gemini",  # Gemini name
+    "copilot.microsoft.com",  # Microsoft Copilot
+    "copilot",  # Copilot name
+    "meta.ai",  # Meta AI
+    "mistral.ai",  # Mistral AI
+    "mistral",  # Mistral name
 ]
 AI_SOURCE_REGEX = r"chat\.openai|chatgpt|perplexity|gemini|claude|openai"  # Keep for reference
 
