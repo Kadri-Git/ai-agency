@@ -457,6 +457,9 @@ export default function DashboardPage() {
   // Fallback for users_per_page_trend if not present (for backwards compatibility)
   const usersTrendData = users_per_page_trend?.data || []
 
+  // Ensure revenue trend has data (fallback to empty array if missing)
+  const revenueTrendData = revenue_trend?.data || []
+
   // #region agent log
   fetch('http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f', {
     method: 'POST',
@@ -469,11 +472,13 @@ export default function DashboardPage() {
         hasRevenueTrend: !!revenue_trend,
         hasTopPages: !!top_landing_pages,
         hasUsersTrend: !!users_per_page_trend,
-        revenueDataPoints: revenue_trend?.data?.length,
+        revenueDataPoints: revenueTrendData.length,
         usersDataPoints: usersTrendData.length,
         aiSessions: metrics?.ai_sessions,
-        firstRevenue: revenue_trend?.data?.[0]?.revenue,
+        firstRevenue: revenueTrendData[0]?.revenue,
         firstUsers: usersTrendData[0]?.users,
+        revenueTrendIsArray: Array.isArray(revenueTrendData),
+        usersTrendIsArray: Array.isArray(usersTrendData),
       },
       timestamp: Date.now(),
       sessionId: 'debug-session',
