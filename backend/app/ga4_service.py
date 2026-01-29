@@ -237,12 +237,12 @@ def get_ai_traffic_metrics(
         raise
     
     # Request for AI traffic
-    # GA4 uses "source" dimension (not "sessionSource")
-    # ChatGPT traffic appears as "chat.openai.com" in the source dimension
+    # Try "sessionSource" dimension - GA4 might use this instead of "source"
+    # ChatGPT traffic appears as "chat.openai.com" in the sessionSource dimension
     ai_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
-        dimensions=[Dimension(name="source")],
+        dimensions=[Dimension(name="sessionSource")],
         metrics=[
             Metric(name="sessions"),
             Metric(name="totalRevenue"),
@@ -252,10 +252,11 @@ def get_ai_traffic_metrics(
     )
 
     # Additional diagnostic request: unfiltered source breakdown to see actual sources
+    # Try "sessionSource" dimension (GA4 might use this instead of "source")
     debug_sources_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
-        dimensions=[Dimension(name="source")],
+        dimensions=[Dimension(name="sessionSource")],
         metrics=[Metric(name="sessions")],
         limit=50,
     )
