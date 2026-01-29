@@ -248,6 +248,15 @@ def get_ai_traffic_metrics(
         ],
         dimension_filter=ai_source_filter,
     )
+
+    # Additional diagnostic request: unfiltered sessionSource breakdown to see actual sources
+    debug_sources_request = RunReportRequest(
+        property=f"properties/{property_id}",
+        date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
+        dimensions=[Dimension(name="sessionSource")],
+        metrics=[Metric(name="sessions")],
+        limit=50,
+    )
     
     # Request for total site traffic
     total_request = RunReportRequest(
@@ -279,21 +288,76 @@ def get_ai_traffic_metrics(
     # #endregion
     
     try:
+        # First: diagnostic unfiltered sources to see actual sessionSource values
+        debug_sources_response = client.run_report(debug_sources_request)
+        try:
+            debug_rows = []
+            if debug_sources_response.rows:
+                for i, row in enumerate(debug_sources_response.rows[:10]):
+                    debug_rows.append(
+                        {
+                            "row_index": i,
+                            "sessionSource": row.dimension_values[0].value
+                            if row.dimension_values
+                            else "",
+                            "sessions": row.metric_values[0].value
+                            if row.metric_values
+                            else "0",
+                        }
+                    )
+            with open(log_path, "a") as f:
+                f.write(
+                    json_module.dumps(
+                        {
+                            "location": "ga4_service.py:debug_sources",
+                            "message": "Unfiltered sessionSource breakdown",
+                            "data": {
+                                "row_count": len(
+                                    debug_sources_response.rows
+                                    if debug_sources_response.rows
+                                    else []
+                                ),
+                                "sample_rows": debug_rows,
+                            },
+                            "timestamp": int(
+                                datetime.now().timestamp() * 1000
+                            ),
+                            "sessionId": "debug-session",
+                            "runId": "ga-debug-sources",
+                            "hypothesisId": "GA_SOURCES",
+                        }
+                    )
+                    + "\n"
+                )
+        except Exception:
+            pass
+
+        # Then: actual AI-filtered request
         ai_response = client.run_report(ai_request)
         # #region agent log
         try:
             row_count = len(ai_response.rows) if ai_response.rows else 0
-            metric_headers = [h.name for h in ai_response.metric_headers] if ai_response.metric_headers else []
+            metric_headers = [
+                h.name for h in ai_response.metric_headers
+            ] if ai_response.metric_headers else []
             sample_rows = []
             if ai_response.rows:
                 for i, row in enumerate(ai_response.rows[:3]):  # Log first 3 rows
                     row_data = {
                         "row_index": i,
-                        "dimension_values": [dv.value for dv in row.dimension_values] if row.dimension_values else [],
-                        "metric_values": [mv.value for mv in row.metric_values] if row.metric_values else []
+                        "dimension_values": [
+                            dv.value for dv in row.dimension_values
+                        ]
+                        if row.dimension_values
+                        else [],
+                        "metric_values": [
+                            mv.value for mv in row.metric_values
+                        ]
+                        if row.metric_values
+                        else [],
                     }
                     sample_rows.append(row_data)
-            with open(log_path, 'a') as f:
+            with open(log_path, "a") as f:
                 log_entry = {
                     "location": "ga4_service.py:ai_response",
                     "message": "AI traffic run_report succeeded",
@@ -301,18 +365,27 @@ def get_ai_traffic_metrics(
                         "row_count": row_count,
                         "metric_headers": metric_headers,
                         "sample_rows": sample_rows,
-                        "has_rows": row_count > 0
+                        "has_rows": row_count > 0,
                     },
                     "timestamp": int(datetime.now().timestamp() * 1000),
                     "sessionId": "debug-session",
                     "runId": "run1",
-                    "hypothesisId": "GA_DATA"
+                    "hypothesisId": "GA_DATA",
                 }
-                f.write(json_module.dumps(log_entry) + '\n')
+                f.write(json_module.dumps(log_entry) + "\n")
         except Exception as log_err:
             try:
-                with open(log_path, 'a') as f:
-                    f.write(json_module.dumps({"location": "ga4_service.py:ai_response:log_err", "message": "Failed to log AI response", "data": {"error": str(log_err)}}) + '\n')
+                with open(log_path, "a") as f:
+                    f.write(
+                        json_module.dumps(
+                            {
+                                "location": "ga4_service.py:ai_response:log_err",
+                                "message": "Failed to log AI response",
+                                "data": {"error": str(log_err)},
+                            }
+                        )
+                        + "\n"
+                    )
             except Exception:
                 pass
         # #endregion
