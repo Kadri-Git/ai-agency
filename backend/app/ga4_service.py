@@ -304,6 +304,17 @@ def get_ai_traffic_metrics(
         limit=100,  # Increased to see more sources
     )
     
+    # Separate diagnostic request: ONLY pageReferrer to see all referrer URLs
+    debug_page_referrer_request = RunReportRequest(
+        property=f"properties/{property_id}",
+        date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
+        dimensions=[
+            Dimension(name="pageReferrer"),  # Only pageReferrer to see all referrer URLs
+        ],
+        metrics=[Metric(name="sessions")],
+        limit=100,
+    )
+    
     # Also check "source" dimension (different from sessionSource)
     debug_source_dimension_request = RunReportRequest(
         property=f"properties/{property_id}",
@@ -349,6 +360,7 @@ def get_ai_traffic_metrics(
     
     debug_sources_response = None
     debug_source_dimension_response = None
+    debug_page_referrer_response = None
     all_sources = []  # Function-level variable to track ALL sources
     try:
         # First: diagnostic unfiltered sources to see actual source values
@@ -357,6 +369,14 @@ def get_ai_traffic_metrics(
         # Also check "source" dimension (different from sessionSource)
         try:
             debug_source_dimension_response = client.run_report(debug_source_dimension_request)
+        except Exception:
+            pass
+        
+        # Also check pageReferrer-only to see all referrer URLs
+        try:
+            debug_page_referrer_response = client.run_report(debug_page_referrer_request)
+        except Exception:
+            pass
         except Exception as source_dim_error:
             # #region agent log
             try:
