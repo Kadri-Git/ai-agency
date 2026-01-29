@@ -339,6 +339,10 @@ def get_ai_traffic_metrics(
             # #endregion
         
         try:
+            # Ensure json_module and log_path are available (they're defined earlier in the function)
+            import json as json_module
+            log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.cursor', 'debug.log')
+            
             debug_rows = []
             all_sources = []  # Track all sources for AI pattern matching
             if debug_sources_response.rows:
