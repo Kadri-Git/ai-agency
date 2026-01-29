@@ -139,6 +139,7 @@ export interface DashboardData {
     total_row_count?: number
     debug_sources_row_count?: number
     debug_sources_sample?: Array<{ source: string; sessions: string }>
+    all_sources?: Array<{ source: string; sessions: string }>
   }
 }
 
