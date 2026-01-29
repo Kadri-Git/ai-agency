@@ -526,11 +526,15 @@ def get_ai_traffic_metrics(
             metric_headers = [
                 h.name for h in ai_response.metric_headers
             ] if ai_response.metric_headers else []
+            dimension_headers = [
+                h.name for h in ai_response.dimension_headers
+            ] if ai_response.dimension_headers else []
             sample_rows = []
             if ai_response.rows:
-                for i, row in enumerate(ai_response.rows[:3]):  # Log first 3 rows
+                for i, row in enumerate(ai_response.rows[:10]):  # Log first 10 rows to see all AI matches
                     row_data = {
                         "row_index": i,
+                        "dimension_names": dimension_headers,
                         "dimension_values": [
                             dv.value for dv in row.dimension_values
                         ]
@@ -549,6 +553,7 @@ def get_ai_traffic_metrics(
                     "message": "AI traffic run_report succeeded",
                     "data": {
                         "row_count": row_count,
+                        "dimension_headers": dimension_headers,
                         "metric_headers": metric_headers,
                         "sample_rows": sample_rows,
                         "has_rows": row_count > 0,
@@ -641,13 +646,44 @@ def get_ai_traffic_metrics(
     ai_revenue = 0.0
     ai_conversions = 0
     
-    # Get metric names from response headers (metric_values don't have .name attribute)
-    # Metric headers contain the names in the same order as metric_values
+    # Get dimension and metric names from response headers
+    dimension_names = [h.name for h in ai_response.dimension_headers] if ai_response.dimension_headers else []
     metric_names = [header.name for header in ai_response.metric_headers] if ai_response.metric_headers else []
     
     if not metric_names:
         # Fallback: use expected order if headers are missing
         metric_names = ["sessions", "totalRevenue", "conversions"]
+    
+    # #region agent log
+    try:
+        ai_rows_detail = []
+        for i, row in enumerate(ai_response.rows):
+            row_detail = {
+                "row_index": i,
+                "dimension_names": dimension_names,
+                "dimension_values": [dv.value for dv in row.dimension_values] if row.dimension_values else [],
+                "metric_values": [mv.value for mv in row.metric_values] if row.metric_values else [],
+            }
+            ai_rows_detail.append(row_detail)
+        with open(log_path, 'a') as f:
+            log_entry = {
+                "location": "ga4_service.py:parse_ai_rows",
+                "message": "AI response rows detail",
+                "data": {
+                    "dimension_names": dimension_names,
+                    "metric_names": metric_names,
+                    "total_rows": len(ai_response.rows),
+                    "rows_detail": ai_rows_detail,
+                },
+                "timestamp": int(datetime.now().timestamp() * 1000),
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "AI_ROWS_DETAIL",
+            }
+            f.write(json_module.dumps(log_entry) + '\n')
+    except Exception:
+        pass
+    # #endregion
     
     for row in ai_response.rows:
         for idx, metric_value in enumerate(row.metric_values):
