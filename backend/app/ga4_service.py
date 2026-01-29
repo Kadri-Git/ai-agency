@@ -43,24 +43,42 @@ def build_ai_source_filter() -> FilterExpression:
     """
     Build a GA4 FilterExpression that matches AI traffic from multiple sources.
     Uses OR logic over CONTAINS string filters for each pattern in AI_SOURCE_PATTERNS.
-    GA4 uses "sessionSource" as the dimension and filter field name.
+    Checks both sessionSource and fullReferrer dimensions to catch all AI referrers.
     """
-    return FilterExpression(
-        or_group=FilterExpressionList(
-            expressions=[
-                FilterExpression(
-                    filter=Filter(
-                        field_name="sessionSource",
-                        string_filter=Filter.StringFilter(
-                            match_type=Filter.StringFilter.MatchType.CONTAINS,
-                            value=pattern,
-                            case_sensitive=False,
-                        ),
-                    )
+    expressions = []
+    
+    # Add filters for sessionSource dimension
+    for pattern in AI_SOURCE_PATTERNS:
+        expressions.append(
+            FilterExpression(
+                filter=Filter(
+                    field_name="sessionSource",
+                    string_filter=Filter.StringFilter(
+                        match_type=Filter.StringFilter.MatchType.CONTAINS,
+                        value=pattern,
+                        case_sensitive=False,
+                    ),
                 )
-                for pattern in AI_SOURCE_PATTERNS
-            ]
+            )
         )
+    
+    # Also add filters for fullReferrer dimension (contains full referrer URL)
+    for pattern in AI_SOURCE_PATTERNS:
+        expressions.append(
+            FilterExpression(
+                filter=Filter(
+                    field_name="fullReferrer",
+                    string_filter=Filter.StringFilter(
+                        match_type=Filter.StringFilter.MatchType.CONTAINS,
+                        value=pattern,
+                        case_sensitive=False,
+                    ),
+                )
+            )
+        )
+    
+    return FilterExpression(
+        or_group=FilterExpressionList(expressions=expressions)
     )
 
 def get_ga4_client(service_account_json: str = None, access_token: str = None, refresh_token: str = None):
@@ -256,12 +274,15 @@ def get_ai_traffic_metrics(
         raise
     
     # Request for AI traffic
-    # Try "sessionSource" dimension - GA4 might use this instead of "source"
-    # ChatGPT traffic appears as "chat.openai.com" in the sessionSource dimension
+    # Use both sessionSource and fullReferrer dimensions to catch all AI referrers
+    # fullReferrer contains the full referrer URL (e.g., https://chat.openai.com/...)
     ai_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
-        dimensions=[Dimension(name="sessionSource")],
+        dimensions=[
+            Dimension(name="sessionSource"),
+            Dimension(name="fullReferrer"),  # Full referrer URL for better matching
+        ],
         metrics=[
             Metric(name="sessions"),
             Metric(name="totalRevenue"),
@@ -271,12 +292,14 @@ def get_ai_traffic_metrics(
     )
 
     # Additional diagnostic request: unfiltered source breakdown to see actual sources
-    # Try "sessionSource" dimension (GA4 might use this instead of "source")
-    # Also check "source" dimension separately to see if ChatGPT appears there
+    # Check both sessionSource and fullReferrer to see all referrer data
     debug_sources_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
-        dimensions=[Dimension(name="sessionSource")],
+        dimensions=[
+            Dimension(name="sessionSource"),
+            Dimension(name="fullReferrer"),  # Full referrer URL
+        ],
         metrics=[Metric(name="sessions")],
         limit=100,  # Increased to see more sources
     )
@@ -365,13 +388,27 @@ def get_ai_traffic_metrics(
             # all_sources is already defined at function level
             ai_matching_sources = []  # Track sources that match AI patterns
             if debug_sources_response.rows:
+                # Get dimension names from headers
+                dimension_names = [h.name for h in debug_sources_response.dimension_headers] if debug_sources_response.dimension_headers else []
+                has_fullReferrer = "fullReferrer" in dimension_names
+                
                 for i, row in enumerate(debug_sources_response.rows):
-                    source_value = row.dimension_values[0].value if row.dimension_values else ""
+                    # Get sessionSource (first dimension)
+                    source_value = row.dimension_values[0].value if row.dimension_values and len(row.dimension_values) > 0 else ""
+                    # Get fullReferrer if available (second dimension)
+                    full_referrer_value = ""
+                    if has_fullReferrer and row.dimension_values and len(row.dimension_values) > 1:
+                        full_referrer_value = row.dimension_values[1].value
+                    
                     sessions_value = row.metric_values[0].value if row.metric_values else "0"
+                    
+                    # Use fullReferrer if available, otherwise use sessionSource
+                    display_source = full_referrer_value if full_referrer_value else source_value
                     
                     # Log ALL sources (not just first 10)
                     all_sources.append({
                         "source": source_value,
+                        "fullReferrer": full_referrer_value,
                         "sessions": sessions_value,
                     })
                     
@@ -381,18 +418,24 @@ def get_ai_traffic_metrics(
                             {
                                 "row_index": i,
                                 "source": source_value,
+                                "fullReferrer": full_referrer_value,
                                 "sessions": sessions_value,
                             }
                         )
                     
-                    # Check if this source matches any AI pattern
+                    # Check if either source or fullReferrer matches any AI pattern
                     source_lower = source_value.lower()
-                    matches_ai = any(pattern.lower() in source_lower for pattern in AI_SOURCE_PATTERNS)
+                    referrer_lower = full_referrer_value.lower() if full_referrer_value else ""
+                    combined_lower = f"{source_lower} {referrer_lower}".strip()
+                    
+                    matches_ai = any(pattern.lower() in combined_lower for pattern in AI_SOURCE_PATTERNS)
                     if matches_ai:
+                        matching_patterns = [p for p in AI_SOURCE_PATTERNS if p.lower() in combined_lower]
                         ai_matching_sources.append({
                             "source": source_value,
+                            "fullReferrer": full_referrer_value,
                             "sessions": sessions_value,
-                            "matches_patterns": [p for p in AI_SOURCE_PATTERNS if p.lower() in source_lower]
+                            "matches_patterns": matching_patterns
                         })
             
             # Also check "source" dimension for AI matches
