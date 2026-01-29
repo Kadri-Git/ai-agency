@@ -269,19 +269,39 @@ def get_ai_traffic_metrics(
         ai_response = client.run_report(ai_request)
         # #region agent log
         try:
+            row_count = len(ai_response.rows) if ai_response.rows else 0
+            metric_headers = [h.name for h in ai_response.metric_headers] if ai_response.metric_headers else []
+            sample_rows = []
+            if ai_response.rows:
+                for i, row in enumerate(ai_response.rows[:3]):  # Log first 3 rows
+                    row_data = {
+                        "row_index": i,
+                        "dimension_values": [dv.value for dv in row.dimension_values] if row.dimension_values else [],
+                        "metric_values": [mv.value for mv in row.metric_values] if row.metric_values else []
+                    }
+                    sample_rows.append(row_data)
             with open(log_path, 'a') as f:
                 log_entry = {
-                    "location": "ga4_service.py:150",
+                    "location": "ga4_service.py:ai_response",
                     "message": "AI traffic run_report succeeded",
-                    "data": {"row_count": len(ai_response.rows) if ai_response.rows else 0},
+                    "data": {
+                        "row_count": row_count,
+                        "metric_headers": metric_headers,
+                        "sample_rows": sample_rows,
+                        "has_rows": row_count > 0
+                    },
                     "timestamp": int(datetime.now().timestamp() * 1000),
                     "sessionId": "debug-session",
                     "runId": "run1",
-                    "hypothesisId": "B"
+                    "hypothesisId": "GA_DATA"
                 }
                 f.write(json_module.dumps(log_entry) + '\n')
-        except Exception:
-            pass
+        except Exception as log_err:
+            try:
+                with open(log_path, 'a') as f:
+                    f.write(json_module.dumps({"location": "ga4_service.py:ai_response:log_err", "message": "Failed to log AI response", "data": {"error": str(log_err)}}) + '\n')
+            except Exception:
+                pass
         # #endregion
     except Exception as run_error:
         # #region agent log
@@ -308,6 +328,42 @@ def get_ai_traffic_metrics(
     
     total_response = client.run_report(total_request)
     
+    # #region agent log
+    try:
+        total_row_count = len(total_response.rows) if total_response.rows else 0
+        total_metric_headers = [h.name for h in total_response.metric_headers] if total_response.metric_headers else []
+        total_sample_rows = []
+        if total_response.rows:
+            for i, row in enumerate(total_response.rows[:3]):  # Log first 3 rows
+                row_data = {
+                    "row_index": i,
+                    "metric_values": [mv.value for mv in row.metric_values] if row.metric_values else []
+                }
+                total_sample_rows.append(row_data)
+        with open(log_path, 'a') as f:
+            log_entry = {
+                "location": "ga4_service.py:total_response",
+                "message": "Total site traffic run_report succeeded",
+                "data": {
+                    "row_count": total_row_count,
+                    "metric_headers": total_metric_headers,
+                    "sample_rows": total_sample_rows,
+                    "has_rows": total_row_count > 0
+                },
+                "timestamp": int(datetime.now().timestamp() * 1000),
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "GA_DATA"
+            }
+            f.write(json_module.dumps(log_entry) + '\n')
+    except Exception as log_err:
+        try:
+            with open(log_path, 'a') as f:
+                f.write(json_module.dumps({"location": "ga4_service.py:total_response:log_err", "message": "Failed to log total response", "data": {"error": str(log_err)}}) + '\n')
+        except Exception:
+            pass
+    # #endregion
+    
     # Parse AI traffic metrics
     ai_sessions = 0
     ai_revenue = 0.0
@@ -327,6 +383,28 @@ def get_ai_traffic_metrics(
                 continue  # Skip if index is out of range
             metric_name = metric_names[idx]
             value = float(metric_value.value) if metric_value.value else 0
+            
+            # #region agent log
+            try:
+                with open(log_path, 'a') as f:
+                    log_entry = {
+                        "location": "ga4_service.py:parse_ai_metric",
+                        "message": "Parsing AI metric value",
+                        "data": {
+                            "metric_name": metric_name,
+                            "raw_value": metric_value.value,
+                            "parsed_value": value,
+                            "dimension_values": [dv.value for dv in row.dimension_values] if row.dimension_values else []
+                        },
+                        "timestamp": int(datetime.now().timestamp() * 1000),
+                        "sessionId": "debug-session",
+                        "runId": "run1",
+                        "hypothesisId": "GA_DATA"
+                    }
+                    f.write(json_module.dumps(log_entry) + '\n')
+            except Exception:
+                pass
+            # #endregion
             
             if metric_name == "sessions":
                 ai_sessions += int(value)
@@ -362,7 +440,7 @@ def get_ai_traffic_metrics(
             elif metric_name == "conversions":
                 total_conversions += int(value)
     
-    return {
+    result = {
         "ai_sessions": ai_sessions,
         "ai_revenue": ai_revenue,
         "ai_conversions": ai_conversions,
@@ -370,6 +448,37 @@ def get_ai_traffic_metrics(
         "total_revenue": total_revenue,
         "total_conversions": total_conversions,
     }
+    
+    # #region agent log
+    try:
+        with open(log_path, 'a') as f:
+            log_entry = {
+                "location": "ga4_service.py:get_ai_traffic_metrics:result",
+                "message": "Final parsed metrics result",
+                "data": {
+                    "ai_sessions": ai_sessions,
+                    "ai_revenue": ai_revenue,
+                    "ai_conversions": ai_conversions,
+                    "total_sessions": total_sessions,
+                    "total_revenue": total_revenue,
+                    "total_conversions": total_conversions,
+                    "ai_row_count": len(ai_response.rows) if ai_response.rows else 0,
+                    "total_row_count": len(total_response.rows) if total_response.rows else 0,
+                    "property_id": property_id,
+                    "start_date": start_date,
+                    "end_date": end_date
+                },
+                "timestamp": int(datetime.now().timestamp() * 1000),
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "GA_DATA"
+            }
+            f.write(json_module.dumps(log_entry) + '\n')
+    except Exception:
+        pass
+    # #endregion
+    
+    return result
 
 def get_revenue_trend(
     property_id: str,
