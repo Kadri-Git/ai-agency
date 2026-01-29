@@ -454,6 +454,9 @@ export default function DashboardPage() {
   const { metrics, revenue_trend, top_landing_pages, users_per_page_trend } =
     dashboardData
 
+  // Fallback for users_per_page_trend if not present (for backwards compatibility)
+  const usersTrendData = users_per_page_trend?.data || []
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -602,7 +605,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={users_per_page_trend.data}>
+              <LineChart data={usersTrendData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
