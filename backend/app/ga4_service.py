@@ -297,19 +297,32 @@ def get_ai_traffic_metrics(
         debug_sources_response = client.run_report(debug_sources_request)
         try:
             debug_rows = []
+            all_sources = []  # Track all sources for AI pattern matching
             if debug_sources_response.rows:
-                for i, row in enumerate(debug_sources_response.rows[:10]):
-                    debug_rows.append(
-                        {
-                            "row_index": i,
-                            "source": row.dimension_values[0].value
-                            if row.dimension_values
-                            else "",
-                            "sessions": row.metric_values[0].value
-                            if row.metric_values
-                            else "0",
-                        }
-                    )
+                for i, row in enumerate(debug_sources_response.rows):
+                    source_value = row.dimension_values[0].value if row.dimension_values else ""
+                    sessions_value = row.metric_values[0].value if row.metric_values else "0"
+                    
+                    # Log first 10 for sample
+                    if i < 10:
+                        debug_rows.append(
+                            {
+                                "row_index": i,
+                                "source": source_value,
+                                "sessions": sessions_value,
+                            }
+                        )
+                    
+                    # Check if this source matches any AI pattern
+                    source_lower = source_value.lower()
+                    matches_ai = any(pattern.lower() in source_lower for pattern in AI_SOURCE_PATTERNS)
+                    if matches_ai:
+                        all_sources.append({
+                            "source": source_value,
+                            "sessions": sessions_value,
+                            "matches_patterns": [p for p in AI_SOURCE_PATTERNS if p.lower() in source_lower]
+                        })
+            
             with open(log_path, "a") as f:
                 f.write(
                     json_module.dumps(
@@ -323,6 +336,9 @@ def get_ai_traffic_metrics(
                                     else []
                                 ),
                                 "sample_rows": debug_rows,
+                                "ai_matching_sources": all_sources,
+                                "ai_patterns_used": AI_SOURCE_PATTERNS,
+                                "total_ai_sources_found": len(all_sources),
                             },
                             "timestamp": int(
                                 datetime.now().timestamp() * 1000
