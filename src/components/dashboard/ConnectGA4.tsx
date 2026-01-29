@@ -28,9 +28,53 @@ export function ConnectGA4({ hasCredentials }: ConnectGA4Props) {
       const fetchProperty = async () => {
         try {
           const status = await api.getGA4Status()
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'ConnectGA4.tsx:fetchProperty',
+                message: 'GA4 status in ConnectGA4 component',
+                data: {
+                  hasCredentials: status.has_credentials,
+                  propertyId: status.ga4_property_id,
+                  connectionType: status.connection_type,
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'ga-status-check',
+                hypothesisId: 'GA_STATUS',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
           setCurrentPropertyId(status.ga4_property_id)
         } catch (error) {
           console.error('Failed to fetch GA4 property:', error)
+          // #region agent log
+          fetch(
+            'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'ConnectGA4.tsx:fetchProperty:error',
+                message: 'Failed to fetch GA4 status',
+                data: {
+                  errorName: error instanceof Error ? error.name : typeof error,
+                  errorMessage:
+                    error instanceof Error ? error.message : String(error),
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'ga-status-check',
+                hypothesisId: 'GA_STATUS',
+              }),
+            }
+          ).catch(() => {})
+          // #endregion
         }
       }
       fetchProperty()

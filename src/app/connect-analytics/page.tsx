@@ -160,6 +160,29 @@ export default function ConnectAnalyticsPage() {
 
       // Refresh status to get the new property ID
       const status = await api.getGA4Status()
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'connect-analytics/page.tsx:afterConnect',
+            message: 'GA4 status after connection',
+            data: {
+              hasCredentials: status.has_credentials,
+              propertyId: status.ga4_property_id,
+              connectionType: status.connection_type,
+              selectedProperty,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'ga-connect',
+            hypothesisId: 'GA_CONNECT',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
       setIsConnected(true)
       setCurrentPropertyId(status.ga4_property_id)
 
