@@ -510,6 +510,49 @@ def get_ai_traffic_metrics(
                     )
                     + "\n"
                 )
+            
+            # Log pageReferrer-only diagnostic data
+            if debug_page_referrer_response and debug_page_referrer_response.rows:
+                page_referrer_list = []
+                page_referrer_ai_matches = []
+                for row in debug_page_referrer_response.rows:
+                    page_ref_value = row.dimension_values[0].value if row.dimension_values else ""
+                    sessions_value = row.metric_values[0].value if row.metric_values else "0"
+                    page_referrer_list.append({
+                        "pageReferrer": page_ref_value,
+                        "sessions": sessions_value,
+                    })
+                    # Check if pageReferrer matches AI patterns
+                    if page_ref_value:
+                        ref_lower = page_ref_value.lower()
+                        matches_ai = any(pattern.lower() in ref_lower for pattern in AI_SOURCE_PATTERNS)
+                        if matches_ai:
+                            page_referrer_ai_matches.append({
+                                "pageReferrer": page_ref_value,
+                                "sessions": sessions_value,
+                                "matches_patterns": [p for p in AI_SOURCE_PATTERNS if p.lower() in ref_lower]
+                            })
+                
+                with open(log_path, "a") as f:
+                    f.write(
+                        json_module.dumps(
+                            {
+                                "location": "ga4_service.py:debug_page_referrer",
+                                "message": "PageReferrer-only diagnostic data",
+                                "data": {
+                                    "page_referrer_row_count": len(debug_page_referrer_response.rows),
+                                    "page_referrer_list": page_referrer_list[:50],  # First 50
+                                    "page_referrer_ai_matches": page_referrer_ai_matches,
+                                    "total_page_referrer_ai_matches": len(page_referrer_ai_matches),
+                                },
+                                "timestamp": int(datetime.now().timestamp() * 1000),
+                                "sessionId": "debug-session",
+                                "runId": "ga-debug-sources",
+                                "hypothesisId": "GA_PAGE_REFERRER",
+                            }
+                        )
+                        + "\n"
+                    )
         except Exception:
             pass
 
