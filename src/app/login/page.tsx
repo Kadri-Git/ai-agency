@@ -180,17 +180,67 @@ export default function LoginPage() {
       if (isAdmin) {
         toast.success('Logged in successfully!')
         if (typeof window !== 'undefined') {
-          window.location.href = '/admin'
+          window.location.assign('/admin')
         } else {
           router.replace('/admin')
         }
         return
       }
       toast.success('Logged in successfully!')
-      // Use window.location for a hard redirect to ensure auth state is recognized
-      // This avoids race conditions with Zustand store updates
+
+      // #region agent log
+      fetch(
+        'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'login/page.tsx:beforeRedirect',
+            message: 'About to redirect to dashboard',
+            data: {
+              hasWindow: typeof window !== 'undefined',
+              currentPath:
+                typeof window !== 'undefined' ? window.location.pathname : null,
+              tokenInLocalStorage:
+                typeof window !== 'undefined'
+                  ? !!localStorage.getItem('auth_token')
+                  : null,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'LOGIN_REDIRECT',
+          }),
+        }
+      ).catch(() => {})
+      // #endregion
+
+      // Force a hard redirect using window.location.assign
+      // This ensures a full page reload so the dashboard reads fresh auth state
       if (typeof window !== 'undefined') {
-        window.location.href = '/dashboard'
+        // #region agent log
+        fetch(
+          'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'login/page.tsx:windowLocationRedirect',
+              message: 'Calling window.location.assign',
+              data: {
+                targetUrl: '/dashboard',
+                currentUrl: window.location.href,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              runId: 'run1',
+              hypothesisId: 'LOGIN_REDIRECT',
+            }),
+          }
+        ).catch(() => {})
+        // #endregion
+        // Use assign() for explicit navigation - more reliable than href
+        window.location.assign('/dashboard')
       } else {
         router.replace('/dashboard')
       }
@@ -281,7 +331,11 @@ export default function LoginPage() {
 
         // Redirect admin to admin dashboard
         toast.success('Demo account logged in!')
-        router.push('/dashboard')
+        if (typeof window !== 'undefined') {
+          window.location.assign('/dashboard')
+        } else {
+          router.replace('/dashboard')
+        }
         return
       } catch (loginError) {
         // If login fails, try to register
@@ -376,7 +430,7 @@ export default function LoginPage() {
 
         toast.success('Demo account created and logged in!')
         if (typeof window !== 'undefined') {
-          window.location.href = '/dashboard'
+          window.location.assign('/dashboard')
         } else {
           router.replace('/dashboard')
         }
