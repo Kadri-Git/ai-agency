@@ -260,12 +260,22 @@ def get_ai_traffic_metrics(
 
     # Additional diagnostic request: unfiltered source breakdown to see actual sources
     # Try "sessionSource" dimension (GA4 might use this instead of "source")
+    # Also check "source" dimension separately to see if ChatGPT appears there
     debug_sources_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
         dimensions=[Dimension(name="sessionSource")],
         metrics=[Metric(name="sessions")],
-        limit=50,
+        limit=100,  # Increased to see more sources
+    )
+    
+    # Also check "source" dimension (different from sessionSource)
+    debug_source_dimension_request = RunReportRequest(
+        property=f"properties/{property_id}",
+        date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
+        dimensions=[Dimension(name="source")],
+        metrics=[Metric(name="sessions")],
+        limit=100,
     )
     
     # Request for total site traffic
