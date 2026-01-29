@@ -308,9 +308,34 @@ def get_ai_traffic_metrics(
     # #endregion
     
     debug_sources_response = None
+    debug_source_dimension_response = None
     try:
         # First: diagnostic unfiltered sources to see actual source values
         debug_sources_response = client.run_report(debug_sources_request)
+        
+        # Also check "source" dimension (different from sessionSource)
+        try:
+            debug_source_dimension_response = client.run_report(debug_source_dimension_request)
+        except Exception as source_dim_error:
+            # #region agent log
+            try:
+                with open(log_path, 'a') as f:
+                    log_entry = {
+                        "location": "ga4_service.py:debug_source_dimension",
+                        "message": "Error checking 'source' dimension",
+                        "data": {
+                            "error": str(source_dim_error),
+                        },
+                        "timestamp": int(datetime.now().timestamp() * 1000),
+                        "sessionId": "debug-session",
+                        "runId": "ga-debug-sources",
+                        "hypothesisId": "GA_SOURCES",
+                    }
+                    f.write(json_module.dumps(log_entry) + '\n')
+            except Exception:
+                pass
+            # #endregion
+        
         try:
             debug_rows = []
             all_sources = []  # Track all sources for AI pattern matching
@@ -339,6 +364,21 @@ def get_ai_traffic_metrics(
                             "matches_patterns": [p for p in AI_SOURCE_PATTERNS if p.lower() in source_lower]
                         })
             
+            # Also check "source" dimension for AI matches
+            source_dim_ai_matches = []
+            if debug_source_dimension_response and debug_source_dimension_response.rows:
+                for row in debug_source_dimension_response.rows:
+                    source_value = row.dimension_values[0].value if row.dimension_values else ""
+                    sessions_value = row.metric_values[0].value if row.metric_values else "0"
+                    source_lower = source_value.lower()
+                    matches_ai = any(pattern.lower() in source_lower for pattern in AI_SOURCE_PATTERNS)
+                    if matches_ai:
+                        source_dim_ai_matches.append({
+                            "source": source_value,
+                            "sessions": sessions_value,
+                            "matches_patterns": [p for p in AI_SOURCE_PATTERNS if p.lower() in source_lower]
+                        })
+            
             with open(log_path, "a") as f:
                 f.write(
                     json_module.dumps(
@@ -346,15 +386,22 @@ def get_ai_traffic_metrics(
                             "location": "ga4_service.py:debug_sources",
                             "message": "Unfiltered source breakdown",
                             "data": {
-                                "row_count": len(
+                                "sessionSource_row_count": len(
                                     debug_sources_response.rows
                                     if debug_sources_response.rows
                                     else []
                                 ),
+                                "source_dimension_row_count": len(
+                                    debug_source_dimension_response.rows
+                                    if debug_source_dimension_response
+                                    else []
+                                ),
                                 "sample_rows": debug_rows,
-                                "ai_matching_sources": all_sources,
+                                "ai_matching_sources_in_sessionSource": all_sources,
+                                "ai_matching_sources_in_source_dim": source_dim_ai_matches,
                                 "ai_patterns_used": AI_SOURCE_PATTERNS,
-                                "total_ai_sources_found": len(all_sources),
+                                "total_ai_sources_found_in_sessionSource": len(all_sources),
+                                "total_ai_sources_found_in_source_dim": len(source_dim_ai_matches),
                             },
                             "timestamp": int(
                                 datetime.now().timestamp() * 1000
