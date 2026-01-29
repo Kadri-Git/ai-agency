@@ -43,7 +43,7 @@ def build_ai_source_filter() -> FilterExpression:
     """
     Build a GA4 FilterExpression that matches AI traffic from multiple sources.
     Uses OR logic over CONTAINS string filters for each pattern in AI_SOURCE_PATTERNS.
-    Checks both sessionSource and fullReferrer dimensions to catch all AI referrers.
+    Checks both sessionSource and pageReferrer dimensions to catch all AI referrers.
     """
     expressions = []
     
@@ -62,12 +62,12 @@ def build_ai_source_filter() -> FilterExpression:
             )
         )
     
-    # Also add filters for fullReferrer dimension (contains full referrer URL)
+    # Also add filters for pageReferrer dimension (contains full referrer URL)
     for pattern in AI_SOURCE_PATTERNS:
         expressions.append(
             FilterExpression(
                 filter=Filter(
-                    field_name="fullReferrer",
+                    field_name="pageReferrer",
                     string_filter=Filter.StringFilter(
                         match_type=Filter.StringFilter.MatchType.CONTAINS,
                         value=pattern,
@@ -274,14 +274,14 @@ def get_ai_traffic_metrics(
         raise
     
     # Request for AI traffic
-    # Use both sessionSource and fullReferrer dimensions to catch all AI referrers
-    # fullReferrer contains the full referrer URL (e.g., https://chat.openai.com/...)
+    # Use both sessionSource and pageReferrer dimensions to catch all AI referrers
+    # pageReferrer contains the full referrer URL (e.g., https://chat.openai.com/...)
     ai_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
         dimensions=[
             Dimension(name="sessionSource"),
-            Dimension(name="fullReferrer"),  # Full referrer URL for better matching
+            Dimension(name="pageReferrer"),  # Full referrer URL for better matching
         ],
         metrics=[
             Metric(name="sessions"),
@@ -292,13 +292,13 @@ def get_ai_traffic_metrics(
     )
 
     # Additional diagnostic request: unfiltered source breakdown to see actual sources
-    # Check both sessionSource and fullReferrer to see all referrer data
+    # Check both sessionSource and pageReferrer to see all referrer data
     debug_sources_request = RunReportRequest(
         property=f"properties/{property_id}",
         date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
         dimensions=[
             Dimension(name="sessionSource"),
-            Dimension(name="fullReferrer"),  # Full referrer URL
+            Dimension(name="pageReferrer"),  # Full referrer URL
         ],
         metrics=[Metric(name="sessions")],
         limit=100,  # Increased to see more sources
@@ -390,25 +390,25 @@ def get_ai_traffic_metrics(
             if debug_sources_response.rows:
                 # Get dimension names from headers
                 dimension_names = [h.name for h in debug_sources_response.dimension_headers] if debug_sources_response.dimension_headers else []
-                has_fullReferrer = "fullReferrer" in dimension_names
+                has_pageReferrer = "pageReferrer" in dimension_names
                 
                 for i, row in enumerate(debug_sources_response.rows):
                     # Get sessionSource (first dimension)
                     source_value = row.dimension_values[0].value if row.dimension_values and len(row.dimension_values) > 0 else ""
-                    # Get fullReferrer if available (second dimension)
-                    full_referrer_value = ""
-                    if has_fullReferrer and row.dimension_values and len(row.dimension_values) > 1:
-                        full_referrer_value = row.dimension_values[1].value
+                    # Get pageReferrer if available (second dimension)
+                    page_referrer_value = ""
+                    if has_pageReferrer and row.dimension_values and len(row.dimension_values) > 1:
+                        page_referrer_value = row.dimension_values[1].value
                     
                     sessions_value = row.metric_values[0].value if row.metric_values else "0"
                     
-                    # Use fullReferrer if available, otherwise use sessionSource
-                    display_source = full_referrer_value if full_referrer_value else source_value
+                    # Use pageReferrer if available, otherwise use sessionSource
+                    display_source = page_referrer_value if page_referrer_value else source_value
                     
                     # Log ALL sources (not just first 10)
                     all_sources.append({
                         "source": source_value,
-                        "fullReferrer": full_referrer_value,
+                        "pageReferrer": page_referrer_value,
                         "sessions": sessions_value,
                     })
                     
@@ -418,14 +418,14 @@ def get_ai_traffic_metrics(
                             {
                                 "row_index": i,
                                 "source": source_value,
-                                "fullReferrer": full_referrer_value,
+                                "pageReferrer": page_referrer_value,
                                 "sessions": sessions_value,
                             }
                         )
                     
-                    # Check if either source or fullReferrer matches any AI pattern
+                    # Check if either source or pageReferrer matches any AI pattern
                     source_lower = source_value.lower()
-                    referrer_lower = full_referrer_value.lower() if full_referrer_value else ""
+                    referrer_lower = page_referrer_value.lower() if page_referrer_value else ""
                     combined_lower = f"{source_lower} {referrer_lower}".strip()
                     
                     matches_ai = any(pattern.lower() in combined_lower for pattern in AI_SOURCE_PATTERNS)
@@ -433,7 +433,7 @@ def get_ai_traffic_metrics(
                         matching_patterns = [p for p in AI_SOURCE_PATTERNS if p.lower() in combined_lower]
                         ai_matching_sources.append({
                             "source": source_value,
-                            "fullReferrer": full_referrer_value,
+                            "pageReferrer": page_referrer_value,
                             "sessions": sessions_value,
                             "matches_patterns": matching_patterns
                         })
