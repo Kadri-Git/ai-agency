@@ -46,8 +46,16 @@ class TopLandingPage(BaseModel):
     revenue: float
     conversion_rate: float
 
+class UsersPerPagePoint(BaseModel):
+    date: str
+    users: int
+
+class UsersPerPageTrend(BaseModel):
+    data: list[UsersPerPagePoint]
+
 class DashboardData(BaseModel):
     metrics: AITrafficMetrics
     revenue_trend: RevenueTrend
     top_landing_pages: list[TopLandingPage]
+    users_per_page_trend: UsersPerPageTrend
 

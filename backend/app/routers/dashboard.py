@@ -8,12 +8,15 @@ from app.schemas import (
     RevenueTrend,
     RevenueTrendPoint,
     TopLandingPage,
+    UsersPerPageTrend,
+    UsersPerPagePoint,
 )
 from app.auth import get_current_client
 from app.ga4_service import (
     get_ai_traffic_metrics,
     get_revenue_trend,
     get_top_landing_pages,
+    get_users_per_page_trend,
     refresh_oauth_token,
 )
 from app.mock_data import generate_mock_dashboard_data
@@ -102,6 +105,12 @@ async def get_dashboard_metrics(
                 top_landing_pages=[
                     TopLandingPage(**lp) for lp in mock_data["top_landing_pages"]
                 ],
+                users_per_page_trend=UsersPerPageTrend(
+                    data=[
+                        UsersPerPagePoint(**d)
+                        for d in mock_data["users_per_page_trend"]["data"]
+                    ]
+                ),
             )
 
         # Check if GA4 credentials are available (OAuth or service account)
@@ -179,7 +188,13 @@ async def get_dashboard_metrics(
                 ),
                 top_landing_pages=[
                     TopLandingPage(**lp) for lp in mock_data["top_landing_pages"]
-                ]
+                ],
+                users_per_page_trend=UsersPerPageTrend(
+                    data=[
+                        UsersPerPagePoint(**d)
+                        for d in mock_data["users_per_page_trend"]["data"]
+                    ]
+                ),
             )
         
         # If we are using OAuth tokens, proactively refresh the GA4 access token
@@ -408,10 +423,24 @@ async def get_dashboard_metrics(
             for lp in landing_pages_data
         ]
         
+        # Get users per page trend (ALL traffic, not filtered by AI sources)
+        users_trend_data = get_users_per_page_trend(
+            property_id=current_client.ga4_property_id,
+            service_account_json=current_client.ga4_service_account_json if has_service_account else None,
+            access_token=current_client.ga4_access_token if has_oauth else None,
+            refresh_token=current_client.ga4_refresh_token if has_oauth else None,
+            days=days
+        )
+        
+        users_per_page_trend = UsersPerPageTrend(
+            data=[UsersPerPagePoint(date=d["date"], users=d["users"]) for d in users_trend_data]
+        )
+        
         return DashboardData(
             metrics=metrics,
             revenue_trend=revenue_trend,
-            top_landing_pages=top_landing_pages
+            top_landing_pages=top_landing_pages,
+            users_per_page_trend=users_per_page_trend
         )
         
     except Exception as e:

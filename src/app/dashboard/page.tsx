@@ -451,7 +451,8 @@ export default function DashboardPage() {
     )
   }
 
-  const { metrics, revenue_trend, top_landing_pages } = dashboardData
+  const { metrics, revenue_trend, top_landing_pages, users_per_page_trend } =
+    dashboardData
 
   return (
     <div className="min-h-screen bg-background">
@@ -585,6 +586,49 @@ export default function DashboardPage() {
                   stroke="#8884d8"
                   strokeWidth={2}
                   name="AI Revenue"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Users per Page Trend Chart - ALL Traffic */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Daily Active Users (All Traffic)</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              This chart shows regular GA4 data to verify connection is working
+            </p>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={users_per_page_trend.data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value: number) =>
+                    Math.round(value).toLocaleString()
+                  }
+                />
+                <Tooltip
+                  formatter={(value: number) =>
+                    Math.round(value).toLocaleString()
+                  }
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="users"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  name="Active Users"
                 />
               </LineChart>
             </ResponsiveContainer>

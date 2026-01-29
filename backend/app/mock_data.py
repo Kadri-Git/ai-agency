@@ -74,6 +74,18 @@ def generate_mock_dashboard_data(days: int = 30) -> dict:
     # Sort by revenue descending
     landing_pages.sort(key=lambda x: x["revenue"], reverse=True)
     
+    # Generate users per page trend (ALL traffic, not just AI)
+    users_trend_data = []
+    end_date = datetime.now()
+    for i in range(days):
+        date = end_date - timedelta(days=days - i - 1)
+        # Add some daily variation for regular site traffic
+        daily_users = base_sessions / days * random.uniform(0.7, 1.3)
+        users_trend_data.append({
+            "date": date.strftime("%Y-%m-%d"),
+            "users": int(daily_users)
+        })
+    
     return {
         "metrics": {
             "ai_sessions": ai_sessions,
@@ -87,7 +99,10 @@ def generate_mock_dashboard_data(days: int = 30) -> dict:
         "revenue_trend": {
             "data": trend_data
         },
-        "top_landing_pages": landing_pages
+        "top_landing_pages": landing_pages,
+        "users_per_page_trend": {
+            "data": users_trend_data
+        }
     }
 
 

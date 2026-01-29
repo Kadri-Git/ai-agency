@@ -618,3 +618,60 @@ def get_top_landing_pages(
     
     return landing_pages
 
+def get_users_per_page_trend(
+    property_id: str,
+    service_account_json: str = None,
+    access_token: str = None,
+    refresh_token: str = None,
+    days: int = 30
+) -> list:
+    """Get daily users per page trend for ALL traffic (not filtered by AI sources)"""
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+    
+    client = get_ga4_client(
+        service_account_json=service_account_json,
+        access_token=access_token,
+        refresh_token=refresh_token
+    )
+    
+    # No filter - get ALL traffic to verify GA4 is working
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        date_ranges=[DateRange(
+            start_date=start_date.strftime("%Y-%m-%d"),
+            end_date=end_date.strftime("%Y-%m-%d")
+        )],
+        dimensions=[Dimension(name="date")],
+        metrics=[Metric(name="activeUsers")],
+    )
+    
+    response = client.run_report(request)
+    
+    # Create a map of date -> users from GA4 response
+    users_by_date = {}
+    for row in response.rows:
+        date_str = row.dimension_values[0].value
+        users = int(float(row.metric_values[0].value)) if row.metric_values[0].value else 0
+        
+        # Format date as YYYY-MM-DD
+        formatted_date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+        users_by_date[formatted_date] = users
+    
+    # Build complete trend data for all days in range, filling zeros for days with no data
+    trend_data = []
+    current_date = start_date
+    while current_date <= end_date:
+        date_str = current_date.strftime("%Y-%m-%d")
+        users = users_by_date.get(date_str, 0)
+        trend_data.append({
+            "date": date_str,
+            "users": users
+        })
+        current_date += timedelta(days=1)
+    
+    # Sort by date (should already be sorted, but just in case)
+    trend_data.sort(key=lambda x: x["date"])
+    
+    return trend_data
+

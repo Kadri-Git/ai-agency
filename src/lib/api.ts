@@ -120,12 +120,20 @@ export interface TopLandingPage {
   conversion_rate: number
 }
 
+export interface UsersPerPagePoint {
+  date: string
+  users: number
+}
+
 export interface DashboardData {
   metrics: AITrafficMetrics
   revenue_trend: {
     data: RevenueTrendPoint[]
   }
   top_landing_pages: TopLandingPage[]
+  users_per_page_trend: {
+    data: UsersPerPagePoint[]
+  }
 }
 
 class ApiClient {
