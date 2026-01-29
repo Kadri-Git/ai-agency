@@ -531,6 +531,8 @@ class ApiClient {
               fullResultKeys: result ? Object.keys(result) : [],
               debugInfo: result?.debug_info,
               debugSourcesSample: result?.debug_info?.debug_sources_sample,
+              allSources: result?.debug_info?.all_sources,
+              allSourcesCount: result?.debug_info?.all_sources?.length || 0,
               aiRowCount: result?.debug_info?.ai_row_count,
               debugSourcesRowCount: result?.debug_info?.debug_sources_row_count,
             },
