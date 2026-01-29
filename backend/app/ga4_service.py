@@ -523,19 +523,29 @@ def get_revenue_trend(
     
     response = client.run_report(request)
     
-    trend_data = []
+    # Create a map of date -> revenue from GA4 response
+    revenue_by_date = {}
     for row in response.rows:
         date_str = row.dimension_values[0].value
         revenue = float(row.metric_values[0].value) if row.metric_values[0].value else 0.0
         
         # Format date as YYYY-MM-DD
         formatted_date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+        revenue_by_date[formatted_date] = revenue
+    
+    # Build complete trend data for all days in range, filling zeros for days with no data
+    trend_data = []
+    current_date = start_date
+    while current_date <= end_date:
+        date_str = current_date.strftime("%Y-%m-%d")
+        revenue = revenue_by_date.get(date_str, 0.0)
         trend_data.append({
-            "date": formatted_date,
+            "date": date_str,
             "revenue": revenue
         })
+        current_date += timedelta(days=1)
     
-    # Sort by date
+    # Sort by date (should already be sorted, but just in case)
     trend_data.sort(key=lambda x: x["date"])
     
     return trend_data
