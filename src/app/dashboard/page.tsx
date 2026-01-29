@@ -587,37 +587,46 @@ export default function DashboardPage() {
             <CardTitle>AI Revenue Trend</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={revenue_trend.data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value: number) =>
-                    `$${Math.round(value).toLocaleString()}`
-                  }
-                />
-                <Tooltip
-                  formatter={(value: number) =>
-                    `$${Math.round(value).toLocaleString()}`
-                  }
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#8884d8"
-                  strokeWidth={2}
-                  name="AI Revenue"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {revenueTrendData.length === 0 ? (
+              <div className="flex items-center justify-center h-[400px] text-muted-foreground border border-dashed rounded">
+                <div className="text-center">
+                  <p className="font-medium">No revenue data available</p>
+                  <p className="text-sm mt-2">Waiting for GA4 data...</p>
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={revenueTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value: number) =>
+                      `$${Math.round(value).toLocaleString()}`
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value: number) =>
+                      `$${Math.round(value).toLocaleString()}`
+                    }
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#8884d8"
+                    strokeWidth={2}
+                    name="AI Revenue"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -630,37 +639,46 @@ export default function DashboardPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={usersTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value: number) =>
-                    Math.round(value).toLocaleString()
-                  }
-                />
-                <Tooltip
-                  formatter={(value: number) =>
-                    Math.round(value).toLocaleString()
-                  }
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="users"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                  name="Active Users"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {usersTrendData.length === 0 ? (
+              <div className="flex items-center justify-center h-[400px] text-muted-foreground border border-dashed rounded">
+                <div className="text-center">
+                  <p className="font-medium">No users data available</p>
+                  <p className="text-sm mt-2">Waiting for GA4 data...</p>
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={usersTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value: number) =>
+                      Math.round(value).toLocaleString()
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value: number) =>
+                      Math.round(value).toLocaleString()
+                    }
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="users"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    name="Active Users"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
