@@ -825,12 +825,18 @@ def get_ai_traffic_metrics(
                         "source": row.dimension_values[0].value if row.dimension_values else "",
                         "sessions": row.metric_values[0].value if row.metric_values else "0"
                     })
-                # Log ALL sources for backend debugging
+                # Log ALL sources for backend debugging (include both sessionSource and pageReferrer)
+                dimension_names = [h.name for h in debug_sources_response.dimension_headers] if debug_sources_response.dimension_headers else []
+                has_pageReferrer = "pageReferrer" in dimension_names
                 for row in debug_sources_response.rows:
-                    source_val = row.dimension_values[0].value if row.dimension_values else ""
+                    source_val = row.dimension_values[0].value if row.dimension_values and len(row.dimension_values) > 0 else ""
+                    page_referrer_val = ""
+                    if has_pageReferrer and row.dimension_values and len(row.dimension_values) > 1:
+                        page_referrer_val = row.dimension_values[1].value
                     sessions_val = row.metric_values[0].value if row.metric_values else "0"
                     all_sources_list.append({
                         "source": source_val,
+                        "pageReferrer": page_referrer_val,
                         "sessions": sessions_val
                     })
     except Exception:
