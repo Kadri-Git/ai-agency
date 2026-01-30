@@ -14,12 +14,20 @@ Your code has been committed locally. To push to GitHub, you need to authenticat
 
 2. **Push using the token:**
 
+   The token is stored in your `.env` file as `GITHUB_TOKEN`. You can use it like this:
+
    ```bash
+   # Option A: Use the push script (reads from .env or uses provided token)
+   ./push-to-github.sh
+
+   # Option B: Use token from environment variable
+   git remote set-url origin https://${GITHUB_TOKEN}@github.com/Kadri-Git/ai-agency.git
+   git push origin main
+
+   # Option C: Use token directly (not recommended for security)
    git remote set-url origin https://YOUR_TOKEN@github.com/Kadri-Git/ai-agency.git
    git push origin main
    ```
-
-   Replace `YOUR_TOKEN` with your actual token.
 
 ## Option 2: GitHub CLI (gh)
 

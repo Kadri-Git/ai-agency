@@ -632,6 +632,32 @@ export default function DashboardPage() {
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* #region agent log */}
+          {(() => {
+            fetch(
+              'http://127.0.0.1:7242/ingest/464e2deb-8374-451b-9bcd-449856a4299f',
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  location: 'dashboard/page.tsx:metricsDisplay',
+                  message: 'Displaying AI sessions metric',
+                  data: {
+                    ai_sessions: metrics?.ai_sessions,
+                    ai_sessions_type: typeof metrics?.ai_sessions,
+                    ai_sessions_toString: String(metrics?.ai_sessions),
+                    metrics_defined: !!metrics,
+                  },
+                  timestamp: Date.now(),
+                  sessionId: 'debug-session',
+                  runId: 'run1',
+                  hypothesisId: 'DISPLAY_CHECK',
+                }),
+              }
+            ).catch(() => {})
+            return null
+          })()}
+          {/* #endregion */}
           <MetricCard
             title="AI Sessions"
             value={metrics.ai_sessions.toLocaleString()}

@@ -5,21 +5,27 @@
 echo "🚀 Pushing to GitHub: Kadri-Git/ai-agency"
 echo ""
 
-# Check if token is provided as argument
-if [ -z "$1" ]; then
-    echo "Usage: ./push-to-github.sh YOUR_GITHUB_TOKEN"
-    echo ""
-    echo "To get a token:"
-    echo "1. Go to: https://github.com/settings/tokens"
-    echo "2. Click 'Generate new token (classic)'"
-    echo "3. Select 'repo' scope"
-    echo "4. Copy the token"
-    echo ""
-    echo "Then run: ./push-to-github.sh YOUR_TOKEN"
-    exit 1
+# Try to get token from environment variable or .env file
+if [ -n "$GITHUB_TOKEN" ]; then
+    TOKEN=$GITHUB_TOKEN
+elif [ -f .env ]; then
+    # Try to extract GITHUB_TOKEN from .env file
+    TOKEN=$(grep "^GITHUB_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
 fi
 
-TOKEN=$1
+# Use provided token as argument, or from environment/.env, or prompt
+if [ -n "$1" ]; then
+    TOKEN=$1
+elif [ -z "$TOKEN" ]; then
+    echo "❌ No GitHub token found!"
+    echo ""
+    echo "Please provide a token in one of these ways:"
+    echo "1. Set GITHUB_TOKEN environment variable"
+    echo "2. Add GITHUB_TOKEN to your .env file"
+    echo "3. Pass token as argument: ./push-to-github.sh YOUR_TOKEN"
+    echo ""
+    exit 1
+fi
 
 # Set remote with token
 git remote set-url origin https://${TOKEN}@github.com/Kadri-Git/ai-agency.git
